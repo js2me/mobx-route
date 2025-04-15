@@ -44,6 +44,11 @@ describe('route', () => {
     history.resetMocks();
   });
 
+  it('empty string', () => {
+    const route = new Route('');
+    expect(route.isMatches).toBe(true);
+  });
+
   it('/test', () => {
     const route = new Route('/test');
     route.navigate();
