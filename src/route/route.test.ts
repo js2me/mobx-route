@@ -117,4 +117,23 @@ describe('route', () => {
       },
     });
   });
+
+  it('/test/:id/:bar + baseUrl + query params', () => {
+    const route = new Route('/test/:id/:bar', { baseUrl: '/mobx-view-model' });
+    route.navigate(
+      {
+        id: 1,
+        bar: 'barg',
+      },
+      {
+        query: { a: 1 },
+      },
+    );
+    expect(history.pushStateSpy).toBeCalledWith(
+      null,
+      '',
+      '/mobx-view-model/test/1/barg?a=1',
+    );
+    expect(route.isMatches).toBe(true);
+  });
 });

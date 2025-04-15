@@ -10,6 +10,7 @@ export interface RouteGlobalConfiguration {
 
 export interface RouteConfiguration<TParentRoute extends AnyRoute | null = null>
   extends Partial<RouteGlobalConfiguration> {
+  baseUrl?: string;
   meta?: Record<string, any>;
   parseOptions?: ParseOptions;
   parent?: TParentRoute;
@@ -57,6 +58,7 @@ export type ExtractPathParams<Path extends string> = Simplify<
 
 export interface RouteNavigateParams {
   replace?: boolean;
+  query?: Record<string, any>;
 }
 
 export interface RouteMatchesData<TPath extends string> {

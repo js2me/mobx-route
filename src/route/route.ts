@@ -1,5 +1,6 @@
 import { computed, makeObservable } from 'mobx';
 import {
+  buildSearchString,
   IMobxHistory,
   IMobxLocation,
   MobxHistory,
@@ -9,7 +10,6 @@ import { compile, match, ParamData, parse, TokenData } from 'path-to-regexp';
 import { AllPropertiesOptional } from 'yummies/utils/types';
 
 import {
-  AnyRoute,
   ExtractPathParams,
   RouteConfiguration,
   RouteGlobalConfiguration,
@@ -19,7 +19,7 @@ import {
 
 export class Route<
   TPath extends string,
-  TParentRoute extends AnyRoute | null = null,
+  TParentRoute extends Route<any, any> | null = null,
 > {
   history: IMobxHistory;
   location: IMobxLocation;
@@ -28,11 +28,10 @@ export class Route<
 
   constructor(
     public path: TPath,
-    protected configuration: RouteConfiguration<TParentRoute> = {},
+    protected config: RouteConfiguration<TParentRoute> = {},
   ) {
-    this.history = configuration.history ?? Route.globalConfiguration.history;
-    this.location =
-      configuration.location ?? Route.globalConfiguration.location;
+    this.history = config.history ?? Route.globalConfiguration.history;
+    this.location = config.location ?? Route.globalConfiguration.location;
 
     computed.struct(this, 'isMatches');
     computed.struct(this, 'matchData');
@@ -41,7 +40,17 @@ export class Route<
   }
 
   get matchData(): RouteMatchesData<TPath> | null {
-    const parsed = match(this.tokenData)(this.location.pathname);
+    let pathname = this.location.pathname;
+
+    if (this.baseUrl) {
+      if (!pathname.startsWith(this.baseUrl)) {
+        return null;
+      }
+
+      pathname = pathname.replace(this.baseUrl, '');
+    }
+
+    const parsed = match(this.tokenData)(pathname);
 
     if (parsed === false) {
       return null;
@@ -54,11 +63,18 @@ export class Route<
     return this.matchData !== null;
   }
 
-  extend<TExtendedPath extends string>(path: TExtendedPath) {
-    return new Route<`${TPath}${TExtendedPath}`, this>(
-      `${this.path}${path}`,
-      this.configuration as any,
-    );
+  extend<TExtendedPath extends string>(
+    path: TExtendedPath,
+    config?: Omit<RouteConfiguration<any>, 'parent'>,
+  ) {
+    type ExtendedRoutePath = `${TPath}${TExtendedPath}`;
+    type ParentRoute = this;
+
+    return new Route<ExtendedRoutePath, ParentRoute>(`${this.path}${path}`, {
+      ...this.config,
+      ...config,
+      parent: this,
+    } as any);
   }
 
   protected processParams(
@@ -74,6 +90,33 @@ export class Route<
     }, {} as ParamData);
   }
 
+  protected get baseUrl() {
+    return !this.config.baseUrl || this.config.baseUrl === '/'
+      ? ''
+      : this.config.baseUrl;
+  }
+
+  createUrl(
+    ...args: AllPropertiesOptional<ExtractPathParams<TPath>> extends true
+      ? [
+          params?: ExtractPathParams<TPath> | null | undefined,
+          query?: Record<string, any>,
+        ]
+      : [params: ExtractPathParams<TPath>, query?: Record<string, any>]
+  ) {
+    const pathParams = args[0];
+    const queryParams = args[1];
+
+    const path = compile(this.tokenData)(this.processParams(pathParams));
+
+    return [
+      this.baseUrl,
+      // type === 'hash' ? '#' : '',
+      path,
+      buildSearchString(queryParams || {}),
+    ].join('');
+  }
+
   navigate(
     ...args: AllPropertiesOptional<ExtractPathParams<TPath>> extends true
       ? [
@@ -82,17 +125,18 @@ export class Route<
         ]
       : [params: ExtractPathParams<TPath>, navigateParams?: RouteNavigateParams]
   ) {
-    const path = compile(this.tokenData)(this.processParams(args[0]));
+    // @ts-expect-error no way to handle typigns here
+    const url = this.createUrl(args[0], args[1]?.query);
     if (args[1]?.replace) {
-      this.history.replaceState(null, '', path);
+      this.history.replaceState(null, '', url);
     } else {
-      this.history.pushState(null, '', path);
+      this.history.pushState(null, '', url);
     }
   }
 
   protected get tokenData() {
     if (!this._tokenData) {
-      this._tokenData = parse(this.path, this.configuration.parseOptions);
+      this._tokenData = parse(this.path, this.config.parseOptions);
     }
     return this._tokenData;
   }
