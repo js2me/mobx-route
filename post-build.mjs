@@ -16,7 +16,7 @@ postBuildScript({
         publishCommand: 'pnpm publish',
         commitAllCurrentChanges: true,
         createTag: true,
-        githubRepoLink: 'https://github.com/js2me/mobx-nuclear-route',
+        githubRepoLink: 'https://github.com/js2me/mobx-route',
         cleanupCommand: 'pnpm clean', 
       })
     }

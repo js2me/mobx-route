@@ -28,12 +28,12 @@
   "description": "",
   "type": "module",
   "bugs": {
-    "url": "https://github.com/js2me/mobx-nuclear-route/issues"
+    "url": "https://github.com/js2me/mobx-route/issues"
   },
-  "homepage": "https://github.com/js2me/mobx-nuclear-route",
+  "homepage": "https://github.com/js2me/mobx-route",
   "repository": {
     "type": "git",
-    "url": "git://github.com/js2me/mobx-nuclear-route"
+    "url": "git://github.com/js2me/mobx-route"
   },
   "dependencies": {
     "mobx-location-history": "^2.0.11",
