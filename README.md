@@ -12,3 +12,23 @@
 [download-url]: https://npmjs.org/package/mobx-route
 [bundlephobia-url]: https://bundlephobia.com/result?p=mobx-route
 [bundlephobia-image]: https://badgen.net/bundlephobia/minzip/mobx-route
+
+
+Uses [`path-to-regexp` power](https://www.npmjs.com/package/path-to-regexp)  
+
+```ts
+import { Route } from "mobx-route";
+
+
+const userDetails = new Route("/users/:id");
+
+userDetails.navigate({ id: 1 }); // path params are required
+
+const userMatrix = userDetails.extend('/matrix{/:matrixId}');
+
+userMatrix.navigate({
+  id: 1, // still required
+  matrixId: '1', // optional because wrapped into {}
+})
+
+```

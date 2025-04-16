@@ -56,8 +56,8 @@ describe('route', () => {
     expect(history.pushStateSpy).toBeCalledWith(null, '', '/test');
   });
 
-  it('/test/:id/:bar', () => {
-    const route = new Route('/test/:id/:bar');
+  it('/test/:id/:bar{/:bar3}', () => {
+    const route = new Route('/test/:id/:bar{/:bar3}');
     route.navigate({
       id: 1,
       bar: 'barg',
@@ -69,6 +69,7 @@ describe('route', () => {
       | {
           id: ParamInputValue;
           bar: ParamInputValue;
+          bar3?: ParamInputValue;
         }
     >();
   });
