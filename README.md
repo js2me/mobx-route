@@ -31,7 +31,17 @@ userMatrix.navigate({
   matrixId: '1', // optional because wrapped into {}
 })
 
+if (userMatrix.match) {
+  console.log(userMatrix.match) // { path: string; params: { id: string; matrixId?: string } }
+}
+
+console.log(userMatrix.isMatches) // true
 
 
+userMatrix.queryParams.update({
+  bar: 1,
+})
+
+userMatrix.queryParams.data; // { bar: "1" }
 
 ```

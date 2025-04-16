@@ -23,9 +23,9 @@ export interface RouteConfiguration<TParentRoute extends AnyRoute | null = null>
 
 export type AnyRoute = Route<any, any>;
 
-export type ParamInputValue = string | number | boolean | null;
+export type PathParam = string | number | boolean | null;
 // eslint-disable-next-line sonarjs/redundant-type-aliases
-export type ParamParsedValue = string;
+export type PathParsedParam = string;
 
 type Simplify<T> = T extends infer U ? { [K in keyof U]: U[K] } : never;
 
@@ -36,11 +36,11 @@ export type ParsedPathParams<Path extends string> = Simplify<
     : Path extends `${infer PartA}/${infer PartB}`
       ? ParsedPathParams<PartA> & ParsedPathParams<PartB>
       : Path extends `:${infer Param}?`
-        ? { [K in Param]?: ParamParsedValue }
+        ? { [K in Param]?: PathParsedParam }
         : Path extends `:${infer Param}`
-          ? { [K in Param]: ParamParsedValue }
+          ? { [K in Param]: PathParsedParam }
           : Path extends `*${infer Wildcard}`
-            ? { [K in Wildcard]: ParamParsedValue[] }
+            ? { [K in Wildcard]: PathParsedParam[] }
             : // eslint-disable-next-line @typescript-eslint/ban-types
               {}
 >;
@@ -52,11 +52,11 @@ export type ExtractPathParams<Path extends string> = Simplify<
     : Path extends `${infer PartA}/${infer PartB}`
       ? ExtractPathParams<PartA> & ExtractPathParams<PartB>
       : Path extends `:${infer Param}?`
-        ? { [K in Param]?: ParamInputValue }
+        ? { [K in Param]?: PathParam }
         : Path extends `:${infer Param}`
-          ? { [K in Param]: ParamInputValue }
+          ? { [K in Param]: PathParam }
           : Path extends `*${infer Wildcard}`
-            ? { [K in Wildcard]: ParamInputValue[] }
+            ? { [K in Wildcard]: PathParam[] }
             : // eslint-disable-next-line @typescript-eslint/ban-types
               {}
 >;

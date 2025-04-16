@@ -44,7 +44,7 @@ export class Route<
     makeObservable(this);
   }
 
-  get matchData(): RouteMatchesData<TPath> | null {
+  get match(): RouteMatchesData<TPath> | null {
     let pathname = this.location.pathname;
 
     if (this.baseUrl) {
@@ -65,7 +65,7 @@ export class Route<
   }
 
   get isMatches() {
-    return this.matchData !== null;
+    return this.match !== null;
   }
 
   extend<TExtendedPath extends string>(
