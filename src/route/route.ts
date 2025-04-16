@@ -129,9 +129,15 @@ export class Route<
           navigateParams?: RouteNavigateParams,
         ]
       : [params: ExtractPathParams<TPath>, navigateParams?: RouteNavigateParams]
-  ) {
-    // @ts-expect-error no way to handle typigns here
-    const url = this.createUrl(args[0], args[1]?.query);
+  ): void;
+
+  navigate(url: string, navigateParams?: RouteNavigateParams): void;
+
+  navigate(...args: any[]) {
+    const url =
+      typeof args[0] === 'string'
+        ? args[0]
+        : this.createUrl(args[0], args[1]?.query);
     if (args[1]?.replace) {
       this.history.replaceState(null, '', url);
     } else {

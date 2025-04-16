@@ -1,7 +1,8 @@
 import { MobxHistory, MobxLocation } from 'mobx-location-history';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 
 import { Route } from './route.js';
+import { ParamInputValue } from './route.types.js';
 
 class MobxHistoryMock extends MobxHistory {
   pushStateSpy = vi.fn();
@@ -62,6 +63,14 @@ describe('route', () => {
       bar: 'barg',
     });
     expect(history.pushStateSpy).toBeCalledWith(null, '', '/test/1/barg');
+    expectTypeOf(route.navigate).toBeFunction();
+    expectTypeOf(route.navigate).parameter(0).toEqualTypeOf<
+      | string
+      | {
+          id: ParamInputValue;
+          bar: ParamInputValue;
+        }
+    >();
   });
 
   it('/test/*splat', () => {

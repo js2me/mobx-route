@@ -23,9 +23,9 @@ export interface RouteConfiguration<TParentRoute extends AnyRoute | null = null>
 
 export type AnyRoute = Route<any, any>;
 
-type ParamInputValue = string | number | boolean | null | undefined;
+export type ParamInputValue = string | number | boolean | null;
 // eslint-disable-next-line sonarjs/redundant-type-aliases
-type ParamParsedValue = string;
+export type ParamParsedValue = string;
 
 type Simplify<T> = T extends infer U ? { [K in keyof U]: U[K] } : never;
 
