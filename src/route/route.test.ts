@@ -141,4 +141,20 @@ describe('route', () => {
     );
     expect(route.isMatches).toBe(true);
   });
+
+  it('/test/:id/:bar + baseUrl + query params + (query params tests)', () => {
+    const route = new Route('/test/:id/:bar', { baseUrl: '/mobx-view-model' });
+    route.navigate(
+      {
+        id: 1,
+        bar: 'barg',
+      },
+      {
+        query: { a: 1 },
+      },
+    );
+    route.query.update({ a: 3, b: [1, 2, 3] });
+    expect(location.search).toBe('?a=3&b=1%2C2%2C3');
+    expect(route.query.data).toEqual({ a: '3', b: '1,2,3' });
+  });
 });

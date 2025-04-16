@@ -3,8 +3,10 @@ import {
   buildSearchString,
   IMobxHistory,
   IMobxLocation,
+  IQueryParams,
   MobxHistory,
   MobxLocation,
+  QueryParams,
 } from 'mobx-location-history';
 import { compile, match, ParamData, parse, TokenData } from 'path-to-regexp';
 import { AllPropertiesOptional } from 'yummies/utils/types';
@@ -21,8 +23,10 @@ export class Route<
   TPath extends string,
   TParentRoute extends Route<any, any> | null = null,
 > {
-  history: IMobxHistory;
-  location: IMobxLocation;
+  protected history: IMobxHistory;
+  protected location: IMobxLocation;
+
+  query: IQueryParams;
 
   private _tokenData: TokenData | undefined;
 
@@ -32,6 +36,7 @@ export class Route<
   ) {
     this.history = config.history ?? Route.globalConfiguration.history;
     this.location = config.location ?? Route.globalConfiguration.location;
+    this.query = config.queryParams ?? Route.globalConfiguration.queryParams;
 
     computed.struct(this, 'isMatches');
     computed.struct(this, 'matchData');
@@ -143,19 +148,26 @@ export class Route<
 
   private static _globalConfiguration: RouteGlobalConfiguration | undefined;
 
-  static setGlobalConfiguration(globalConfiguration: RouteGlobalConfiguration) {
-    this._globalConfiguration = globalConfiguration;
+  static setGlobalConfiguration(
+    globalConfiguration: Partial<RouteGlobalConfiguration>,
+  ) {
+    const history = globalConfiguration.history ?? new MobxHistory();
+    const location = globalConfiguration.location ?? new MobxLocation(history);
+    const queryParams =
+      globalConfiguration.queryParams ?? new QueryParams(location, history);
+
+    const config: RouteGlobalConfiguration = {
+      history,
+      location,
+      queryParams,
+    };
+
+    this._globalConfiguration = config;
   }
 
   static get globalConfiguration() {
     if (!this._globalConfiguration) {
-      const history = new MobxHistory();
-      const location = new MobxLocation(history);
-
-      this.setGlobalConfiguration({
-        location,
-        history,
-      });
+      this.setGlobalConfiguration({});
     }
 
     return this._globalConfiguration!;

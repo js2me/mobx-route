@@ -1,4 +1,8 @@
-import { IMobxHistory, IMobxLocation } from 'mobx-location-history';
+import {
+  IMobxHistory,
+  IMobxLocation,
+  IQueryParams,
+} from 'mobx-location-history';
 import { ParseOptions } from 'path-to-regexp';
 
 import type { Route } from './route.js';
@@ -6,6 +10,7 @@ import type { Route } from './route.js';
 export interface RouteGlobalConfiguration {
   history: IMobxHistory;
   location: IMobxLocation;
+  queryParams: IQueryParams;
 }
 
 export interface RouteConfiguration<TParentRoute extends AnyRoute | null = null>
