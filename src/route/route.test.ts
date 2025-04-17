@@ -174,7 +174,7 @@ describe('route', () => {
 
   it('hierarchy test', () => {
     const routes = {
-      privateGroup: new RouteGroup({
+      private: new RouteGroup({
         techreview: new Route('/techreview'),
         techreviewTemplates: new Route('/techreview-templates'),
         employee: new Route('/employee'),
@@ -188,14 +188,14 @@ describe('route', () => {
       login: new Route('/login'),
     };
 
-    expect(routes.privateGroup.isMatches).toBe(false);
-    expect(routes.privateGroup.routes.matrices.isMatches).toBe(false);
+    expect(routes.private.isMatches).toBe(false);
+    expect(routes.private.routes.matrices.isMatches).toBe(false);
 
     history.pushState(null, '', '/matrices');
 
-    expect(routes.privateGroup.isMatches).toBe(true);
-    expect(routes.privateGroup.routes.matrices.isMatches).toBe(true);
+    expect(routes.private.isMatches).toBe(true);
+    expect(routes.private.routes.matrices.isMatches).toBe(true);
 
-    expect(routes.privateGroup.routes.techreview.isMatches).toBe(false);
+    expect(routes.private.routes.techreview.isMatches).toBe(false);
   });
 });
