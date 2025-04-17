@@ -1,4 +1,4 @@
-import { computed, makeObservable } from 'mobx';
+import { action, computed, makeObservable, observable } from 'mobx';
 import {
   buildSearchString,
   IMobxHistory,
@@ -12,6 +12,7 @@ import { compile, match, ParamData, parse, TokenData } from 'path-to-regexp';
 import { AllPropertiesOptional } from 'yummies/utils/types';
 
 import {
+  AnyRoute,
   ExtractPathParams,
   RouteConfiguration,
   RouteGlobalConfiguration,
@@ -30,6 +31,8 @@ export class Route<
 
   private _tokenData: TokenData | undefined;
 
+  children: AnyRoute[] = [];
+
   constructor(
     public path: TPath,
     protected config: RouteConfiguration<TParentRoute> = {},
@@ -40,6 +43,10 @@ export class Route<
 
     computed.struct(this, 'isMatches');
     computed.struct(this, 'matchData');
+    computed.struct(this, 'hasChildrenMatches');
+    observable(this, 'children');
+    action(this, 'addChildren');
+    action(this, 'removeChildren');
 
     makeObservable(this);
   }
@@ -55,6 +62,10 @@ export class Route<
       pathname = pathname.replace(this.baseUrl, '');
     }
 
+    if (this.path === '' && pathname === '/') {
+      return { params: {} as any, path: pathname };
+    }
+
     const parsed = match(this.tokenData)(pathname);
 
     if (parsed === false) {
@@ -68,18 +79,39 @@ export class Route<
     return this.match !== null;
   }
 
-  extend<TExtendedPath extends string>(
-    path: TExtendedPath,
+  extend<TExtendPath extends string>(
+    path: TExtendPath,
     config?: Omit<RouteConfiguration<any>, 'parent'>,
   ) {
-    type ExtendedRoutePath = `${TPath}${TExtendedPath}`;
+    type ExtendedRoutePath = `${TPath}${TExtendPath}`;
     type ParentRoute = this;
 
-    return new Route<ExtendedRoutePath, ParentRoute>(`${this.path}${path}`, {
-      ...this.config,
-      ...config,
-      parent: this,
-    } as any);
+    const extendedChild = new Route<ExtendedRoutePath, ParentRoute>(
+      `${this.path}${path}`,
+      {
+        ...this.config,
+        ...config,
+        parent: this,
+      } as any,
+    );
+
+    this.addChildren(extendedChild);
+
+    return extendedChild;
+  }
+
+  addChildren(...children: AnyRoute[]) {
+    this.children.push(...children);
+  }
+
+  removeChildren(...childrenToRemove: AnyRoute[]) {
+    this.children = this.children.filter(
+      (child) => !childrenToRemove.includes(child),
+    );
+  }
+
+  get hasChildrenMatches() {
+    return this.children.some((child) => child.isMatches);
   }
 
   protected processParams(

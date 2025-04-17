@@ -19,6 +19,7 @@ export interface RouteConfiguration<TParentRoute extends AnyRoute | null = null>
   meta?: Record<string, any>;
   parseOptions?: ParseOptions;
   parent?: TParentRoute;
+  children?: AnyRoute[];
 }
 
 export type AnyRoute = Route<any, any>;

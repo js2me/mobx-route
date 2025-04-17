@@ -1,6 +1,10 @@
+/* eslint-disable sonarjs/no-dead-store */
+/* eslint-disable sonarjs/sonar-no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { MobxHistory, MobxLocation } from 'mobx-location-history';
 import { beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 
+import { RouteGroup } from './route-group.js';
 import { Route } from './route.js';
 import { PathParam } from './route.types.js';
 
@@ -166,5 +170,32 @@ describe('route', () => {
     route.query.update({ a: 3, b: [1, 2, 3] });
     expect(location.search).toBe('?a=3&b=1%2C2%2C3');
     expect(route.query.data).toEqual({ a: '3', b: '1,2,3' });
+  });
+
+  it('hierarchy test', () => {
+    const routes = {
+      privateGroup: new RouteGroup({
+        techreview: new Route('/techreview'),
+        techreviewTemplates: new Route('/techreview-templates'),
+        employee: new Route('/employee'),
+        matrices: new Route('/matrices'),
+        orgstructure: new Route('/orgstructure'),
+        roles: new Route('/roles'),
+        account: new Route('/account'),
+      }),
+      notFound: new Route('/not-found'),
+      noAccess: new Route('/no-access'),
+      login: new Route('/login'),
+    };
+
+    expect(routes.privateGroup.isMatches).toBe(false);
+    expect(routes.privateGroup.routes.matrices.isMatches).toBe(false);
+
+    history.pushState(null, '', '/matrices');
+
+    expect(routes.privateGroup.isMatches).toBe(true);
+    expect(routes.privateGroup.routes.matrices.isMatches).toBe(true);
+
+    expect(routes.privateGroup.routes.techreview.isMatches).toBe(false);
   });
 });
