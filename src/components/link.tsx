@@ -56,7 +56,7 @@ export const Link = observer(
 
         if (!event.defaultPrevented) {
           event.preventDefault();
-          (route as AnyRoute).navigate(href, { replace, query });
+          (route as AnyRoute).open(href, { replace, query });
         }
       };
 

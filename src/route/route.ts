@@ -51,7 +51,7 @@ export class Route<
     makeObservable(this);
   }
 
-  get match(): RouteMatchesData<TPath> | null {
+  get data(): RouteMatchesData<TPath> | null {
     let pathname = this.location.pathname;
 
     if (this.baseUrl) {
@@ -75,8 +75,8 @@ export class Route<
     return parsed as RouteMatchesData<TPath>;
   }
 
-  get isMatches() {
-    return this.match !== null;
+  get isOpened() {
+    return this.data !== null;
   }
 
   extend<TExtendPath extends string>(
@@ -111,7 +111,7 @@ export class Route<
   }
 
   get hasChildrenMatches() {
-    return this.children.some((child) => child.isMatches);
+    return this.children.some((child) => child.isOpened);
   }
 
   protected processParams(
@@ -154,7 +154,7 @@ export class Route<
     ].join('');
   }
 
-  navigate(
+  open(
     ...args: AllPropertiesOptional<ExtractPathParams<TPath>> extends true
       ? [
           params?: ExtractPathParams<TPath> | null | undefined,
@@ -163,9 +163,9 @@ export class Route<
       : [params: ExtractPathParams<TPath>, navigateParams?: RouteNavigateParams]
   ): void;
 
-  navigate(url: string, navigateParams?: RouteNavigateParams): void;
+  open(url: string, navigateParams?: RouteNavigateParams): void;
 
-  navigate(...args: any[]) {
+  open(...args: any[]) {
     const url =
       typeof args[0] === 'string'
         ? args[0]

@@ -51,24 +51,24 @@ describe('route', () => {
 
   it('empty string', () => {
     const route = new Route('');
-    expect(route.isMatches).toBe(true);
+    expect(route.isOpened).toBe(true);
   });
 
   it('/test', () => {
     const route = new Route('/test');
-    route.navigate();
+    route.open();
     expect(history.pushStateSpy).toBeCalledWith(null, '', '/test');
   });
 
   it('/test/:id/:bar{/:bar3}', () => {
     const route = new Route('/test/:id/:bar{/:bar3}');
-    route.navigate({
+    route.open({
       id: 1,
       bar: 'barg',
     });
     expect(history.pushStateSpy).toBeCalledWith(null, '', '/test/1/barg');
-    expectTypeOf(route.navigate).toBeFunction();
-    expectTypeOf(route.navigate).parameter(0).toEqualTypeOf<
+    expectTypeOf(route.open).toBeFunction();
+    expectTypeOf(route.open).parameter(0).toEqualTypeOf<
       | string
       | {
           id: PathParam;
@@ -80,7 +80,7 @@ describe('route', () => {
 
   it('/test/*splat', () => {
     const route = new Route('/test/*splat');
-    route.navigate({
+    route.open({
       splat: [1, 2, 3],
     });
     expect(history.pushStateSpy).toBeCalledWith(null, '', '/test/1/2/3');
@@ -88,20 +88,20 @@ describe('route', () => {
 
   it('/users{/:id}/delete', () => {
     const route = new Route('/users{/:id}/delete');
-    route.navigate({
+    route.open({
       id: 1,
     });
     expect(history.pushStateSpy).toBeCalledWith(null, '', '/users/1/delete');
 
     history.resetMocks();
 
-    route.navigate();
+    route.open();
     expect(history.pushStateSpy).toBeCalledWith(null, '', '/users/delete');
 
     history.resetMocks();
 
     const childRoute = route.extend('/push/:id1{/:bar}');
-    childRoute.navigate({
+    childRoute.open({
       id1: 1,
       bar: 2,
       id: 3,
@@ -115,7 +115,7 @@ describe('route', () => {
 
   it('/posts{/:slug}/*rest', () => {
     const route = new Route('/posts{/:slug}/*rest');
-    route.navigate({
+    route.open({
       slug: true,
       rest: [1, 2, 3, 'bar'],
     });
@@ -126,9 +126,9 @@ describe('route', () => {
     );
     const otherRoute = new Route('/kek/pek');
 
-    expect(otherRoute.isMatches).toBe(false);
-    expect(route.isMatches).toBe(true);
-    expect(route.match).toEqual({
+    expect(otherRoute.isOpened).toBe(false);
+    expect(route.isOpened).toBe(true);
+    expect(route.data).toEqual({
       path: '/posts/true/1/2/3/bar',
       params: {
         rest: ['1', '2', '3', 'bar'],
@@ -139,7 +139,7 @@ describe('route', () => {
 
   it('/test/:id/:bar + baseUrl + query params', () => {
     const route = new Route('/test/:id/:bar', { baseUrl: '/mobx-view-model' });
-    route.navigate(
+    route.open(
       {
         id: 1,
         bar: 'barg',
@@ -153,12 +153,12 @@ describe('route', () => {
       '',
       '/mobx-view-model/test/1/barg?a=1',
     );
-    expect(route.isMatches).toBe(true);
+    expect(route.isOpened).toBe(true);
   });
 
   it('/test/:id/:bar + baseUrl + query params + (query params tests)', () => {
     const route = new Route('/test/:id/:bar', { baseUrl: '/mobx-view-model' });
-    route.navigate(
+    route.open(
       {
         id: 1,
         bar: 'barg',
@@ -188,14 +188,14 @@ describe('route', () => {
       login: new Route('/login'),
     };
 
-    expect(routes.private.isMatches).toBe(false);
-    expect(routes.private.routes.matrices.isMatches).toBe(false);
+    expect(routes.private.isOpened).toBe(false);
+    expect(routes.private.routes.matrices.isOpened).toBe(false);
 
     history.pushState(null, '', '/matrices');
 
-    expect(routes.private.isMatches).toBe(true);
-    expect(routes.private.routes.matrices.isMatches).toBe(true);
+    expect(routes.private.isOpened).toBe(true);
+    expect(routes.private.routes.matrices.isOpened).toBe(true);
 
-    expect(routes.private.routes.techreview.isMatches).toBe(false);
+    expect(routes.private.routes.techreview.isOpened).toBe(false);
   });
 });

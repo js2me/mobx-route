@@ -12,8 +12,8 @@ export class RouteGroup<
     makeObservable(this);
   }
 
-  get isMatches(): boolean {
+  get isOpened(): boolean {
     const routes = Object.values(this.routes);
-    return routes.some((route) => route.isMatches);
+    return routes.some((route) => route.isOpened);
   }
 }

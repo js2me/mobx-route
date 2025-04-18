@@ -15,6 +15,7 @@ export interface RouteGlobalConfiguration {
 
 export interface RouteConfiguration<TParentRoute extends AnyRoute | null = null>
   extends Partial<RouteGlobalConfiguration> {
+  index?: boolean;
   baseUrl?: string;
   meta?: Record<string, any>;
   parseOptions?: ParseOptions;
