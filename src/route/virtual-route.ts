@@ -1,3 +1,4 @@
+import { action, computed, makeObservable, observable } from 'mobx';
 import { IQueryParams } from 'mobx-location-history';
 import { FnValue, resolveFnValue } from 'yummies/common';
 import {
@@ -7,9 +8,8 @@ import {
   Maybe,
 } from 'yummies/utils/types';
 
-import { VirtualRouteConfiguration } from './virtual-route.types.js';
 import { routeConfig } from './config.js';
-import { action, computed, makeObservable, observable } from 'mobx';
+import { VirtualRouteConfiguration } from './virtual-route.types.js';
 
 export class VirtualRoute<
   TParams extends AnyObject | EmptyObject = EmptyObject,
@@ -24,17 +24,18 @@ export class VirtualRoute<
     this.query = config.queryParams ?? routeConfig.get().queryParams;
     this.params = {} as TParams;
 
-    observable(this,'params')
+    observable(this, 'params');
     observable.ref(this, 'isOpenedResolver');
     computed.struct(this, 'isOpened');
     action(this, 'open');
-    action(this,'close');
+    action(this, 'close');
     makeObservable(this);
   }
 
   get isOpened() {
     return (
-      this.isOpenedResolver != null && resolveFnValue(this.isOpenedResolver, this.query.data)
+      this.isOpenedResolver != null &&
+      resolveFnValue(this.isOpenedResolver, this.query.data)
     );
   }
 
@@ -51,7 +52,7 @@ export class VirtualRoute<
     this.params = args[0] ?? {};
     if (args[1] != null) {
       this.query.update(args[1]);
-    } 
+    }
     this.isOpenedResolver = true;
   }
 
