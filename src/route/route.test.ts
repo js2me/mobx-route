@@ -4,6 +4,7 @@
 import { MobxHistory, MobxLocation } from 'mobx-location-history';
 import { beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 
+import { routeConfig } from './config.js';
 import { RouteGroup } from './route-group.js';
 import { Route } from './route.js';
 import { PathParam } from './route.types.js';
@@ -40,7 +41,7 @@ describe('route', () => {
   const history = new MobxHistoryMock();
   const location = new MobxLocation(history);
 
-  Route.setGlobalConfiguration({
+  routeConfig.update({
     history,
     location,
   });

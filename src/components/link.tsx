@@ -8,7 +8,7 @@ import {
   MouseEvent,
   ReactNode,
 } from 'react';
-import { AllPropertiesOptional } from 'yummies/utils/types';
+import { AllPropertiesOptional, AnyObject } from 'yummies/utils/types';
 
 import {
   AnyRoute,
@@ -35,7 +35,7 @@ type LinkComponentType = <TRoute extends AnyRoute>(
 ) => ReactNode;
 
 export const Link = observer(
-  forwardRef<HTMLAnchorElement, Record<string, any>>(
+  forwardRef<HTMLAnchorElement, AnyObject>(
     (
       { route, asChild, query, replace, children, params, ...anchorProps },
       ref,

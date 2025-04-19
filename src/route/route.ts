@@ -4,18 +4,15 @@ import {
   IMobxHistory,
   IMobxLocation,
   IQueryParams,
-  MobxHistory,
-  MobxLocation,
-  QueryParams,
 } from 'mobx-location-history';
 import { compile, match, ParamData, parse, TokenData } from 'path-to-regexp';
-import { AllPropertiesOptional } from 'yummies/utils/types';
+import { AllPropertiesOptional, AnyObject, Maybe } from 'yummies/utils/types';
 
+import { routeConfig } from './config.js';
 import {
   AnyRoute,
   ExtractPathParams,
   RouteConfiguration,
-  RouteGlobalConfiguration,
   RouteMatchesData,
   RouteNavigateParams,
 } from './route.types.js';
@@ -37,9 +34,10 @@ export class Route<
     public path: TPath,
     protected config: RouteConfiguration<TParentRoute> = {},
   ) {
-    this.history = config.history ?? Route.globalConfiguration.history;
-    this.location = config.location ?? Route.globalConfiguration.location;
-    this.query = config.queryParams ?? Route.globalConfiguration.queryParams;
+    const defaults = routeConfig.get();
+    this.history = config.history ?? defaults.history;
+    this.location = config.location ?? defaults.location;
+    this.query = config.queryParams ?? defaults.queryParams;
 
     computed.struct(this, 'isMatches');
     computed.struct(this, 'matchData');
@@ -132,19 +130,15 @@ export class Route<
   }
 
   protected get baseUrl() {
-    const usedBaseUrl =
-      this.config.baseUrl ?? Route.globalConfiguration.baseUrl;
+    const usedBaseUrl = this.config.baseUrl ?? routeConfig.get().baseUrl;
 
     return !usedBaseUrl || usedBaseUrl === '/' ? '' : usedBaseUrl;
   }
 
   createUrl(
     ...args: AllPropertiesOptional<ExtractPathParams<TPath>> extends true
-      ? [
-          params?: ExtractPathParams<TPath> | null | undefined,
-          query?: Record<string, any>,
-        ]
-      : [params: ExtractPathParams<TPath>, query?: Record<string, any>]
+      ? [params?: Maybe<ExtractPathParams<TPath>>, query?: AnyObject]
+      : [params: ExtractPathParams<TPath>, query?: AnyObject]
   ) {
     const pathParams = args[0];
     const queryParams = args[1];
@@ -187,32 +181,5 @@ export class Route<
       this._tokenData = parse(this.path, this.config.parseOptions);
     }
     return this._tokenData;
-  }
-
-  private static _globalConfiguration: RouteGlobalConfiguration | undefined;
-
-  static setGlobalConfiguration(
-    globalConfiguration: Partial<RouteGlobalConfiguration>,
-  ) {
-    const history = globalConfiguration.history ?? new MobxHistory();
-    const location = globalConfiguration.location ?? new MobxLocation(history);
-    const queryParams =
-      globalConfiguration.queryParams ?? new QueryParams(location, history);
-
-    const config: RouteGlobalConfiguration = {
-      history,
-      location,
-      queryParams,
-    };
-
-    this._globalConfiguration = config;
-  }
-
-  static get globalConfiguration() {
-    if (!this._globalConfiguration) {
-      this.setGlobalConfiguration({});
-    }
-
-    return this._globalConfiguration!;
   }
 }

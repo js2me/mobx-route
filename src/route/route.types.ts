@@ -4,6 +4,7 @@ import {
   IQueryParams,
 } from 'mobx-location-history';
 import { ParseOptions } from 'path-to-regexp';
+import { AnyObject } from 'yummies/utils/types';
 
 import type { Route } from './route.js';
 
@@ -17,7 +18,7 @@ export interface RouteGlobalConfiguration {
 export interface RouteConfiguration<TParentRoute extends AnyRoute | null = null>
   extends Partial<RouteGlobalConfiguration> {
   index?: boolean;
-  meta?: Record<string, any>;
+  meta?: AnyObject;
   parseOptions?: ParseOptions;
   parent?: TParentRoute;
   children?: AnyRoute[];
@@ -65,7 +66,7 @@ export type ExtractPathParams<Path extends string> = Simplify<
 
 export interface RouteNavigateParams {
   replace?: boolean;
-  query?: Record<string, any>;
+  query?: AnyObject;
 }
 
 export interface RouteMatchesData<TPath extends string> {
