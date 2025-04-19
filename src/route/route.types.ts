@@ -11,12 +11,12 @@ export interface RouteGlobalConfiguration {
   history: IMobxHistory;
   location: IMobxLocation;
   queryParams: IQueryParams;
+  baseUrl?: string;
 }
 
 export interface RouteConfiguration<TParentRoute extends AnyRoute | null = null>
   extends Partial<RouteGlobalConfiguration> {
   index?: boolean;
-  baseUrl?: string;
   meta?: Record<string, any>;
   parseOptions?: ParseOptions;
   parent?: TParentRoute;

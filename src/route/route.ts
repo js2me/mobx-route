@@ -79,6 +79,10 @@ export class Route<
     return this.data !== null;
   }
 
+  get isIndex() {
+    return !!this.config.index;
+  }
+
   extend<TExtendPath extends string>(
     path: TExtendPath,
     config?: Omit<RouteConfiguration<any>, 'parent'>,
@@ -128,9 +132,10 @@ export class Route<
   }
 
   protected get baseUrl() {
-    return !this.config.baseUrl || this.config.baseUrl === '/'
-      ? ''
-      : this.config.baseUrl;
+    const usedBaseUrl =
+      this.config.baseUrl ?? Route.globalConfiguration.baseUrl;
+
+    return !usedBaseUrl || usedBaseUrl === '/' ? '' : usedBaseUrl;
   }
 
   createUrl(

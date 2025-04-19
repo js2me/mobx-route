@@ -175,12 +175,18 @@ describe('route', () => {
   it('hierarchy test', () => {
     const routes = {
       private: new RouteGroup({
+        index: new Route('/', { index: true }),
         techreview: new Route('/techreview'),
         techreviewTemplates: new Route('/techreview-templates'),
         employee: new Route('/employee'),
         matrices: new Route('/matrices'),
         orgstructure: new Route('/orgstructure'),
-        roles: new Route('/roles'),
+        roles: new RouteGroup({
+          index: new Route('/roles', { index: true }),
+          list: new Route('/roles/list'),
+          create: new Route('/roles/create'),
+          edit: new Route('/roles/edit/:id'),
+        }),
         account: new Route('/account'),
       }),
       notFound: new Route('/not-found'),
@@ -192,10 +198,21 @@ describe('route', () => {
     expect(routes.private.routes.matrices.isOpened).toBe(false);
 
     history.pushState(null, '', '/matrices');
+    history.resetMocks();
 
     expect(routes.private.isOpened).toBe(true);
     expect(routes.private.routes.matrices.isOpened).toBe(true);
 
     expect(routes.private.routes.techreview.isOpened).toBe(false);
+
+    routes.private.routes.index.open();
+
+    expect(routes.private.isOpened).toBe(true);
+    expect(routes.private.routes.index.isOpened).toBe(true);
+    expect(routes.private.routes.techreview.isOpened).toBe(false);
+
+    expect(history.pushStateSpy).toBeCalledWith(null, '', '/');
+    expect(location.href).toBe('http://localhost:3000/');
+    history.resetMocks();
   });
 });
