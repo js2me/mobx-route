@@ -2,9 +2,9 @@ import { observer } from 'mobx-react-lite';
 import { ComponentType, useRef } from 'react';
 import { loadable } from 'react-simple-loadable';
 
-import { AnyRouteGroup } from '../route/route-group.types.js';
-import { AnyRoute } from '../route/route.types.js';
-import type { VirtualRoute } from '../route/virtual-route.js';
+import type { AnyRoute } from '../../route/index.js';
+import type { AnyRouteGroup } from '../../route-group/index.js';
+import type { VirtualRoute } from '../../virtual-route/index.js';
 
 type RouteKind = AnyRouteGroup | AnyRoute | VirtualRoute;
 

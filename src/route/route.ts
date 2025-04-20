@@ -8,7 +8,8 @@ import {
 import { compile, match, ParamData, parse, TokenData } from 'path-to-regexp';
 import { AllPropertiesOptional, AnyObject, Maybe } from 'yummies/utils/types';
 
-import { routeConfig } from './config.js';
+import { routeConfig } from '../config/config.js';
+
 import {
   AnyRoute,
   ExtractPathParams,

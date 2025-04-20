@@ -6,8 +6,9 @@ import {
 import { ParseOptions } from 'path-to-regexp';
 import { AnyObject } from 'yummies/utils/types';
 
+import { AnyRouter } from '../router/index.js';
+
 import type { Route } from './route.js';
-import type { AnyRouter } from './router.types.js';
 
 export interface RouteGlobalConfiguration {
   history: IMobxHistory;

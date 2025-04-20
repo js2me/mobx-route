@@ -4,8 +4,9 @@
 import { MobxHistory, MobxLocation } from 'mobx-location-history';
 import { beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 
-import { routeConfig } from './config.js';
-import { RouteGroup } from './route-group.js';
+import { routeConfig } from '../config/config.js';
+import { RouteGroup } from '../route-group/route-group.js';
+
 import { Route } from './route.js';
 import { PathParam } from './route.types.js';
 

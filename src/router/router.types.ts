@@ -5,7 +5,8 @@ import {
 } from 'mobx-location-history';
 import { AnyObject } from 'yummies/utils/types';
 
-import type { RoutesCollection } from './route-group.types.js';
+import { RoutesCollection } from '../route-group/index.js';
+
 import { Router } from './router.js';
 
 export interface RouterConfiguration<TRoutesStruct extends RoutesCollection> {

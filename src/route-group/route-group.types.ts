@@ -1,6 +1,7 @@
+import type { AnyRoute } from '../route/index.js';
+import { VirtualRoute } from '../virtual-route/index.js';
+
 import type { RouteGroup } from './route-group.js';
-import { AnyRoute } from './route.types.js';
-import { VirtualRoute } from './virtual-route.js';
 
 export type AnyRouteGroup = RouteGroup<RoutesCollection>;
 

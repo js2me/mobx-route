@@ -50,6 +50,12 @@
   "peerDependenciesMeta": {
     "mobx-view-model": {
       "optional": true
+    },
+    "react": {
+      "optional": true
+    },
+    "mobx-react-lite": {
+      "optional": true
     }
   },
   "devDependencies": {

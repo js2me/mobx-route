@@ -8,7 +8,8 @@ import {
   Maybe,
 } from 'yummies/utils/types';
 
-import { routeConfig } from './config.js';
+import { routeConfig } from '../config/index.js';
+
 import { VirtualRouteConfiguration } from './virtual-route.types.js';
 
 export class VirtualRoute<

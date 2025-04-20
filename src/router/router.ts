@@ -5,8 +5,9 @@ import {
   IQueryParams,
 } from 'mobx-location-history';
 
-import { routeConfig } from './config.js';
-import { RoutesCollection } from './route-group.types.js';
+import { routeConfig } from '../config/config.js';
+import { RoutesCollection } from '../route-group/index.js';
+
 import { RouterConfiguration, RouterNavigateOptions } from './router.types.js';
 
 export class Router<TRoutesCollection extends RoutesCollection> {

@@ -14,7 +14,7 @@ import {
   AnyRoute,
   ExtractPathParams,
   RouteNavigateParams,
-} from '../route/route.types.js';
+} from '../../route/index.js';
 
 export type LinkProps<TRoute extends AnyRoute> = Omit<
   AnchorHTMLAttributes<HTMLAnchorElement>,

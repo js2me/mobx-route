@@ -6,13 +6,13 @@ import {
 } from 'mobx-location-history';
 import { createGlobalDynamicConfig } from 'yummies/complex';
 
-import { RouteGlobalConfiguration } from './route.types.js';
+import { RouteGlobalConfig } from './config.types.js';
 
 let localHistory: MobxHistory | undefined;
 let localLocation: MobxLocation | undefined;
 let localQueryParams: IQueryParams | undefined;
 
-export const routeConfig = createGlobalDynamicConfig<RouteGlobalConfiguration>(
+export const routeConfig = createGlobalDynamicConfig<RouteGlobalConfig>(
   (update) => {
     if (update?.router) {
       localHistory?.destroy();
