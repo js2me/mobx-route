@@ -7,11 +7,13 @@ import { ParseOptions } from 'path-to-regexp';
 import { AnyObject } from 'yummies/utils/types';
 
 import type { Route } from './route.js';
+import type { AnyRouter } from './router.types.js';
 
 export interface RouteGlobalConfiguration {
   history: IMobxHistory;
   location: IMobxLocation;
   queryParams: IQueryParams;
+  router?: AnyRouter;
   baseUrl?: string;
 }
 
@@ -24,7 +26,7 @@ export interface RouteConfiguration<TParentRoute extends AnyRoute | null = null>
   children?: AnyRoute[];
 }
 
-export type AnyRoute = Route<any, any>;
+export type AnyRoute = Route<string, any>;
 
 export type PathParam = string | number | boolean | null;
 // eslint-disable-next-line sonarjs/redundant-type-aliases

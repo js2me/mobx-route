@@ -1,16 +1,9 @@
 import { computed, makeObservable, observable } from 'mobx';
 
-import { AnyRouteGroup } from './route-group.types.js';
-import { AnyRoute } from './route.types.js';
-import { VirtualRoute } from './virtual-route.js';
+import { RoutesCollection } from './route-group.types.js';
 
-export class RouteGroup<
-  TGrouppedRoutes extends Record<
-    string,
-    AnyRoute | AnyRouteGroup | VirtualRoute
-  >,
-> {
-  constructor(public routes: TGrouppedRoutes) {
+export class RouteGroup<TRoutesCollection extends RoutesCollection> {
+  constructor(public routes: TRoutesCollection) {
     computed.struct(this, 'isMatches');
     observable.shallow(this, 'routes');
     makeObservable(this);

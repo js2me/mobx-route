@@ -36,7 +36,7 @@
     "url": "git://github.com/js2me/mobx-route"
   },
   "dependencies": {
-    "mobx-location-history": "^2.0.11",
+    "mobx-location-history": "^2.1.0",
     "path-to-regexp": "^8.2.0",
     "react-simple-loadable": "^2.1.0",
     "yummies": "^3.1.7"
@@ -44,7 +44,13 @@
   "peerDependencies": {
     "mobx": "^6.12.4",
     "mobx-react-lite": "^4.0.7",
-    "react": "^18.3.1"
+    "react": "^18.3.1",
+    "mobx-view-model": "^6.0.0"
+  },
+  "peerDependenciesMeta": {
+    "mobx-view-model": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@testing-library/react": "^16.3.0",
