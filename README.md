@@ -1,3 +1,5 @@
+<img src="assets/logo.png" align="right" height="156" alt="logo" />
+
 # mobx-route  
 
 [![NPM version][npm-image]][npm-url] [![test status][github-test-actions-image]][github-actions-url] [![build status][github-build-actions-image]][github-actions-url] [![npm download][download-image]][download-url] [![bundle size][bundlephobia-image]][bundlephobia-url]
