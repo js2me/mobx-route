@@ -2,11 +2,13 @@ import { computed, makeObservable } from 'mobx';
 import { ViewModelBase, ViewModelParams } from 'mobx-view-model';
 import { AnyObject, EmptyObject } from 'yummies/utils/types';
 
-import { routeConfig } from '../config.js';
-import { RouteCollectionItem } from '../route-group.types.js';
-import { Route } from '../route.js';
-import { ParsedPathParams } from '../route.types.js';
-import { VirtualRoute } from '../virtual-route.js';
+import {
+  Route,
+  RouteCollectionItem,
+  VirtualRoute,
+  ParsedPathParams,
+  routeConfig,
+} from '../route/index.js';
 
 export abstract class RouteViewModel<
   TRoute extends RouteCollectionItem = RouteCollectionItem,
