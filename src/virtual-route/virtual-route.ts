@@ -18,15 +18,15 @@ export class VirtualRoute<
   query: IQueryParams;
   params: TParams;
 
-  constructor(
-    private isOpenedResolver?: FnValue<boolean, [query: IQueryParams['data']]>,
-    protected config: VirtualRouteConfiguration = {},
-  ) {
+  private checkOpened: VirtualRouteConfiguration<TParams>['checkOpened'];
+
+  constructor(protected config: VirtualRouteConfiguration = {}) {
     this.query = config.queryParams ?? routeConfig.get().queryParams;
     this.params = {} as TParams;
+    this.checkOpened = config.checkOpened;
 
     observable(this, 'params');
-    observable.ref(this, 'isOpenedResolver');
+    observable.ref(this, 'checkOpened');
     computed.struct(this, 'isOpened');
     action(this, 'open');
     action(this, 'close');
@@ -35,13 +35,13 @@ export class VirtualRoute<
 
   get isOpened() {
     return (
-      this.isOpenedResolver != null &&
-      resolveFnValue(this.isOpenedResolver, this.query.data)
+      this.checkOpened != null &&
+      resolveFnValue(this.checkOpened, this.query.data)
     );
   }
 
-  setResolver(isOpenedResolver: FnValue<boolean>) {
-    this.isOpenedResolver = isOpenedResolver;
+  setResolver(checkOpened: FnValue<boolean>) {
+    this.checkOpened = checkOpened;
   }
 
   open(
@@ -50,14 +50,26 @@ export class VirtualRoute<
       : [params: TParams, query?: AnyObject]
   ): void;
   open(...args: any[]) {
+    if (this.config.open != null) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      this.checkOpened = this.config.open(...args);
+      return;
+    }
+
     this.params = args[0] ?? {};
     if (args[1] != null) {
       this.query.update(args[1]);
     }
-    this.isOpenedResolver = true;
+    this.checkOpened = true;
   }
 
   close() {
-    this.isOpenedResolver = false;
+    if (this.config.close != null) {
+      this.checkOpened = this.config.close(this.query.data);
+      return;
+    }
+
+    this.checkOpened = false;
   }
 }

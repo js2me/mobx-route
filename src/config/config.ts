@@ -14,19 +14,6 @@ let localQueryParams: IQueryParams | undefined;
 
 export const routeConfig = createGlobalDynamicConfig<RouteGlobalConfig>(
   (update) => {
-    if (update?.router) {
-      localHistory?.destroy();
-      localLocation?.destroy();
-      localQueryParams?.destroy();
-
-      return {
-        ...update,
-        history: update.router.history,
-        location: update.router.location,
-        queryParams: update.router.query,
-      };
-    }
-
     if (localHistory && update?.history) {
       localHistory.destroy();
     }
@@ -42,6 +29,9 @@ export const routeConfig = createGlobalDynamicConfig<RouteGlobalConfig>(
     let queryParams: IQueryParams;
 
     if ((update?.history || update?.location) && !update.queryParams) {
+      if (localQueryParams) {
+        localQueryParams.destroy();
+      }
       queryParams = localQueryParams = new QueryParams(location, history);
     } else {
       if (localQueryParams && update?.queryParams) {

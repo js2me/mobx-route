@@ -47,3 +47,48 @@ userMatrix.queryParams.update({
 userMatrix.queryParams.data; // { bar: "1" }
 
 ```
+
+## Integration with React   
+
+```tsx
+import { RouteView } from "mobx-route/react";
+
+...
+<RouteView route={userMatrix} view={YourComponent} />
+```
+
+## Integration with [`mobx-view-model`](https://js2me.github.io/mobx-view-model/)  
+
+```tsx
+import { RouteViewModel } from "mobx-route/view-model";
+import { withViewModel } from "mobx-view-model";
+
+...
+class YourVM extends RouteViewModel<typeof userMatrix> {
+  route = userMatrix;
+}
+
+export const YourComponent = withViewModel(YourVM)(YourComponentView);
+```
+
+
+# Examples   
+
+```ts
+const routes = {
+  home: new Route('/'),
+  apps: new RouteGroup({
+    index: new Route('/apps', { index: true }),
+    new: new Route('/apps/new'),
+    details: new Route('/apps/:appId'),
+  }),
+}
+
+history.pushState(null, '', '/apps');
+
+routes.apps.index.isOpened; // true
+
+routes.apps.details.open({ appId: 1 });
+
+location.pathname; // /apps/1
+```

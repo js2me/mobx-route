@@ -24,6 +24,7 @@ export class Route<
 > {
   protected history: IMobxHistory;
   protected location: IMobxLocation;
+  protected baseUrl: string;
 
   query: IQueryParams;
 
@@ -35,10 +36,11 @@ export class Route<
     public path: TPath,
     protected config: RouteConfiguration<TParentRoute> = {},
   ) {
-    const defaults = routeConfig.get();
-    this.history = config.history ?? defaults.history;
-    this.location = config.location ?? defaults.location;
-    this.query = config.queryParams ?? defaults.queryParams;
+    this.history = config.history ?? routeConfig.get().history;
+    this.location = config.location ?? routeConfig.get().location;
+    this.query = config.queryParams ?? routeConfig.get().queryParams;
+    const usedBaseUrl = this.config.baseUrl ?? routeConfig.get().baseUrl;
+    this.baseUrl = !usedBaseUrl || usedBaseUrl === '/' ? '' : usedBaseUrl;
 
     computed.struct(this, 'isMatches');
     computed.struct(this, 'matchData');
@@ -128,12 +130,6 @@ export class Route<
       }
       return acc;
     }, {} as ParamData);
-  }
-
-  protected get baseUrl() {
-    const usedBaseUrl = this.config.baseUrl ?? routeConfig.get().baseUrl;
-
-    return !usedBaseUrl || usedBaseUrl === '/' ? '' : usedBaseUrl;
   }
 
   createUrl(
