@@ -63,7 +63,10 @@ export class Route<
       pathname = pathname.replace(this.baseUrl, '');
     }
 
-    if ((this.path === '' || this.path === '/') && (pathname === '/' || pathname === '')) {
+    if (
+      (this.path === '' || this.path === '/') &&
+      (pathname === '/' || pathname === '')
+    ) {
       return { params: {} as any, path: pathname };
     }
 
