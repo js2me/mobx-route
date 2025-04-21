@@ -217,4 +217,22 @@ describe('route', () => {
     expect(location.href).toBe('http://localhost:3000/');
     history.resetMocks();
   });
+
+  it('test with root paths (/, "")', () => {
+    const routes = {
+      home: new Route('/'),
+      root: new Route(''),
+      projects: new RouteGroup({
+        index: new Route('/projects', { index: true }),
+        new: new Route('/projects/new'),
+        details: new Route('/projects/:projectId'),
+      }),
+    };
+
+    history.replaceState(null, '', '/');
+    expect(location.href).toBe('http://localhost:3000/');
+    expect(routes.home.isOpened).toBe(true);
+    expect(routes.root.isOpened).toBe(true);
+    expect(routes.projects.routes.index.isOpened).toBe(false);
+  });
 });

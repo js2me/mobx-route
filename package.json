@@ -7,6 +7,7 @@
     "ts:check": "tsc --noEmit",
     "check": "npm run lint:check && npm run ts:check",
     "prebuild": "npm run clean && npm run check",
+    "build:watch": "npm run build && nodemon --watch src --ext ts --exec \"tsc && node ./post-build.mjs\"",
     "build": "tsc && node ./post-build.mjs",
     "pub": "PUBLISH=true pnpm run build",
     "pub:patch": "PUBLISH=true PUBLISH_VERSION=patch pnpm run build",
@@ -39,7 +40,7 @@
     "mobx-location-history": "^2.1.0",
     "path-to-regexp": "^8.2.0",
     "react-simple-loadable": "^2.1.0",
-    "yummies": "^3.1.7"
+    "yummies": "^3.1.8"
   },
   "peerDependencies": {
     "mobx": "^6.12.4",
@@ -69,6 +70,7 @@
     "js2me-eslint-config": "^1.0.7",
     "js2me-exports-post-build-script": "^2.0.18",
     "jsdom": "^25.0.1",
+    "nodemon": "^3.1.9",
     "rimraf": "^6.0.1",
     "typescript": "^5.8.3",
     "vitest": "^2.1.9"
