@@ -158,7 +158,8 @@ export class Route<
     const pathParams = args[0];
     const queryParams = args[1];
 
-    const compiler = this._compiler ?? (this._compiler = compile(this.tokenData));
+    const compiler =
+      this._compiler ?? (this._compiler = compile(this.tokenData));
     const path = compiler(this.processParams(pathParams));
 
     return [

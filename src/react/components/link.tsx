@@ -12,7 +12,8 @@ import { AllPropertiesOptional, AnyObject } from 'yummies/utils/types';
 
 import {
   AnyRoute,
-  ExtractPathParams, RouteNavigateParams
+  ExtractPathParams,
+  RouteNavigateParams,
 } from '../../core/index.js';
 
 export type LinkProps<TRoute extends AnyRoute> = Omit<
@@ -20,22 +21,20 @@ export type LinkProps<TRoute extends AnyRoute> = Omit<
   'href'
 > & {
   asChild?: boolean;
-} & RouteNavigateParams & (
+} & RouteNavigateParams &
   (
-    {
-      to: TRoute;
-    } & (AllPropertiesOptional<ExtractPathParams<TRoute['path']>> extends true
-      ? {
-          // eslint-disable-next-line sonarjs/no-redundant-optional
-          params?: ExtractPathParams<TRoute['path']> | null | undefined;
-        }
-      : { params: ExtractPathParams<TRoute['path']> })
-  ) | (
-    {
-      to: string;
-    }
-  )
-);
+    | ({
+        to: TRoute;
+      } & (AllPropertiesOptional<ExtractPathParams<TRoute['path']>> extends true
+        ? {
+            // eslint-disable-next-line sonarjs/no-redundant-optional
+            params?: ExtractPathParams<TRoute['path']> | null | undefined;
+          }
+        : { params: ExtractPathParams<TRoute['path']> }))
+    | {
+        to: string;
+      }
+  );
 
 type LinkComponentType = <TRoute extends AnyRoute>(
   props: LinkProps<TRoute>,
@@ -47,7 +46,8 @@ export const Link = observer(
       { to, asChild, query, replace, children, params, ...anchorProps },
       ref,
     ) => {
-      const href = typeof to === 'string' ? to : (to as AnyRoute).createUrl(params, query);
+      const href =
+        typeof to === 'string' ? to : (to as AnyRoute).createUrl(params, query);
 
       const handleClick = (event: MouseEvent<HTMLElement>) => {
         if (
