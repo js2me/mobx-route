@@ -5,3 +5,9 @@ install:
 reinstall:
 	make clean
 	make install
+docs-dev:
+	cd docs && \
+	rm -rf node_modules && \
+	rm -rf .vitepress/cache && \
+	pnpm i && \
+	pnpm dev

@@ -16,17 +16,22 @@
     "test": "vitest run",
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
+    "docs": "pnpm build && cd docs && pnpm dev",
+    "docs:build": "pnpm build && cd docs && pnpm build",
+    "docs:serve": "cd docs && pnpm preview",
     "dev": "pnpm test:watch"
   },
   "keywords": [
     "mobx",
     "react",
     "router",
+    "router",
+    "mobx-router",
     "react-router-dom"
   ],
   "author": "js2me",
   "license": "MIT",
-  "description": "",
+  "description": "simple and lightweight typed router",
   "type": "module",
   "bugs": {
     "url": "https://github.com/js2me/mobx-route/issues"
@@ -40,7 +45,7 @@
     "mobx-location-history": "^2.1.0",
     "path-to-regexp": "^8.2.0",
     "react-simple-loadable": "^2.1.0",
-    "yummies": "^3.1.8"
+    "yummies": "^3.1.9"
   },
   "peerDependencies": {
     "mobx": "^6.12.4",
@@ -69,11 +74,11 @@
     "eslint": "^8.57.1",
     "js2me-eslint-config": "^1.0.7",
     "js2me-exports-post-build-script": "^2.0.18",
-    "jsdom": "^25.0.1",
+    "jsdom": "^26.1.0",
     "nodemon": "^3.1.9",
     "rimraf": "^6.0.1",
     "typescript": "^5.8.3",
-    "vitest": "^2.1.9"
+    "vitest": "^3.1.2"
   },
   "packageManager": "pnpm@9.5.0+sha512.140036830124618d624a2187b50d04289d5a087f326c9edfc0ccd733d76c4f52c3a313d4fc148794a2a9d81553016004e6742e8cf850670268a7387fc220c903"
 }

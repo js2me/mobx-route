@@ -13,6 +13,7 @@ import { routeConfig } from '../config/config.js';
 import {
   AnyRoute,
   ExtractPathParams,
+  ParsedPathParams,
   RouteConfiguration,
   RouteMatchesData,
   RouteNavigateParams,
@@ -29,6 +30,8 @@ export class Route<
   query: IQueryParams;
 
   private _tokenData: TokenData | undefined;
+  private _matcher?: ReturnType<typeof match>;
+  private _compiler?: ReturnType<typeof compile>;
 
   children: AnyRoute[] = [];
 
@@ -42,9 +45,12 @@ export class Route<
     const usedBaseUrl = this.config.baseUrl ?? routeConfig.get().baseUrl;
     this.baseUrl = !usedBaseUrl || usedBaseUrl === '/' ? '' : usedBaseUrl;
 
-    computed.struct(this, 'isMatches');
-    computed.struct(this, 'matchData');
-    computed.struct(this, 'hasChildrenMatches');
+    computed.struct(this, 'isOpened');
+    computed.struct(this, 'data');
+    computed.struct(this, 'params');
+    computed.struct(this, 'currentPath');
+    computed.struct(this, 'hasOpenedChildren');
+
     observable(this, 'children');
     action(this, 'addChildren');
     action(this, 'removeChildren');
@@ -52,7 +58,7 @@ export class Route<
     makeObservable(this);
   }
 
-  get data(): RouteMatchesData<TPath> | null {
+  protected get data(): RouteMatchesData<TPath> | null {
     let pathname = this.location.pathname;
 
     if (this.baseUrl) {
@@ -70,13 +76,22 @@ export class Route<
       return { params: {} as any, path: pathname };
     }
 
-    const parsed = match(this.tokenData)(pathname);
+    const matcher = this._matcher ?? (this._matcher = match(this.tokenData));
+    const parsed = matcher(pathname);
 
     if (parsed === false) {
       return null;
     }
 
     return parsed as RouteMatchesData<TPath>;
+  }
+
+  get currentPath(): string | null {
+    return this.data?.path ?? null;
+  }
+
+  get params(): ParsedPathParams<TPath> | null {
+    return this.data?.params ?? null;
   }
 
   get isOpened() {
@@ -118,7 +133,7 @@ export class Route<
     );
   }
 
-  get hasChildrenMatches() {
+  get hasOpenedChildren() {
     return this.children.some((child) => child.isOpened);
   }
 
@@ -143,7 +158,8 @@ export class Route<
     const pathParams = args[0];
     const queryParams = args[1];
 
-    const path = compile(this.tokenData)(this.processParams(pathParams));
+    const compiler = this._compiler ?? (this._compiler = compile(this.tokenData));
+    const path = compiler(this.processParams(pathParams));
 
     return [
       this.baseUrl,

@@ -12,23 +12,30 @@ import { AllPropertiesOptional, AnyObject } from 'yummies/utils/types';
 
 import {
   AnyRoute,
-  ExtractPathParams,
-  RouteNavigateParams,
-} from '../../route/index.js';
+  ExtractPathParams, RouteNavigateParams
+} from '../../core/index.js';
 
 export type LinkProps<TRoute extends AnyRoute> = Omit<
   AnchorHTMLAttributes<HTMLAnchorElement>,
   'href'
 > & {
   asChild?: boolean;
-} & RouteNavigateParams & {
-    route: TRoute;
-  } & (AllPropertiesOptional<ExtractPathParams<TRoute['path']>> extends true
-    ? {
-        // eslint-disable-next-line sonarjs/no-redundant-optional
-        params?: ExtractPathParams<TRoute['path']> | null | undefined;
-      }
-    : { params: ExtractPathParams<TRoute['path']> });
+} & RouteNavigateParams & (
+  (
+    {
+      to: TRoute;
+    } & (AllPropertiesOptional<ExtractPathParams<TRoute['path']>> extends true
+      ? {
+          // eslint-disable-next-line sonarjs/no-redundant-optional
+          params?: ExtractPathParams<TRoute['path']> | null | undefined;
+        }
+      : { params: ExtractPathParams<TRoute['path']> })
+  ) | (
+    {
+      to: string;
+    }
+  )
+);
 
 type LinkComponentType = <TRoute extends AnyRoute>(
   props: LinkProps<TRoute>,
@@ -37,10 +44,10 @@ type LinkComponentType = <TRoute extends AnyRoute>(
 export const Link = observer(
   forwardRef<HTMLAnchorElement, AnyObject>(
     (
-      { route, asChild, query, replace, children, params, ...anchorProps },
+      { to, asChild, query, replace, children, params, ...anchorProps },
       ref,
     ) => {
-      const href = (route as AnyRoute).createUrl(params, query);
+      const href = typeof to === 'string' ? to : (to as AnyRoute).createUrl(params, query);
 
       const handleClick = (event: MouseEvent<HTMLElement>) => {
         if (
@@ -54,9 +61,9 @@ export const Link = observer(
 
         anchorProps.onClick?.(event);
 
-        if (!event.defaultPrevented) {
+        if (!event.defaultPrevented && typeof to !== 'string') {
           event.preventDefault();
-          (route as AnyRoute).open(href, { replace, query });
+          (to as AnyRoute).open(href, { replace, query });
         }
       };
 

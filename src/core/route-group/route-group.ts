@@ -2,6 +2,8 @@ import { computed, makeObservable, observable } from 'mobx';
 
 import { RoutesCollection } from './route-group.types.js';
 
+declare const process: { env: { NODE_ENV?: string } };
+
 export class RouteGroup<TRoutesCollection extends RoutesCollection> {
   constructor(public routes: TRoutesCollection) {
     computed.struct(this, 'isMatches');
@@ -29,6 +31,10 @@ export class RouteGroup<TRoutesCollection extends RoutesCollection> {
 
     if (lastGroupRoute) {
       lastGroupRoute.open();
+    } else if (process.env.NODE_ENV !== 'production') {
+      console.warn(
+        "RouteGroup doesn't have index route. open() method doesn't work.",
+      );
     }
   }
 }

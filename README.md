@@ -18,6 +18,10 @@
 
 Uses [`path-to-regexp` power](https://www.npmjs.com/package/path-to-regexp)  
 
+
+### Read the docs: [js2me.github.io/mobx-route](https://js2me.github.io/mobx-route)  
+
+
 ```ts
 import { Route } from "mobx-route";
 

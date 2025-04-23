@@ -1,18 +1,22 @@
 import { observer } from 'mobx-react-lite';
-import { ComponentType, useRef } from 'react';
+import { ComponentType, ReactNode, useRef } from 'react';
 import { loadable } from 'react-simple-loadable';
 
-import type { AnyRoute } from '../../route/index.js';
-import type { AnyRouteGroup } from '../../route-group/index.js';
-import type { VirtualRoute } from '../../virtual-route/index.js';
+import type {
+  AnyRoute,
+  AnyRouteGroup,
+  VirtualRoute,
+} from '../../core/index.js';
 
 type RouteKind = AnyRouteGroup | AnyRoute | VirtualRoute;
 
 export interface RouteViewProps<TRouteKind extends RouteKind> {
   route: TRouteKind;
-  view?: ComponentType<any>;
-  lazyView?: () => Promise<ComponentType<any>>;
+  view?: ComponentType<{ children?: ReactNode }>;
+  lazyView?: () => Promise<ComponentType<{ children?: ReactNode }>>;
   loader?: ComponentType;
+  notOpenedContent?: ReactNode;
+  children?: ReactNode;
 }
 
 function RouteViewBase<TRouteKind extends RouteKind>(
@@ -23,7 +27,7 @@ function RouteViewBase<TRouteKind extends RouteKind>(
   let Component: ComponentType<any> | undefined;
 
   if (!props.route.isOpened) {
-    return null;
+    return props.notOpenedContent ?? null;
   }
 
   if (props.lazyView) {
@@ -35,7 +39,7 @@ function RouteViewBase<TRouteKind extends RouteKind>(
     Component = props.view;
   }
 
-  return Component && <Component />;
+  return Component && <Component>{props.children}</Component>;
 }
 
 export const RouteView = observer(RouteViewBase);

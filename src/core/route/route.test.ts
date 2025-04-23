@@ -130,7 +130,10 @@ describe('route', () => {
 
     expect(otherRoute.isOpened).toBe(false);
     expect(route.isOpened).toBe(true);
-    expect(route.data).toEqual({
+    expect({
+      path: route.currentPath,
+      params: route.params,
+    }).toEqual({
       path: '/posts/true/1/2/3/bar',
       params: {
         rest: ['1', '2', '3', 'bar'],
