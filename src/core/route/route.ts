@@ -123,11 +123,11 @@ export class Route<
     return extendedChild;
   }
 
-  addChildren(...children: AnyRoute[]) {
+  protected addChildren(...children: AnyRoute[]) {
     this.children.push(...children);
   }
 
-  removeChildren(...childrenToRemove: AnyRoute[]) {
+  protected removeChildren(...childrenToRemove: AnyRoute[]) {
     this.children = this.children.filter(
       (child) => !childrenToRemove.includes(child),
     );

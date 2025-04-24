@@ -34,3 +34,22 @@ route.open({
   segment: [1,2,3]
 })
 ```
+
+
+## Methods and properties  
+
+### open(params, otherParams)   
+
+### extend(path, config)  
+
+### isIndex  
+
+### isOpened  
+
+### params  
+
+### currentPath  
+
+### hasOpenedChildren  
+
+### createUrl(params, query)  
