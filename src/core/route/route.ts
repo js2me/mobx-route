@@ -33,6 +33,8 @@ export class Route<
   private _matcher?: ReturnType<typeof match>;
   private _compiler?: ReturnType<typeof compile>;
 
+  isIndex: boolean;
+
   children: AnyRoute[] = [];
 
   constructor(
@@ -44,6 +46,7 @@ export class Route<
     this.query = config.queryParams ?? routeConfig.get().queryParams;
     const usedBaseUrl = this.config.baseUrl ?? routeConfig.get().baseUrl;
     this.baseUrl = !usedBaseUrl || usedBaseUrl === '/' ? '' : usedBaseUrl;
+    this.isIndex = !!this.config.index;
 
     computed.struct(this, 'isOpened');
     computed.struct(this, 'data');
@@ -98,10 +101,6 @@ export class Route<
     return this.data !== null;
   }
 
-  get isIndex() {
-    return !!this.config.index;
-  }
-
   extend<TExtendPath extends string>(
     path: TExtendPath,
     config?: Omit<RouteConfiguration<any>, 'parent'>,
@@ -123,14 +122,12 @@ export class Route<
     return extendedChild;
   }
 
-  protected addChildren(...children: AnyRoute[]) {
-    this.children.push(...children);
+  addChildren(...routes: AnyRoute[]) {
+    this.children.push(...routes);
   }
 
-  protected removeChildren(...childrenToRemove: AnyRoute[]) {
-    this.children = this.children.filter(
-      (child) => !childrenToRemove.includes(child),
-    );
+  removeChildren(...routes: AnyRoute[]) {
+    this.children = this.children.filter((child) => !routes.includes(child));
   }
 
   get hasOpenedChildren() {

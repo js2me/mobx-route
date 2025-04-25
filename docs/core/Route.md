@@ -38,18 +38,77 @@ route.open({
 
 ## Methods and properties  
 
-### open(params, otherParams)   
+### `open(params?, { query?, replace? })`   
 
-### extend(path, config)  
+Navigates to this route.   
+First argument can be required based on path declaration (first argument)  
 
-### isIndex  
+Examples:  
+```ts
+const stars = new Route('/stars');
+stars.open();
+location.pathname; // /stars
+```
 
-### isOpened  
+```ts
+const starDetails = new Route('/stars/:starId');
+starDetails.open({ starId: 1 });
 
-### params  
+const starsWithMeta = new Route('/stars{/:meta}');
+starsWithMeta();
+starsWithMeta({ meta: 1 });
+```
 
-### currentPath  
+### `extend(path, config): Route`  
+Allows to create child route based on this route with merging this route path and extending path.   
+Example:
+```ts
+const stars = new Route('/stars');
+const starDetails = stars.extends('/:starId');
+starDetails.path; // '/stars/:starId'
+starDetails.open({ starId: 1 });
+location.pathname; // /stars/1
+```
 
-### hasOpenedChildren  
+### `isIndex: boolean`  
 
-### createUrl(params, query)  
+
+### `isOpened: boolean` <Badge type="tip" text="computed" />   
+
+Defines the "open" state for this route.   
+Example:  
+```ts
+const stars = new Route('/stars');
+stars.open();
+stars.isOpened; // true
+```
+
+
+### `params: ParsedPathParams | null`  <Badge type="tip" text="computed" />  
+
+### `currentPath: ParsedPathName | null` <Badge type="tip" text="computed" />   
+
+### `hasOpenedChildren: boolean` <Badge type="tip" text="computed" />   
+
+### `children: AnyRoute[]` <Badge type="info" text="observable" />   
+
+### `createUrl(params?, query?): string`  
+
+Creates url based on this route configuration   
+Example:   
+```ts
+const starDetails = new Route('/stars/:starId');
+starDetails.createUrl({ starId: 1 }, { bar: 1 }); // /stars/1?bar=1
+```
+
+### `path: string`  
+Route path declaration  
+Example:   
+```ts
+const starDetails = new Route('/stars/:starId');
+starDetails.path; // /stars/:starId
+```
+
+### `addChildren(...routes: AnyRoute[]): void` <Badge type="info" text="action" />     
+
+### `removeChildren(...routes: AnyRoute[]): void` <Badge type="info" text="action" />     

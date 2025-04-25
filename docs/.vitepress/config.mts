@@ -14,6 +14,7 @@ export default defineConfig({
   title: 'mobx route',
   description: 'mobx route documentation',
   base: `/${packageName}/`,
+  lastUpdated: true,
   head: [
     ['link', { rel: 'icon', href: `/${packageName}/logo.png` }],
   ],
