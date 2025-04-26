@@ -5,6 +5,14 @@ Routes are self-contained entities and do not require binding to a router.
 
 You can track their open state using the `isOpened` property, and also "open" the route using the `open()` method.   
 
+## Constructor   
+```ts
+new Route(
+  path: TPath,
+  config?: RouteConfiguration<TParentRoute>,
+)
+```
+
 ### Basic example
 
 ```ts
@@ -71,11 +79,14 @@ location.pathname; // /stars/1
 ```
 
 ### `isIndex: boolean`  
-
+Indicates if this route is an index route. Index routes activate when parent route path matches exactly.  
+Useful with groupping routes using [`RouteGroup`](/core/RouteGroup)  
 
 ### `isOpened: boolean` <Badge type="tip" text="computed" />   
 
 Defines the "open" state for this route.   
+Returns true when current URL matches this route's path pattern.
+
 Example:  
 ```ts
 const stars = new Route('/stars');
@@ -85,16 +96,20 @@ stars.isOpened; // true
 
 
 ### `params: ParsedPathParams | null`  <Badge type="tip" text="computed" />  
+Current parsed path parameters. `null` if route isn't open.  
 
 ### `currentPath: ParsedPathName | null` <Badge type="tip" text="computed" />   
+Matched path segment for current URL. `null` if route isn't open.  
 
 ### `hasOpenedChildren: boolean` <Badge type="tip" text="computed" />   
+`true` when any child route is currently active.  
 
 ### `children: AnyRoute[]` <Badge type="info" text="observable" />   
+Array of child routes. Automatically updated when using `extend()`.  
 
 ### `createUrl(params?, query?): string`  
+Generates full URL for route. Respects base URL and parent routes.  
 
-Creates url based on this route configuration   
 Example:   
 ```ts
 const starDetails = new Route('/stars/:starId');
@@ -102,7 +117,8 @@ starDetails.createUrl({ starId: 1 }, { bar: 1 }); // /stars/1?bar=1
 ```
 
 ### `path: string`  
-Route path declaration  
+Original path pattern used for route matching.  
+
 Example:   
 ```ts
 const starDetails = new Route('/stars/:starId');
@@ -110,5 +126,7 @@ starDetails.path; // /stars/:starId
 ```
 
 ### `addChildren(...routes: AnyRoute[]): void` <Badge type="info" text="action" />     
+Manually add child routes. Prefer `extend()` for typical use cases.  
 
 ### `removeChildren(...routes: AnyRoute[]): void` <Badge type="info" text="action" />     
+Remove specified routes from children.  

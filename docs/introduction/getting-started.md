@@ -7,7 +7,7 @@ title: Getting started
 ## Installation
 
 ::: warning
-mobx-route currently is WIP project. This is not production ready.
+mobx-route currently is WIP project. This is not production ready.  
 :::
 
 ::: code-group

@@ -50,18 +50,18 @@ export class VirtualRoute<
       : [params: TParams, query?: AnyObject]
   ): void;
   open(...args: any[]) {
-    if (this.config.open != null) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      this.checkOpened = this.config.open(...args);
-      return;
-    }
-
     this.params = args[0] ?? {};
     if (args[1] != null) {
       this.query.update(args[1]);
     }
-    this.checkOpened = true;
+
+    if (this.config.open == null) {
+      this.checkOpened = true;
+    } else {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      this.checkOpened = this.config.open(...args);
+    }
   }
 
   close() {
