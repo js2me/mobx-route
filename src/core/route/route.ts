@@ -107,11 +107,13 @@ export class Route<
   ) {
     type ExtendedRoutePath = `${TPath}${TExtendPath}`;
     type ParentRoute = this;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { index, ...configFromCurrentRoute } = this.config;
 
     const extendedChild = new Route<ExtendedRoutePath, ParentRoute>(
       `${this.path}${path}`,
       {
-        ...this.config,
+        ...configFromCurrentRoute,
         ...config,
         parent: this,
       } as any,
