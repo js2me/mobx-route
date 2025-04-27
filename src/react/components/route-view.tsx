@@ -2,16 +2,10 @@ import { observer } from 'mobx-react-lite';
 import { ComponentType, ReactNode, useRef } from 'react';
 import { loadable } from 'react-simple-loadable';
 
-import type {
-  AnyRoute,
-  AnyRouteGroup,
-  VirtualRoute,
-} from '../../core/index.js';
+import type { AnyRouteEntity } from '../../core/index.js';
 
-type RouteKind = AnyRouteGroup | AnyRoute | VirtualRoute;
-
-export interface RouteViewProps<TRouteKind extends RouteKind> {
-  route: TRouteKind;
+export interface RouteViewProps<TRouteEntity extends AnyRouteEntity> {
+  route: TRouteEntity;
   view?: ComponentType<{ children?: ReactNode }>;
   lazyView?: () => Promise<ComponentType<{ children?: ReactNode }>>;
   loader?: ComponentType;
@@ -19,8 +13,8 @@ export interface RouteViewProps<TRouteKind extends RouteKind> {
   children?: ReactNode;
 }
 
-function RouteViewBase<TRouteKind extends RouteKind>(
-  props: RouteViewProps<TRouteKind>,
+function RouteViewBase<TRouteEntity extends AnyRouteEntity>(
+  props: RouteViewProps<TRouteEntity>,
 ) {
   const lazyViewComponentRef = useRef<ComponentType<any>>();
 

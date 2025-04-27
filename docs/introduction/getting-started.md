@@ -43,7 +43,7 @@ const route = new Route('/foo/bar/:baz');
 ## Writing first routes
 
 ```ts
-import { Route } from 'mobx-route';
+import { Route, RouteGroup } from 'mobx-route';
 
 const feed = new Route('/');
 const users = new Route('/users');
@@ -53,6 +53,10 @@ export const routes = {
   feed,
   users,
   userDetails,
+  memes: new RouteGroup({
+    list: new Route('/memes', { index: true }),
+    details: new Route('/memes/:memeId'),
+  })
 }
 ```
 
