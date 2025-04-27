@@ -9,7 +9,7 @@ import {
 
 import type { VirtualRoute } from './virtual-route.js';
 
-export type AnyVirtualRoute = VirtualRoute<AnyObject>
+export type AnyVirtualRoute = VirtualRoute<AnyObject>;
 
 export interface VirtualRouteConfiguration<
   TParams extends AnyObject | EmptyObject = EmptyObject,
