@@ -30,8 +30,8 @@ importers:
         specifier: ^2.1.0
         version: 2.1.0(react@18.3.1)
       yummies:
-        specifier: ^3.1.9
-        version: 3.1.9
+        specifier: ^3.1.10
+        version: 3.1.10
     devDependencies:
       '@testing-library/react':
         specifier: ^16.3.0
@@ -49,8 +49,8 @@ importers:
         specifier: ^3.9.0
         version: 3.9.0(vite@5.4.18(@types/node@20.17.30))
       '@vitest/coverage-istanbul':
-        specifier: ^2.1.9
-        version: 2.1.9(vitest@3.1.2(@types/node@20.17.30)(jsdom@26.1.0))
+        specifier: ^3.1.2
+        version: 3.1.2(vitest@3.1.2(@types/node@20.17.30)(jsdom@26.1.0))
       eslint:
         specifier: ^8.57.1
         version: 8.57.1
@@ -1415,10 +1415,10 @@ packages:
     peerDependencies:
       vite: ^4 || ^5 || ^6
 
-  '@vitest/coverage-istanbul@2.1.9':
-    resolution: {integrity: sha512-vdYE4FkC/y2lxcN3Dcj54Bw+ericmDwiex0B8LV5F/YNYEYP1mgVwhPnHwWGAXu38qizkjOuyczKbFTALfzFKw==}
+  '@vitest/coverage-istanbul@3.1.2':
+    resolution: {integrity: sha512-PXjSd4g7SxlC9WJ00jbMMFJob+LcjXUYow5vpXuZe/acjhlEQgCaf6npm+W9Mg/ahiFKtIAHI+P8A9n2JfZilg==}
     peerDependencies:
-      vitest: 2.1.9
+      vitest: 3.1.2
 
   '@vitest/expect@3.1.2':
     resolution: {integrity: sha512-O8hJgr+zREopCAqWl3uCVaOdqJwZ9qaDwUP7vy3Xigad0phZe9APxKhPcDNqYYi0rX5oMvwJMSCAXY2afqeTSA==}
@@ -3129,10 +3129,6 @@ packages:
     resolution: {integrity: sha512-al6n+QEANGFOMf/dmUMsuS5/r9B06uwlyNjZZql/zv8J7ybHCgoihBNORZCY2mzUuAnomQa2JdhyHKzZxPCrFA==}
     engines: {node: ^18.0.0 || >=20.0.0}
 
-  tinyrainbow@1.2.0:
-    resolution: {integrity: sha512-weEDEq7Z5eTHPDh4xjX789+fHfF+P8boiFB+0vbWzpbnbsEr/GRaohi/uMKxg8RZMXnl1ItAi/IUHWMsjDV7kQ==}
-    engines: {node: '>=14.0.0'}
-
   tinyrainbow@2.0.0:
     resolution: {integrity: sha512-op4nsTR47R6p0vMUUoYl/a+ljLFVtlfaXkLQmqfLR1qHma1h/ysYk4hEXZ880bf2CYgTskvTa/e196Vd5dDQXw==}
     engines: {node: '>=14.0.0'}
@@ -3416,8 +3412,8 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
-  yummies@3.1.9:
-    resolution: {integrity: sha512-CdRig6WHMB7Mr5oRwTvVxlqReqYEp1VYdKYF35wido8iw9WRR/8Q6X1jyXuvf6qL0UFq6B/zRTrmYwa7r3sKuw==}
+  yummies@3.1.10:
+    resolution: {integrity: sha512-UUZ+8o3T74wT4tLtPiZ2BoEnAEjpl6R9tV5qH+bjopEgPsNLRn8aS+iebc3k9wlPkIh3qj48kXznZ4tkW6HuzQ==}
 
 snapshots:
 
@@ -4853,7 +4849,7 @@ snapshots:
     transitivePeerDependencies:
       - '@swc/helpers'
 
-  '@vitest/coverage-istanbul@2.1.9(vitest@3.1.2(@types/node@20.17.30)(jsdom@26.1.0))':
+  '@vitest/coverage-istanbul@3.1.2(vitest@3.1.2(@types/node@20.17.30)(jsdom@26.1.0))':
     dependencies:
       '@istanbuljs/schema': 0.1.3
       debug: 4.4.0(supports-color@5.5.0)
@@ -4864,7 +4860,7 @@ snapshots:
       istanbul-reports: 3.1.7
       magicast: 0.3.5
       test-exclude: 7.0.1
-      tinyrainbow: 1.2.0
+      tinyrainbow: 2.0.0
       vitest: 3.1.2(@types/node@20.17.30)(jsdom@26.1.0)
     transitivePeerDependencies:
       - supports-color
@@ -6287,7 +6283,7 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
       react-simple-loadable: 2.1.0(react@18.3.1)
-      yummies: 3.1.9
+      yummies: 3.1.10
 
   mobx@6.13.7: {}
 
@@ -6902,8 +6898,6 @@ snapshots:
 
   tinypool@1.0.2: {}
 
-  tinyrainbow@1.2.0: {}
-
   tinyrainbow@2.0.0: {}
 
   tinyspy@3.0.2: {}
@@ -7218,7 +7212,7 @@ snapshots:
 
   yocto-queue@0.1.0: {}
 
-  yummies@3.1.9:
+  yummies@3.1.10:
     dependencies:
       '@types/insane': 1.0.0
       clsx: 2.1.1

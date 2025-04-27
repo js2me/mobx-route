@@ -16,13 +16,13 @@ export class VirtualRoute<
   TParams extends AnyObject | EmptyObject = EmptyObject,
 > {
   query: IQueryParams;
-  params: TParams;
+  params: TParams | null;
 
   private checkOpened: FnValue<boolean, [route: this]>;
 
   constructor(protected config: VirtualRouteConfiguration<TParams> = {}) {
     this.query = config.queryParams ?? routeConfig.get().queryParams;
-    this.params = (config.initialParams ?? {}) as TParams;
+    this.params = config.initialParams ?? null;
     this.checkOpened = config.checkOpened as any;
 
     observable(this, 'params');
@@ -55,7 +55,7 @@ export class VirtualRoute<
     if (this.config.open == null) {
       this.checkOpened = true;
     } else {
-      this.checkOpened = this.config.open(this.params, this);
+      this.checkOpened = this.config.open(this.params!, this);
     }
   }
 

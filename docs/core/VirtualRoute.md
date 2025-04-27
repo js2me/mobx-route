@@ -14,6 +14,7 @@ new VirtualRoute(config?: VirtualRouteConfiguration<TParams>)
 ```
 
 **Configuration options:**  
+- `initialParams`: initial params for this route
 - `checkOpened`: Function/value determining if route is open  
 - `open`: Custom open handler  
 - `close`: Custom close handler  
