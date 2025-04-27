@@ -9,6 +9,7 @@ declare const process: { env: { NODE_ENV?: string } };
 export class RouteGroup<TRoutesCollection extends RoutesCollection> {
   constructor(public routes: TRoutesCollection) {
     computed.struct(this, 'isMatches');
+    computed.struct(this, 'indexRoute');
     observable.shallow(this, 'routes');
     makeObservable(this);
   }
@@ -18,16 +19,24 @@ export class RouteGroup<TRoutesCollection extends RoutesCollection> {
     return routes.some((route) => route.isOpened);
   }
 
+  get indexRoute() {
+    return Object.values(this.routes).find(
+      (route) => 'isIndex' in route && route.isIndex,
+    );
+  }
+
   open(params?: any, navigateParams?: RouteNavigateParams) {
     let lastGroupRoute: RouteGroup<any> | undefined;
+
+    if (this.indexRoute) {
+      this.indexRoute.open(params, navigateParams);
+      return;
+    }
 
     for (const routeName in this.routes) {
       const route = this.routes[routeName];
       if (route instanceof RouteGroup) {
         lastGroupRoute = route;
-      } else if ('isIndex' in route && route.isIndex) {
-        route.open(params, navigateParams);
-        return;
       }
     }
 
