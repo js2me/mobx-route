@@ -6,12 +6,12 @@ import {
   routeConfig,
   Route,
   ParsedPathParams,
-  RouteCollectionItem,
+  AnyRouteEntity,
   VirtualRoute,
 } from '../core/index.js';
 
 export abstract class RouteViewModel<
-  TRoute extends RouteCollectionItem = RouteCollectionItem,
+  TRoute extends AnyRouteEntity = AnyRouteEntity,
 > extends ViewModelBase<AnyObject> {
   abstract readonly route: TRoute;
 
