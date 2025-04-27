@@ -11,8 +11,8 @@ const { version, name: packageName, author, license } = JSON.parse(
 );
 
 export default defineConfig({
-  title: 'mobx route',
-  description: 'mobx route documentation',
+  title: packageName.replace(/-/g, ' '),
+  description: `${packageName.replace(/-/g, ' ')} documentation`,
   base: `/${packageName}/`,
   lastUpdated: true,
   head: [
