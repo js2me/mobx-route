@@ -7,20 +7,30 @@ import {
   Maybe,
 } from 'yummies/utils/types';
 
+import type { VirtualRoute } from './virtual-route.js';
+
+export type AnyVirtualRoute =
+  | VirtualRoute<AnyObject>
+  | VirtualRoute<EmptyObject>;
+
+export type GetVirtualRouteParams<TVirtualRoute extends AnyVirtualRoute> =
+  TVirtualRoute['params'];
+
 export interface VirtualRouteConfiguration<
   TParams extends AnyObject | EmptyObject = EmptyObject,
 > {
   queryParams?: IQueryParams;
-  checkOpened?: FnValue<boolean, [query: IQueryParams['data']]>;
+  checkOpened?: FnValue<boolean, [route: VirtualRoute<TParams>]>;
+  initialParams?: Maybe<TParams>;
 
   // custom implementation of open behaviour for this route
   // if not provided, default implementation will be used
   open?: (
     ...args: AllPropertiesOptional<TParams> extends true
-      ? [params?: Maybe<TParams>, query?: AnyObject]
-      : [params: TParams, query?: AnyObject]
+      ? [params: Maybe<TParams>, route: VirtualRoute<TParams>]
+      : [params: TParams, route: VirtualRoute<TParams>]
   ) => boolean;
   // custom implementation of close behaviour for this route
   // if not provided, default implementation will be used
-  close?: (query: AnyObject) => boolean;
+  close?: (route: VirtualRoute<TParams>) => boolean;
 }

@@ -18,12 +18,12 @@ export class VirtualRoute<
   query: IQueryParams;
   params: TParams;
 
-  private checkOpened: VirtualRouteConfiguration<TParams>['checkOpened'];
+  private checkOpened: FnValue<boolean, [route: this]>;
 
-  constructor(protected config: VirtualRouteConfiguration = {}) {
+  constructor(protected config: VirtualRouteConfiguration<TParams> = {}) {
     this.query = config.queryParams ?? routeConfig.get().queryParams;
-    this.params = {} as TParams;
-    this.checkOpened = config.checkOpened;
+    this.params = (config.initialParams ?? {}) as TParams;
+    this.checkOpened = config.checkOpened as any;
 
     observable(this, 'params');
     observable.ref(this, 'checkOpened');
@@ -34,10 +34,7 @@ export class VirtualRoute<
   }
 
   get isOpened() {
-    return (
-      this.checkOpened != null &&
-      resolveFnValue(this.checkOpened, this.query.data)
-    );
+    return this.checkOpened != null && resolveFnValue(this.checkOpened, this);
   }
 
   setResolver(checkOpened: FnValue<boolean>) {
@@ -58,15 +55,13 @@ export class VirtualRoute<
     if (this.config.open == null) {
       this.checkOpened = true;
     } else {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      this.checkOpened = this.config.open(...args);
+      this.checkOpened = this.config.open(this.params, this);
     }
   }
 
   close() {
     if (this.config.close != null) {
-      this.checkOpened = this.config.close(this.query.data);
+      this.checkOpened = this.config.close(this);
       return;
     }
 

@@ -23,14 +23,15 @@ Example:
 
 ```ts
 const ageModalRoute = new VirtualRoute<{ age: number }>({
-  checkOpened: (query) => !!query.showAgeModal,
-  open: (params) =>
-    ageModalRoute.query.update({
+  initialParams: { age: 0 },
+  checkOpened: (route) => !!route.query.showAgeModal,
+  open: (params, route) =>
+    route.query.update({
       ...params,
       showAgeModal: 'true'
     }),
-  close: () =>
-    ageModalRoute.query.update({
+  close: (route) =>
+    route.query.update({
       showAgeModal: undefined
     })
 });
@@ -60,7 +61,7 @@ Example:
 ```ts
 const route = new VirtualRoute<{ userId: string }>();
 route.open({ userId: '123' });
-route.params.userId; // '123'
+route.params?.userId; // '123'
 ```
 
 ### `query: IQueryParams`  
