@@ -7,21 +7,21 @@ title: Getting started
 ## Installation
 
 ::: warning
-mobx-route currently is WIP project. This is not production ready.  
+{packageJson.name} currently is WIP project. This is not production ready.  
 :::
 
 ::: code-group
 
 ```bash [npm]
-npm install mobx-route
+npm install {packageJson.name}
 ```
 
 ```bash [yarn]
-yarn add mobx-route
+yarn add {packageJson.name}
 ```
 
 ```bash [pnpm]
-pnpm add mobx-route
+pnpm add {packageJson.name}
 ```
 
 :::
