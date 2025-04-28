@@ -19,7 +19,7 @@
 _Uses [`path-to-regexp` power](https://www.npmjs.com/package/path-to-regexp)_  
 
 
-### Documentation: [js2me.github.io/mobx-route](https://js2me.github.io/mobx-route)  
+## Documentation is [here](https://js2me.github.io/mobx-route)  
 
 
 ```ts
