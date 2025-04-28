@@ -24,14 +24,18 @@ export const RouteGroupView = memo(
 
     return (
       <>
-        {viewEntries.map(([routeName, props]) => {
+        {viewEntries.map(([routeName, propsOrView]) => {
           const route = group.routes[routeName];
           const viewProps =
-            typeof props === 'function'
+            propsOrView &&
+            (typeof propsOrView === 'function' ||
+              'contextTypes' in propsOrView ||
+              '$$typeof' in propsOrView)
               ? {
-                  view: props as any,
+                  view: propsOrView as any,
                 }
-              : props;
+              : propsOrView;
+
           return <RouteView key={routeName} route={route} {...viewProps} />;
         })}
       </>
