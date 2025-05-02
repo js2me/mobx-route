@@ -98,11 +98,39 @@ stars.isOpened; // true
 ### `params: ParsedPathParams | null`  <Badge type="tip" text="computed" />  
 Current parsed path parameters. `null` if route isn't open.  
 
+### `parent: TParentRoute | null` <Badge type="info" text="observable.ref" />  
+Parent route  
+
+Example:  
+```ts
+const routeA = new Route('/a');
+const routeB = routeA.extend('/b');
+
+routeB.parent === routeA; // true
+```
+
 ### `currentPath: ParsedPathName | null` <Badge type="tip" text="computed" />   
 Matched path segment for current URL. `null` if route isn't open.  
 
 ### `hasOpenedChildren: boolean` <Badge type="tip" text="computed" />   
-`true` when any child route is currently active.  
+`true` when any child route is currently opened.  
+
+Example:   
+```ts
+const routeA = new Route('/a');
+const routeB = routeA.extend('/b');
+const routeC = routeB.extend('/c');
+
+history.pushState(null, '', '/a/b/c');
+
+routeA.isOpened; // false
+routeB.isOpened; // false;
+routeC.isOpened; // true;
+
+routeA.hasOpenedChildren; // true
+routeB.hasOpenedChildren; // true
+routeC.hasOpenedChildren; // false
+```
 
 ### `children: AnyRoute[]` <Badge type="info" text="observable" />   
 Array of child routes. Automatically updated when using `extend()`.  
