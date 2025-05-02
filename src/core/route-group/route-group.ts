@@ -16,7 +16,11 @@ export class RouteGroup<TRoutesCollection extends RoutesCollection> {
 
   get isOpened(): boolean {
     const routes = Object.values(this.routes);
-    return routes.some((route) => route.isOpened);
+    return routes.some(
+      (route) =>
+        route.isOpened ||
+        ('hasOpenedChildren' in route && route.hasOpenedChildren),
+    );
   }
 
   get indexRoute() {
