@@ -238,4 +238,20 @@ describe('route', () => {
     expect(routes.root.isOpened).toBe(true);
     expect(routes.projects.routes.index.isOpened).toBe(false);
   });
+
+  it('parent test', () => {
+    history.pushState(null, '', '/a/b/c');
+
+    const routeA = new Route('/a');
+    const routeB = routeA.extend('/b');
+    const routeC = routeB.extend('/c');
+
+    expect(routeA.hasOpenedChildren).toBe(true);
+    expect(routeB.hasOpenedChildren).toBe(true);
+    expect(routeC.hasOpenedChildren).toBe(false);
+
+    expect(routeA.isOpened).toBe(false);
+    expect(routeB.isOpened).toBe(false);
+    expect(routeC.isOpened).toBe(true);
+  });
 });
