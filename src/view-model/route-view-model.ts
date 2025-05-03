@@ -51,4 +51,8 @@ export abstract class RouteViewModel<
   get pathParams() {
     return this.payload;
   }
+
+  get isMounted() {
+    return super.isMounted && this.route.isOpened;
+  }
 }

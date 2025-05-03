@@ -18,8 +18,8 @@ importers:
         specifier: ^4.0.7
         version: 4.1.0(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       mobx-view-model:
-        specifier: ^6.0.0
-        version: 6.0.0(mobx-react-lite@4.1.0(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^6.5.0
+        version: 6.5.0(mobx-react-lite@4.1.0(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       path-to-regexp:
         specifier: ^8.2.0
         version: 8.2.0
@@ -2573,8 +2573,8 @@ packages:
       react-native:
         optional: true
 
-  mobx-view-model@6.0.0:
-    resolution: {integrity: sha512-jBHuizQCxr6yOoeat6MV1juoKyl9gkUF8UwWby62UDFRDc35BW4QzP9677hV9Goq0U84rHQOqsoQiPe12AgjUA==}
+  mobx-view-model@6.5.0:
+    resolution: {integrity: sha512-Kwg4FvsYqeu2T144CB9tIDouHJ2t0xFRC4wE1RjJb/jBIaGDMyd8HL0lehPhTrIWmsfNSpRtT2DhhhfNF5wkBQ==}
     peerDependencies:
       mobx: ^6.12.4
       mobx-react-lite: ^4.0.7
@@ -6276,7 +6276,7 @@ snapshots:
     optionalDependencies:
       react-dom: 18.3.1(react@18.3.1)
 
-  mobx-view-model@6.0.0(mobx-react-lite@4.1.0(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  mobx-view-model@6.5.0(mobx-react-lite@4.1.0(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       mobx: 6.13.7
       mobx-react-lite: 4.1.0(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
