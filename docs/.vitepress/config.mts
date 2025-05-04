@@ -61,9 +61,9 @@ export default defineConfig({
         text: 'Core API',
         items: [
           { text: 'Route', link: '/core/Route' },
-          { text: 'Router', link: '/core/Router' },
           { text: 'RouteGroup', link: '/core/RouteGroup' },
           { text: 'VirtualRoute', link: '/core/VirtualRoute' },
+          { text: 'Router', link: '/core/Router' },
           { text: 'routeConfig', link: '/core/routeConfig' },
         ],
       },
