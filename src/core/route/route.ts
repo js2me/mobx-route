@@ -160,6 +160,9 @@ export class Route<
     this.children = this.children.filter((child) => !routes.includes(child));
   }
 
+  /**
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#hasopenedchildren-boolean)
+   */
   get hasOpenedChildren(): boolean {
     return this.children.some(
       (child) => child.isOpened || child.hasOpenedChildren,

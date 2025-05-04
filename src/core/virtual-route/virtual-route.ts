@@ -33,14 +33,23 @@ export class VirtualRoute<
     makeObservable(this);
   }
 
+  /**
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#isopened-boolean)
+   */
   get isOpened() {
     return this.checkOpened != null && resolveFnValue(this.checkOpened, this);
   }
 
+  /**
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#setresolver-checkopened-void)
+   */
   setResolver(checkOpened: FnValue<boolean>) {
     this.checkOpened = checkOpened;
   }
 
+  /**
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#open-params-query-void)
+   */
   open(
     ...args: AllPropertiesOptional<TParams> extends true
       ? [params?: Maybe<TParams>, query?: AnyObject]
@@ -59,6 +68,9 @@ export class VirtualRoute<
     }
   }
 
+  /**
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#close-void)
+   */
   close() {
     if (this.config.close != null) {
       this.checkOpened = this.config.close(this);
