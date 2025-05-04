@@ -69,6 +69,7 @@ export type ExtractPathParams<Path extends string> = Simplify<
 
 export interface RouteNavigateParams {
   replace?: boolean;
+  state?: any;
   query?: AnyObject;
 }
 

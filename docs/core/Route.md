@@ -46,10 +46,16 @@ route.open({
 
 ## Methods and properties  
 
-### `open(params?, { query?, replace? })`   
+### `open(...args)`   
 
 Navigates to this route.   
 First argument can be required based on path declaration (first argument)  
+
+**API Signature**  
+```ts
+open(params?, { query?, replace?, state? })
+open(params?, replace?, query?)
+```
 
 Examples:  
 ```ts
@@ -82,7 +88,7 @@ location.pathname; // /stars/1
 Indicates if this route is an index route. Index routes activate when parent route path matches exactly.  
 Useful with groupping routes using [`RouteGroup`](/core/RouteGroup)  
 
-### `isOpened: boolean` <Badge type="tip" text="computed" />   
+### `isOpened: boolean` <Badge type="tip" text="computed.struct" />   
 
 Defines the "open" state for this route.   
 Returns true when current URL matches this route's path pattern.
@@ -95,8 +101,15 @@ stars.isOpened; // true
 ```
 
 
-### `params: ParsedPathParams | null`  <Badge type="tip" text="computed" />  
+### `params: ParsedPathParams | null`  <Badge type="tip" text="computed.struct" />  
 Current parsed path parameters. `null` if route isn't open.  
+
+Example:  
+```ts
+const routeA = new Route('/foo/bar/:baz');
+location.href = '/foo/bar/1234';
+routeA.params; // { baz: "1234" }
+```
 
 ### `parent: TParentRoute | null` <Badge type="info" text="observable.ref" />  
 Parent route  
@@ -109,10 +122,17 @@ const routeB = routeA.extend('/b');
 routeB.parent === routeA; // true
 ```
 
-### `currentPath: ParsedPathName | null` <Badge type="tip" text="computed" />   
+### `currentPath: ParsedPathName | null` <Badge type="tip" text="computed.struct" />   
 Matched path segment for current URL. `null` if route isn't open.  
 
-### `hasOpenedChildren: boolean` <Badge type="tip" text="computed" />   
+Example:  
+```ts
+const routeA = new Route('/foo/bar/:baz');
+location.href = '/foo/bar/1234';
+routeA.currentPath; // '/foo/bar/1234'
+```
+
+### `hasOpenedChildren: boolean` <Badge type="tip" text="computed.struct" />   
 `true` when any child route is currently opened.  
 
 Example:   

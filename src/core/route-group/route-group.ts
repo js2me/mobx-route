@@ -1,19 +1,26 @@
 import { computed, makeObservable, observable } from 'mobx';
 
-import { RouteNavigateParams } from '../route/index.js';
-
 import { RoutesCollection } from './route-group.types.js';
 
 declare const process: { env: { NODE_ENV?: string } };
 
 export class RouteGroup<TRoutesCollection extends RoutesCollection> {
-  constructor(public routes: TRoutesCollection) {
-    computed.struct(this, 'isMatches');
+  routes: TRoutesCollection;
+
+  constructor(routes: TRoutesCollection) {
+    this.routes = routes;
+
+    computed.struct(this, 'isOpened');
     computed.struct(this, 'indexRoute');
     observable.shallow(this, 'routes');
     makeObservable(this);
   }
 
+  /**
+   * Returns true if at least one route in the group is open.
+   *
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/RouteGroup.html#isopened-boolean)
+   */
   get isOpened(): boolean {
     const routes = Object.values(this.routes);
     return routes.some(
@@ -23,17 +30,27 @@ export class RouteGroup<TRoutesCollection extends RoutesCollection> {
     );
   }
 
+  /**
+   * First found index route.
+   *
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/RouteGroup.html#indexroute-route-undefined)
+   */
   get indexRoute() {
     return Object.values(this.routes).find(
       (route) => 'isIndex' in route && route.isIndex,
     );
   }
 
-  open(params?: any, navigateParams?: RouteNavigateParams) {
+  /**
+   * Main navigation method for the group.
+   *
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/RouteGroup.html#open-args-any-void)
+   */
+  open(...args: any[]) {
     let lastGroupRoute: RouteGroup<any> | undefined;
 
     if (this.indexRoute) {
-      this.indexRoute.open(params, navigateParams);
+      this.indexRoute.open(...args);
       return;
     }
 
@@ -45,7 +62,7 @@ export class RouteGroup<TRoutesCollection extends RoutesCollection> {
     }
 
     if (lastGroupRoute) {
-      lastGroupRoute.open(params, navigateParams);
+      lastGroupRoute.open(...args);
     } else if (process.env.NODE_ENV !== 'production') {
       console.warn(
         "RouteGroup doesn't have index route. open() method doesn't work.",

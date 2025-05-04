@@ -34,6 +34,11 @@ export class Route<
   private _matcher?: ReturnType<typeof match>;
   private _compiler?: ReturnType<typeof compile>;
 
+  /**
+   * Indicates if this route is an index route. Index routes activate when parent route path matches exactly.
+   *
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#isindex-boolean)
+   */
   isIndex: boolean;
 
   children: AnyRoute[] = [];
@@ -92,18 +97,38 @@ export class Route<
     return parsed as RouteMatchesData<TPath>;
   }
 
+  /**
+   * Matched path segment for current URL.
+   *
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#currentpath-parsedpathname-null)
+   */
   get currentPath(): string | null {
     return this.data?.path ?? null;
   }
 
+  /**
+   * Current parsed path parameters.
+   *
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#params-parsedpathparams-null)
+   */
   get params(): ParsedPathParams<TPath> | null {
     return this.data?.params ?? null;
   }
 
+  /**
+   * Defines the "open" state for this route.
+   *
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#isopened-boolean)
+   */
   get isOpened() {
     return this.data !== null;
   }
 
+  /**
+   * Allows to create child route based on this route with merging this route path and extending path.
+   *
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#extend-path-config-route)
+   */
   extend<TExtendPath extends string>(
     path: TExtendPath,
     config?: Omit<RouteConfiguration<any>, 'parent'>,
@@ -174,6 +199,11 @@ export class Route<
     ].join('');
   }
 
+  /**
+   * Navigates to this route.
+   *
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#open-args)
+   */
   open(
     ...args: AllPropertiesOptional<ExtractPathParams<TPath>> extends true
       ? [
@@ -182,18 +212,48 @@ export class Route<
         ]
       : [params: ExtractPathParams<TPath>, navigateParams?: RouteNavigateParams]
   ): void;
-
+  open(
+    ...args: AllPropertiesOptional<ExtractPathParams<TPath>> extends true
+      ? [
+          params?: ExtractPathParams<TPath> | null | undefined,
+          replace?: RouteNavigateParams['replace'],
+          query?: RouteNavigateParams['query'],
+        ]
+      : [
+          params: ExtractPathParams<TPath>,
+          replace?: RouteNavigateParams['replace'],
+          query?: RouteNavigateParams['query'],
+        ]
+  ): void;
   open(url: string, navigateParams?: RouteNavigateParams): void;
+  open(
+    url: string,
+    replace?: RouteNavigateParams['replace'],
+    query?: RouteNavigateParams['query'],
+  ): void;
 
+  /**
+   * Navigates to this route.
+   *
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#open-args)
+   */
   open(...args: any[]) {
+    const {
+      replace,
+      state: rawState,
+      query,
+    } = typeof args[1] === 'boolean' || args.length > 2
+      ? { replace: args[1], query: args[2] }
+      : (args[1] ?? {});
     const url =
-      typeof args[0] === 'string'
-        ? args[0]
-        : this.createUrl(args[0], args[1]?.query);
-    if (args[1]?.replace) {
-      this.history.replaceState(null, '', url);
+      typeof args[0] === 'string' ? args[0] : this.createUrl(args[0], query);
+
+    const state = rawState ?? null;
+
+    if (replace) {
+      this.history.replaceState(state, '', url);
     } else {
-      this.history.pushState(null, '', url);
+      this.history.pushState(state, '', url);
     }
   }
 
