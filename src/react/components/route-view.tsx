@@ -2,19 +2,32 @@ import { observer } from 'mobx-react-lite';
 import { ComponentType, ReactNode, useRef } from 'react';
 import { loadable } from 'react-simple-loadable';
 
-import type { AnyRouteEntity } from '../../core/index.js';
+import type {
+  AnyRoute,
+  AnyRouteEntity,
+  AnyVirtualRoute,
+} from '../../core/index.js';
 
-export interface RouteViewProps<TRouteEntity extends AnyRouteEntity> {
+export interface RouteViewConfigProps<TRouteEntity extends AnyRouteEntity> {
   route: TRouteEntity;
-  view?: ComponentType<{ children?: ReactNode }>;
-  lazyView?: () => Promise<ComponentType<{ children?: ReactNode }>>;
+  view?: ComponentType<RouteViewProps<TRouteEntity>>;
+  lazyView?: () => Promise<ComponentType<RouteViewProps<TRouteEntity>>>;
   loader?: ComponentType;
   notOpenedContent?: ReactNode;
   children?: ReactNode;
 }
 
+export type RouteViewProps<TRouteEntity extends AnyRouteEntity> = {
+  children?: ReactNode;
+  params: TRouteEntity extends AnyRoute
+    ? Exclude<TRouteEntity['params'], null | undefined>
+    : TRouteEntity extends AnyVirtualRoute
+      ? TRouteEntity['params']
+      : never;
+};
+
 function RouteViewBase<TRouteEntity extends AnyRouteEntity>(
-  props: RouteViewProps<TRouteEntity>,
+  props: RouteViewConfigProps<TRouteEntity>,
 ) {
   const lazyViewComponentRef = useRef<ComponentType<any>>();
 
@@ -33,7 +46,9 @@ function RouteViewBase<TRouteEntity extends AnyRouteEntity>(
     Component = props.view;
   }
 
-  return Component && <Component>{props.children}</Component>;
+  const params = 'params' in props.route ? props.route.params : {};
+
+  return Component && <Component params={params}>{props.children}</Component>;
 }
 
 export const RouteView = observer(RouteViewBase);

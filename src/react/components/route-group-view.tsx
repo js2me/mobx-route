@@ -2,12 +2,15 @@ import { memo } from 'react';
 
 import { AnyRouteGroup } from '../../core/index.js';
 
-import { RouteView, RouteViewProps } from './route-view.js';
+import { RouteView, RouteViewConfigProps } from './route-view.js';
 
 export type RouteViewCollectionProps<TRouteGroup extends AnyRouteGroup> = {
   [K in keyof TRouteGroup['routes']]:
-    | Omit<RouteViewProps<TRouteGroup['routes'][K]>, 'route'>
-    | Exclude<RouteViewProps<TRouteGroup['routes'][K]>['view'], undefined>;
+    | Omit<RouteViewConfigProps<TRouteGroup['routes'][K]>, 'route'>
+    | Exclude<
+        RouteViewConfigProps<TRouteGroup['routes'][K]>['view'],
+        undefined
+      >;
 };
 
 export interface RouteGroupViewProps<TRouteGroup extends AnyRouteGroup> {
