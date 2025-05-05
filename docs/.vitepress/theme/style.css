@@ -106,13 +106,14 @@
 
 :root {
   --vp-home-hero-name-color: transparent;
-  --vp-home-hero-name-background: -webkit-linear-gradient(120deg, #ff0000 15%, #ffa970);
-  --vp-home-hero-image-background-image: linear-gradient(-45deg, #ff542f 50%, #ffbbcf 50%);
+  --vp-home-hero-name-background: -webkit-linear-gradient(120deg, #0066f6 5%, #ff4a00);
+  --vp-home-hero-image-background-image: linear-gradient(-45deg, #ff542f 50%, #0066f699 50%);
   --vp-home-hero-image-filter: blur(44px);
 }
 
 html.dark {
-  --vp-home-hero-image-background-image: linear-gradient(-45deg, #ff510b 50%, #ff6591 50%);
+  --vp-home-hero-name-background: -webkit-linear-gradient(120deg, #3c8dff 2%, #ff4a00);
+  --vp-home-hero-image-background-image: linear-gradient(-45deg, #ff542f 50%, #0066f699 50%);
 }
 
 @media (min-width: 640px) {
@@ -159,9 +160,15 @@ html.dark {
       background-position: 0% 0%;
       transform: scale(1) translate(-50%, -50%);
   }
+  25% {
+      background-position: 200% 200%;
+  }
   50% {
-      background-position: 300% 300%;
+      background-position: 100% 100%;
       transform: scale(1.4) translate(-35%, -35%);
+  }
+  25% {
+      background-position: 200% 200%;
   }
   100% {
       background-position: 0% 0%;
