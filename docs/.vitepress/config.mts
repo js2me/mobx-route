@@ -76,13 +76,13 @@ export default defineConfig({
         ],
       },
       {
-        text: 'view-model',
+        text: 'mobx-view-model',
         items: [
           { text: 'RouteViewModel', link: '/view-model/RouteViewModel' },
         ],
       },
       {
-        text: 'recipes',
+        text: 'Recipes',
         items: [
           { text: 'Routing declarations', link: '/recipes/routing-declarations' },
           // { text: 'Protected routes', link: '/recipes/protected-routes' },
