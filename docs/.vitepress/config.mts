@@ -81,6 +81,13 @@ export default defineConfig({
           { text: 'RouteViewModel', link: '/view-model/RouteViewModel' },
         ],
       },
+      {
+        text: 'recipes',
+        items: [
+          { text: 'Routing declarations', link: '/recipes/routing-declarations' },
+          // { text: 'Protected routes', link: '/recipes/protected-routes' },
+        ],
+      }
     ],
 
     footer: {
