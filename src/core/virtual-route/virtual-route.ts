@@ -22,7 +22,7 @@ export class VirtualRoute<
 
   constructor(protected config: VirtualRouteConfiguration<TParams> = {}) {
     this.query = config.queryParams ?? routeConfig.get().queryParams;
-    this.params = config.initialParams ?? null;
+    this.params = resolveFnValue(config.initialParams, this) ?? null;
     this.checkOpened = config.checkOpened as any;
 
     observable(this, 'params');

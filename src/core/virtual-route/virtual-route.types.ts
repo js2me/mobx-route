@@ -18,7 +18,7 @@ export interface VirtualRouteConfiguration<
 > {
   queryParams?: IQueryParams;
   checkOpened?: FnValue<boolean, [route: VirtualRoute<TParams>]>;
-  initialParams?: Maybe<TParams>;
+  initialParams?: FnValue<Maybe<TParams>, [route: VirtualRoute<TParams>]>;
 
   // custom implementation of open behaviour for this route
   // if not provided, default implementation will be used
