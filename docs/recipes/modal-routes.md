@@ -50,11 +50,24 @@ export const modalRoute = new VirtualRoute({
 
 ## Local state  
 
-One possible implementation:   
+Possible implementations:   
 
+_local state_  
+```ts
+export const modalRoute = new VirtualRoute();
+```
+
+_using `localStorage`_  
 ```ts
 export const modalRoute = new VirtualRoute({
-  open: () => true,
-  close: () => false,
+  checkOpened: () => !!localStorage.getItem('yourModal'),
+  open: () => {
+    localStorage.setItem('yourModal', true);
+    return true;
+  },
+  close: () => {
+    localStorage.removeItem('yourModal');
+    return false;
+  },
 });
 ```
