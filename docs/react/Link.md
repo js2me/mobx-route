@@ -15,7 +15,10 @@ function Navbar({ user }) {
       <Link to={routes.userDetails} params={{ userId: user.id }}>
         User details
       </Link>
-      <Link to={"/custom-url"}>Custom url</Link>
+      <Link to={"/custom-url"} replace>Custom url</Link>
+      <Link to={"/custom-url/meme"} query={{ foo: 1, bar: 2 }}>
+        Url with query params
+      </Link>
     </>
   );
 }
