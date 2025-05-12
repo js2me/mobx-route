@@ -86,7 +86,15 @@ location.pathname; // /stars/1
 
 ### `isIndex: boolean`  
 Indicates if this route is an index route. Index routes activate when parent route path matches exactly.  
-Useful with groupping routes using [`RouteGroup`](/core/RouteGroup)  
+Useful with groupping routes using [`RouteGroup`](/core/RouteGroup)   
+
+### `isHash: boolean`  
+Indicates if this route is an hash based route.  
+Hash based routes work with only `#hashstrings` in browser address URL. This is useful when you want to create routes that only affect the hash part of the URL, such as for client-side routing or for creating routes that don't affect the server-side routing.  
+
+::: info  
+This parameter will be `true` if you set [`useHashRouting`](/core/routeConfig#usehashrouting) as `true` in [global `routeConfig`](/core/routeConfig)  
+:::
 
 ### `isOpened: boolean` <Badge type="tip" text="computed.struct" />   
 
