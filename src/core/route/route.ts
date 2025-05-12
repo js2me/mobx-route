@@ -25,7 +25,6 @@ export class Route<
 > {
   protected history: IMobxHistory;
   protected location: IMobxLocation;
-  protected baseUrl: string;
   parent: TParentRoute;
 
   query: IQueryParams;
@@ -50,8 +49,6 @@ export class Route<
     this.history = config.history ?? routeConfig.get().history;
     this.location = config.location ?? routeConfig.get().location;
     this.query = config.queryParams ?? routeConfig.get().queryParams;
-    const usedBaseUrl = this.config.baseUrl ?? routeConfig.get().baseUrl;
-    this.baseUrl = !usedBaseUrl || usedBaseUrl === '/' ? '' : usedBaseUrl;
     this.isIndex = !!this.config.index;
     this.parent = config.parent ?? (null as unknown as TParentRoute);
 
@@ -60,6 +57,7 @@ export class Route<
     computed.struct(this, 'params');
     computed.struct(this, 'currentPath');
     computed.struct(this, 'hasOpenedChildren');
+    computed(this, 'baseUrl');
 
     observable(this, 'children');
     observable.ref(this, 'parent');
@@ -67,6 +65,11 @@ export class Route<
     action(this, 'removeChildren');
 
     makeObservable(this);
+  }
+
+  protected get baseUrl() {
+    const baseUrl = this.config.baseUrl ?? routeConfig.get().baseUrl;
+    return baseUrl?.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
   }
 
   protected get data(): RouteMatchesData<TPath> | null {
