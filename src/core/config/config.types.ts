@@ -9,4 +9,5 @@ export interface RouteGlobalConfig {
   location: IMobxLocation;
   queryParams: IQueryParams;
   baseUrl?: string;
+  useHashRouting?: boolean;
 }

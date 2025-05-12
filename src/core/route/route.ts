@@ -40,6 +40,13 @@ export class Route<
    */
   isIndex: boolean;
 
+  /**
+   * Indicates if this route is an hash route.
+   *
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#ishash-boolean)
+   */
+  isHash: boolean;
+
   children: AnyRoute[] = [];
 
   constructor(
@@ -50,6 +57,7 @@ export class Route<
     this.location = config.location ?? routeConfig.get().location;
     this.query = config.queryParams ?? routeConfig.get().queryParams;
     this.isIndex = !!this.config.index;
+    this.isHash = this.config.hash ?? !!routeConfig.get().useHashRouting;
     this.parent = config.parent ?? (null as unknown as TParentRoute);
 
     computed.struct(this, 'isOpened');
@@ -73,25 +81,31 @@ export class Route<
   }
 
   protected get data(): RouteMatchesData<TPath> | null {
-    let pathname = this.location.pathname;
+    let pathnameToCheck: string;
+
+    if (this.isHash) {
+      pathnameToCheck = this.location.hash.slice(1);
+    } else {
+      pathnameToCheck = this.location.pathname;
+    }
 
     if (this.baseUrl) {
-      if (!pathname.startsWith(this.baseUrl)) {
+      if (!this.location.pathname.startsWith(this.baseUrl)) {
         return null;
       }
 
-      pathname = pathname.replace(this.baseUrl, '');
+      pathnameToCheck = pathnameToCheck.replace(this.baseUrl, '');
     }
 
     if (
       (this.path === '' || this.path === '/') &&
-      (pathname === '/' || pathname === '')
+      (pathnameToCheck === '/' || pathnameToCheck === '')
     ) {
-      return { params: {} as any, path: pathname };
+      return { params: {} as any, path: pathnameToCheck };
     }
 
     const matcher = this._matcher ?? (this._matcher = match(this.tokenData));
-    const parsed = matcher(pathname);
+    const parsed = matcher(pathnameToCheck);
 
     if (parsed === false) {
       return null;
@@ -199,7 +213,7 @@ export class Route<
 
     return [
       this.baseUrl,
-      // type === 'hash' ? '#' : '',
+      this.isHash ? '#' : '',
       path,
       buildSearchString(queryParams || {}),
     ].join('');

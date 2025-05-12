@@ -21,6 +21,7 @@ export interface RouteGlobalConfiguration {
 export interface RouteConfiguration<TParentRoute extends AnyRoute | null = null>
   extends Partial<RouteGlobalConfiguration> {
   index?: boolean;
+  hash?: boolean;
   meta?: AnyObject;
   parseOptions?: ParseOptions;
   parent?: TParentRoute;
