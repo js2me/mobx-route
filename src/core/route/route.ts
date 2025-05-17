@@ -19,6 +19,11 @@ import {
   RouteNavigateParams,
 } from './route.types.js';
 
+/**
+ * Class for creating path based route.
+ *
+ * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html)
+ */
 export class Route<
   TPath extends string,
   TParentRoute extends Route<any, any> | null = null,

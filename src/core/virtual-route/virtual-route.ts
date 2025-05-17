@@ -12,6 +12,11 @@ import { routeConfig } from '../config/index.js';
 
 import { VirtualRouteConfiguration } from './virtual-route.types.js';
 
+/**
+ * Class for creating routes with custom activation logic
+ *
+ * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html)
+ */
 export class VirtualRoute<
   TParams extends AnyObject | EmptyObject = EmptyObject,
 > {

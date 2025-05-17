@@ -1,6 +1,6 @@
 # Route  
 
-Creates a route.   
+Class for creating path based route.   
 Routes are self-contained entities and do not require binding to a router.   
 
 You can track their open state using the `isOpened` property, and also "open" the route using the `open()` method.   

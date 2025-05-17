@@ -4,6 +4,11 @@ import { RoutesCollection } from './route-group.types.js';
 
 declare const process: { env: { NODE_ENV?: string } };
 
+/**
+ * Class for grouping related routes and managing their state.
+ *
+ * [**Documentation**](https://js2me.github.io/mobx-route/core/RouteGroup.html)
+ */
 export class RouteGroup<TRoutesCollection extends RoutesCollection> {
   routes: TRoutesCollection;
 

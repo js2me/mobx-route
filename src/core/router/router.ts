@@ -10,6 +10,11 @@ import { RoutesCollection } from '../route-group/index.js';
 
 import { RouterConfiguration, RouterNavigateOptions } from './router.types.js';
 
+/**
+ * Class for centralized routing management.
+ *
+ * [**Documentation**](https://js2me.github.io/mobx-route/core/Router.html)
+ */
 export class Router<TRoutesCollection extends RoutesCollection> {
   routes: TRoutesCollection;
   history: IMobxHistory;

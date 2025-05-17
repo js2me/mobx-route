@@ -1,6 +1,6 @@
 # Router
 
-A class for centralized routing management.  
+Class for centralized routing management.  
 Provides a common interface for working with history, location, and route collections.  
 
 ## Constructor
