@@ -1,12 +1,8 @@
-import {
-  IMobxHistory,
-  IMobxLocation,
-  IQueryParams,
-} from 'mobx-location-history';
+import { AnyHistory, AnyLocation, IQueryParams } from 'mobx-location-history';
 
 export interface RouteGlobalConfig {
-  history: IMobxHistory;
-  location: IMobxLocation;
+  history: AnyHistory;
+  location?: AnyLocation;
   queryParams: IQueryParams;
   baseUrl?: string;
   useHashRouting?: boolean;

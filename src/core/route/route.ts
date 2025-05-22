@@ -1,8 +1,8 @@
 import { action, computed, makeObservable, observable } from 'mobx';
 import {
   buildSearchString,
-  IMobxHistory,
-  IMobxLocation,
+  AnyHistory,
+  AnyLocation,
   IQueryParams,
 } from 'mobx-location-history';
 import { compile, match, ParamData, parse, TokenData } from 'path-to-regexp';
@@ -28,8 +28,8 @@ export class Route<
   TPath extends string,
   TParentRoute extends Route<any, any> | null = null,
 > {
-  protected history: IMobxHistory;
-  protected location: IMobxLocation;
+  protected history: AnyHistory;
+  protected location: AnyLocation;
   parent: TParentRoute;
 
   query: IQueryParams;
@@ -59,7 +59,7 @@ export class Route<
     protected config: RouteConfiguration<TParentRoute> = {},
   ) {
     this.history = config.history ?? routeConfig.get().history;
-    this.location = config.location ?? routeConfig.get().location;
+    this.location = config.location ?? routeConfig.get().location ?? this.history.location;
     this.query = config.queryParams ?? routeConfig.get().queryParams;
     this.isIndex = !!this.config.index;
     this.isHash = this.config.hash ?? !!routeConfig.get().useHashRouting;
@@ -276,9 +276,9 @@ export class Route<
     const state = rawState ?? null;
 
     if (replace) {
-      this.history.replaceState(state, '', url);
+      this.history.replace(url, state);
     } else {
-      this.history.pushState(state, '', url);
+      this.history.push(url, state);
     }
   }
 

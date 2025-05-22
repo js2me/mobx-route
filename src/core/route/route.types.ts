@@ -1,8 +1,4 @@
-import {
-  IMobxHistory,
-  IMobxLocation,
-  IQueryParams,
-} from 'mobx-location-history';
+import { AnyHistory, AnyLocation, IQueryParams } from 'mobx-location-history';
 import { ParseOptions } from 'path-to-regexp';
 import { AnyObject } from 'yummies/utils/types';
 
@@ -11,8 +7,8 @@ import { AnyRouter } from '../router/index.js';
 import type { Route } from './route.js';
 
 export interface RouteGlobalConfiguration {
-  history: IMobxHistory;
-  location: IMobxLocation;
+  history: AnyHistory;
+  location: AnyLocation;
   queryParams: IQueryParams;
   router?: AnyRouter;
   baseUrl?: string;

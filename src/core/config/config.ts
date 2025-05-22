@@ -1,15 +1,16 @@
 import {
   IQueryParams,
-  MobxHistory,
-  MobxLocation,
+  History,
   QueryParams,
+  AnyLocation,
+  AnyHistory,
 } from 'mobx-location-history';
 import { createGlobalDynamicConfig } from 'yummies/complex';
 
 import { RouteGlobalConfig } from './config.types.js';
 
-let localHistory: MobxHistory | undefined;
-let localLocation: MobxLocation | undefined;
+let localHistory: AnyHistory | undefined;
+let localLocation: AnyLocation | undefined;
 let localQueryParams: IQueryParams | undefined;
 
 export const routeConfig = createGlobalDynamicConfig<RouteGlobalConfig>(
@@ -18,28 +19,27 @@ export const routeConfig = createGlobalDynamicConfig<RouteGlobalConfig>(
       localHistory.destroy();
     }
 
-    const history = update?.history ?? (localHistory = new MobxHistory());
+    const history = update?.history ?? (localHistory = new History());
 
-    if (localLocation && update?.location) {
+    if (localLocation && update?.location && 'destroy' in localLocation) {
       localLocation.destroy();
     }
 
-    const location =
-      update?.location ?? (localLocation = new MobxLocation(history));
+    const location = update?.location ?? history.location;
     let queryParams: IQueryParams;
 
     if ((update?.history || update?.location) && !update.queryParams) {
       if (localQueryParams) {
         localQueryParams.destroy();
       }
-      queryParams = localQueryParams = new QueryParams(location, history);
+      queryParams = localQueryParams = new QueryParams({ history });
     } else {
       if (localQueryParams && update?.queryParams) {
         localQueryParams.destroy();
       }
       queryParams =
         update?.queryParams ??
-        (localQueryParams = new QueryParams(location, history));
+        (localQueryParams = new QueryParams({ history }));
     }
 
     return {

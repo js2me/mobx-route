@@ -6,9 +6,9 @@ This object contains all global options for some behaviour of route and router i
 ## Basic example
 
 ```ts
-import { routeConfig, MobxHistory } from "mobx-route";
+import { routeConfig, History } from "mobx-route";
 
-const yourHistory = new MobxHistory()
+const yourHistory = new History()
 
 routeConfig.update({
   history: yourHistory,
@@ -22,11 +22,11 @@ routeConfig.get();
 ## Fields   
 
 ### `history`  
-This is instance of the `MobxHistory` class from [`mobx-location-history` package](https://github.com/js2me/mobx-location-history).  
+This is instance of the `History` class from [`mobx-location-history` package](https://github.com/js2me/mobx-location-history).  
 This class is also can be exported from `mobx-route` package.  
 
 ### `location`  
-This is instance of the `MobxLocation` class from [`mobx-location-history` package](https://github.com/js2me/mobx-location-history)  
+This is instance of the `Location` class from [`mobx-location-history` package](https://github.com/js2me/mobx-location-history)  
 This class is also can be exported from `mobx-route` package.  
 
 ### `queryParams`  

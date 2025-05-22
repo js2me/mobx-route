@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/no-dead-store */
 /* eslint-disable sonarjs/sonar-no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { MobxHistory, MobxLocation } from 'mobx-location-history';
+import { History, Location, To } from 'mobx-location-history';
 import { beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 
 import { routeConfig } from '../config/config.js';
@@ -10,37 +10,29 @@ import { RouteGroup } from '../route-group/route-group.js';
 import { Route } from './route.js';
 import { PathParam } from './route.types.js';
 
-class MobxHistoryMock extends MobxHistory {
-  pushStateSpy = vi.fn();
-  replaceStateSpy = vi.fn();
+class HistoryMock extends History {
+  spies = {
+    push: vi.fn((to: To, state?: any) => super.push(to, state)),
+    replace: vi.fn((to: To, state?: any) => super.replace(to, state)),
+  };
 
-  pushState(
-    data: any,
-    unused: string,
-    url?: string | URL | null | undefined,
-  ): void {
-    this.pushStateSpy(data, unused, url);
-    super.pushState(data, unused, url);
+  push(to: To, state?: any): void {
+    return this.spies.push(to, state);
   }
 
-  replaceState(
-    data: any,
-    unused: string,
-    url?: string | URL | null | undefined,
-  ): void {
-    this.replaceStateSpy(data, unused, url);
-    super.replaceState(data, unused, url);
+  replace(to: To, state?: any): void {
+    return this.spies.replace(to, state);
   }
 
   resetMocks() {
-    this.pushStateSpy.mockReset();
-    this.replaceStateSpy.mockReset();
+    this.spies.push.mockReset();
+    this.spies.replace.mockReset();
   }
 }
 
 describe('route', () => {
-  const history = new MobxHistoryMock();
-  const location = new MobxLocation(history);
+  const history = new HistoryMock();
+  const location = new Location({ history });
 
   routeConfig.update({
     history,
@@ -59,7 +51,7 @@ describe('route', () => {
   it('/test', () => {
     const route = new Route('/test');
     route.open();
-    expect(history.pushStateSpy).toBeCalledWith(null, '', '/test');
+    expect(history.spies.push).toBeCalledWith('/test', null);
   });
 
   it('/test/:id/:bar{/:bar3}', () => {
@@ -68,7 +60,7 @@ describe('route', () => {
       id: 1,
       bar: 'barg',
     });
-    expect(history.pushStateSpy).toBeCalledWith(null, '', '/test/1/barg');
+    expect(history.spies.push).toBeCalledWith('/test/1/barg', null);
     expectTypeOf(route.open).toBeFunction();
     expectTypeOf(route.open).parameter(0).toEqualTypeOf<
       | string
@@ -85,7 +77,7 @@ describe('route', () => {
     route.open({
       splat: [1, 2, 3],
     });
-    expect(history.pushStateSpy).toBeCalledWith(null, '', '/test/1/2/3');
+    expect(history.spies.push).toBeCalledWith('/test/1/2/3', null);
   });
 
   it('/users{/:id}/delete', () => {
@@ -93,12 +85,12 @@ describe('route', () => {
     route.open({
       id: 1,
     });
-    expect(history.pushStateSpy).toBeCalledWith(null, '', '/users/1/delete');
+    expect(history.spies.push).toBeCalledWith('/users/1/delete', null);
 
     history.resetMocks();
 
     route.open();
-    expect(history.pushStateSpy).toBeCalledWith(null, '', '/users/delete');
+    expect(history.spies.push).toBeCalledWith('/users/delete', null);
 
     history.resetMocks();
 
@@ -108,11 +100,7 @@ describe('route', () => {
       bar: 2,
       id: 3,
     });
-    expect(history.pushStateSpy).toBeCalledWith(
-      null,
-      '',
-      '/users/3/delete/push/1/2',
-    );
+    expect(history.spies.push).toBeCalledWith('/users/3/delete/push/1/2', null);
   });
 
   it('/posts{/:slug}/*rest', () => {
@@ -121,11 +109,7 @@ describe('route', () => {
       slug: true,
       rest: [1, 2, 3, 'bar'],
     });
-    expect(history.pushStateSpy).toBeCalledWith(
-      null,
-      '',
-      '/posts/true/1/2/3/bar',
-    );
+    expect(history.spies.push).toBeCalledWith('/posts/true/1/2/3/bar', null);
     const otherRoute = new Route('/kek/pek');
 
     expect(otherRoute.isOpened).toBe(false);
@@ -153,10 +137,9 @@ describe('route', () => {
         query: { a: 1 },
       },
     );
-    expect(history.pushStateSpy).toBeCalledWith(
-      null,
-      '',
+    expect(history.spies.push).toBeCalledWith(
       '/mobx-view-model/test/1/barg?a=1',
+      null,
     );
     expect(route.isOpened).toBe(true);
   });
@@ -202,7 +185,7 @@ describe('route', () => {
     expect(routes.private.isOpened).toBe(false);
     expect(routes.private.routes.matrices.isOpened).toBe(false);
 
-    history.pushState(null, '', '/matrices');
+    history.push('/matrices', null);
     history.resetMocks();
 
     expect(routes.private.isOpened).toBe(true);
@@ -216,7 +199,7 @@ describe('route', () => {
     expect(routes.private.routes.index.isOpened).toBe(true);
     expect(routes.private.routes.techreview.isOpened).toBe(false);
 
-    expect(history.pushStateSpy).toBeCalledWith(null, '', '/');
+    expect(history.spies.push).toBeCalledWith('/', null);
     expect(location.href).toBe('http://localhost:3000/');
     history.resetMocks();
   });
@@ -232,7 +215,7 @@ describe('route', () => {
       }),
     };
 
-    history.replaceState(null, '', '/');
+    history.replace('/', null);
     expect(location.href).toBe('http://localhost:3000/');
     expect(routes.home.isOpened).toBe(true);
     expect(routes.root.isOpened).toBe(true);
@@ -240,7 +223,7 @@ describe('route', () => {
   });
 
   it('parent test', () => {
-    history.pushState(null, '', '/a/b/c');
+    history.push('/a/b/c', null);
 
     const routeA = new Route('/a');
     const routeB = routeA.extend('/b');

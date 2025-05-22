@@ -1,7 +1,7 @@
 import {
+  AnyHistory,
+  AnyLocation,
   buildSearchString,
-  IMobxHistory,
-  IMobxLocation,
   IQueryParams,
 } from 'mobx-location-history';
 
@@ -17,14 +17,14 @@ import { RouterConfiguration, RouterNavigateOptions } from './router.types.js';
  */
 export class Router<TRoutesCollection extends RoutesCollection> {
   routes: TRoutesCollection;
-  history: IMobxHistory;
-  location: IMobxLocation;
+  history: AnyHistory;
+  location: AnyLocation;
   query: IQueryParams;
 
   constructor(config: RouterConfiguration<TRoutesCollection>) {
     this.routes = config.routes;
     this.history = config.history ?? routeConfig.get().history;
-    this.location = config.location ?? routeConfig.get().location;
+    this.location = config.location ?? routeConfig.get().location ?? this.history.location;
     this.query = config.queryParams ?? routeConfig.get().queryParams;
   }
 
@@ -34,9 +34,9 @@ export class Router<TRoutesCollection extends RoutesCollection> {
     );
 
     if (options?.replace) {
-      this.history.replaceState(null, '', navigationUrl);
+      this.history.replace(navigationUrl, options?.state);
     } else {
-      this.history.pushState(null, '', navigationUrl);
+      this.history.push(navigationUrl, options?.state);
     }
   }
 }

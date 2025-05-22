@@ -14,7 +14,7 @@ Accepts configuration with route collection and routing settings.
 
 ```ts
 import {
-  MobxLocation,
+  History,
   QueryParams,
   Route,
   routeConfig,
@@ -22,13 +22,11 @@ import {
   Router,
 } from 'mobx-route';
 
-const history = new MobxHistory();
-const location = new MobxLocation(history);
-const queryParams = new QueryParams(location, history);
+const history = new History();
+const queryParams = new QueryParams({ history });
 
 routeConfig.set({
   history,
-  location,
   queryParams,
   baseUrl: '/base-url',
 });
@@ -67,7 +65,7 @@ router.routes.home.open();
 router.routes.admin.routes.dashboard.isOpened;  
 ```
 
-### `history: IMobxHistory`  
+### `history: AnyHistory`  
 Interface for managing browser history from [`mobx-location-history` package](https://github.com/js2me/mobx-location-history).  
 Handles navigation operations.   
 
@@ -76,7 +74,7 @@ Example:
 router.history.back();
 ```
 
-### `location: IMobxLocation`  
+### `location: AnyLocation`  
 Reactive object with browser location from [`mobx-location-history` package](https://github.com/js2me/mobx-location-history).  
 
 Example:
