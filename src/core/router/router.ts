@@ -24,7 +24,8 @@ export class Router<TRoutesCollection extends RoutesCollection> {
   constructor(config: RouterConfiguration<TRoutesCollection>) {
     this.routes = config.routes;
     this.history = config.history ?? routeConfig.get().history;
-    this.location = config.location ?? routeConfig.get().location ?? this.history.location;
+    this.location =
+      config.location ?? routeConfig.get().location ?? this.history.location;
     this.query = config.queryParams ?? routeConfig.get().queryParams;
   }
 

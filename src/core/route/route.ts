@@ -59,7 +59,8 @@ export class Route<
     protected config: RouteConfiguration<TParentRoute> = {},
   ) {
     this.history = config.history ?? routeConfig.get().history;
-    this.location = config.location ?? routeConfig.get().location ?? this.history.location;
+    this.location =
+      config.location ?? routeConfig.get().location ?? this.history.location;
     this.query = config.queryParams ?? routeConfig.get().queryParams;
     this.isIndex = !!this.config.index;
     this.isHash = this.config.hash ?? !!routeConfig.get().useHashRouting;
