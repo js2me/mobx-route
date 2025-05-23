@@ -14,7 +14,7 @@ Accepts configuration with route collection and routing settings.
 
 ```ts
 import {
-  History,
+  createBrowserHistory,
   QueryParams,
   Route,
   routeConfig,
@@ -22,7 +22,7 @@ import {
   Router,
 } from 'mobx-route';
 
-const history = new History();
+const history = createBrowserHistory();
 const queryParams = new QueryParams({ history });
 
 routeConfig.set({

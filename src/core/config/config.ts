@@ -1,34 +1,28 @@
 import {
   IQueryParams,
-  History,
   QueryParams,
-  AnyLocation,
-  AnyHistory,
+  History,
+  isObservableHistory,
+  createBrowserHistory,
 } from 'mobx-location-history';
 import { createGlobalDynamicConfig } from 'yummies/complex';
 
 import { RouteGlobalConfig } from './config.types.js';
 
-let localHistory: AnyHistory | undefined;
-let localLocation: AnyLocation | undefined;
+let localHistory: History | undefined;
 let localQueryParams: IQueryParams | undefined;
 
 export const routeConfig = createGlobalDynamicConfig<RouteGlobalConfig>(
   (update) => {
-    if (localHistory && update?.history) {
+    if (localHistory && update?.history && isObservableHistory(localHistory)) {
       localHistory.destroy();
     }
 
-    const history = update?.history ?? (localHistory = new History());
+    const history = update?.history ?? (localHistory = createBrowserHistory());
 
-    if (localLocation && update?.location && 'destroy' in localLocation) {
-      localLocation.destroy();
-    }
-
-    const location = update?.location ?? history.location;
     let queryParams: IQueryParams;
 
-    if ((update?.history || update?.location) && !update.queryParams) {
+    if (update?.history && !update.queryParams) {
       if (localQueryParams) {
         localQueryParams.destroy();
       }

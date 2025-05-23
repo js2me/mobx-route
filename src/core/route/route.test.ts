@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/no-dead-store */
 /* eslint-disable sonarjs/sonar-no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { History, Location, To } from 'mobx-location-history';
+import { createBrowserHistory, History } from 'mobx-location-history';
 import { beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 
 import { routeConfig } from '../config/config.js';
@@ -10,37 +10,33 @@ import { RouteGroup } from '../route-group/route-group.js';
 import { Route } from './route.js';
 import { PathParam } from './route.types.js';
 
-class HistoryMock extends History {
-  spies = {
-    push: vi.fn((to: To, state?: any) => super.push(to, state)),
-    replace: vi.fn((to: To, state?: any) => super.replace(to, state)),
+export const mockHistory = (history: History) => {
+  const spies = {
+    push: vi.spyOn(history, 'push'),
+    replace: vi.spyOn(history, 'replace'),
   };
 
-  push(to: To, state?: any): void {
-    return this.spies.push(to, state);
-  }
+  const clearMocks = () => {
+    spies.push.mockClear();
+    spies.replace.mockClear();
+  };
 
-  replace(to: To, state?: any): void {
-    return this.spies.replace(to, state);
-  }
-
-  resetMocks() {
-    this.spies.push.mockReset();
-    this.spies.replace.mockReset();
-  }
-}
+  return {
+    ...history,
+    spies,
+    clearMocks,
+  };
+};
 
 describe('route', () => {
-  const history = new HistoryMock();
-  const location = new Location({ history });
+  const history = mockHistory(createBrowserHistory());
 
   routeConfig.update({
     history,
-    location,
   });
 
   beforeEach(() => {
-    history.resetMocks();
+    history.clearMocks();
   });
 
   it('empty string', () => {
@@ -87,12 +83,12 @@ describe('route', () => {
     });
     expect(history.spies.push).toBeCalledWith('/users/1/delete', null);
 
-    history.resetMocks();
+    history.clearMocks();
 
     route.open();
     expect(history.spies.push).toBeCalledWith('/users/delete', null);
 
-    history.resetMocks();
+    history.clearMocks();
 
     const childRoute = route.extend('/push/:id1{/:bar}');
     childRoute.open({
@@ -186,7 +182,7 @@ describe('route', () => {
     expect(routes.private.routes.matrices.isOpened).toBe(false);
 
     history.push('/matrices', null);
-    history.resetMocks();
+    history.clearMocks();
 
     expect(routes.private.isOpened).toBe(true);
     expect(routes.private.routes.matrices.isOpened).toBe(true);
@@ -201,7 +197,7 @@ describe('route', () => {
 
     expect(history.spies.push).toBeCalledWith('/', null);
     expect(location.href).toBe('http://localhost:3000/');
-    history.resetMocks();
+    history.clearMocks();
   });
 
   it('test with root paths (/, "")', () => {

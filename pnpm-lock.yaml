@@ -15,8 +15,8 @@ importers:
         specifier: ^6.12.4
         version: 6.13.7
       mobx-location-history:
-        specifier: ^5.1.0
-        version: 5.1.0(mobx@6.13.7)
+        specifier: ^6.0.4
+        version: 6.0.4(mobx@6.13.7)
       mobx-react-lite:
         specifier: ^4.0.7
         version: 4.1.0(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2193,6 +2193,9 @@ packages:
     resolution: {integrity: sha512-DoufbNNOFzwRPy8uecq+j+VCPQ+JyDelHTmSgygrA5TsR8Cbw4Qcir5sGtWiusB4BdT89nmlaVDhSJOqC/33vw==}
     hasBin: true
 
+  history@5.3.0:
+    resolution: {integrity: sha512-ZqaKwjjrAYUYfLG+htGaIIZ4nioX2L70ZUMIFysS3xvBsSG4x/n1V6TXV3N8ZYNuFGlDirFg32T7B6WOUPDYcQ==}
+
   hosted-git-info@2.8.9:
     resolution: {integrity: sha512-mxIDAb9Lsm6DoOJ7xH+5+X4y1LU/4Hi50L9C5sIswK3JzULS4bwk1FvjdBgvYR4bzT4tuUQiC15FE2f5HbLvYw==}
 
@@ -2572,8 +2575,8 @@ packages:
     resolution: {integrity: sha512-qOOzS1cBTWYF4BH8fVePDBOO9iptMnGUEZwNc/cMWnTV2nVLZ7VoNWEPHkYczZA0pdoA7dl6e7FL659nX9S2aw==}
     engines: {node: '>=16 || 14 >=14.17'}
 
-  mobx-location-history@5.1.0:
-    resolution: {integrity: sha512-CATiYz8ZNszx2Vluun9KBywg9yZwXUt7VC7T+/RpzPJGiJfZ4sJcDz5w4bBPt2QCEaAxHK/3oj8mGymfo0d8oQ==}
+  mobx-location-history@6.0.4:
+    resolution: {integrity: sha512-B2RJG/SCucWOZ1qYjTQ1RuaOpMeovI5O+RdQa6Ua4mSwFigSGf4CROL+oRu3KRhSJhgF4OlwJJBbNs4JkOALfA==}
     peerDependencies:
       mobx: ^6.13.3
 
@@ -5877,6 +5880,10 @@ snapshots:
 
   he@0.5.0: {}
 
+  history@5.3.0:
+    dependencies:
+      '@babel/runtime': 7.27.1
+
   hosted-git-info@2.8.9: {}
 
   html-encoding-sniffer@4.0.0:
@@ -6291,8 +6298,9 @@ snapshots:
 
   minipass@7.1.2: {}
 
-  mobx-location-history@5.1.0(mobx@6.13.7):
+  mobx-location-history@6.0.4(mobx@6.13.7):
     dependencies:
+      history: 5.3.0
       linked-abort-controller: 1.1.0
       mobx: 6.13.7
       yummies: 3.2.6

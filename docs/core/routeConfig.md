@@ -6,12 +6,12 @@ This object contains all global options for some behaviour of route and router i
 ## Basic example
 
 ```ts
-import { routeConfig, History } from "mobx-route";
+import { routeConfig, createBrowserHistory } from "mobx-route";
 
-const yourHistory = new History()
+const history = createBrowserHistory()
 
 routeConfig.update({
-  history: yourHistory,
+  history,
   baseUrl: '/',
   useHashRouting: false, // default - false
 });
@@ -22,12 +22,42 @@ routeConfig.get();
 ## Fields   
 
 ### `history`  
-This is instance of the `History` class from [`mobx-location-history` package](https://github.com/js2me/mobx-location-history).  
-This class is also can be exported from `mobx-route` package.  
+This is interface `History` from [`mobx-location-history` package](https://github.com/js2me/mobx-location-history).  
+API is identical with [`history` NPM package](https://www.npmjs.com/package/history)  
 
-### `location`  
-This is instance of the `Location` class from [`mobx-location-history` package](https://github.com/js2me/mobx-location-history)  
-This class is also can be exported from `mobx-route` package.  
+Example:  
+
+```ts
+import {
+  createHashHistory,
+  createBrowserHistory,
+  createMemoryHistory,
+} from "mobx-location-history";
+
+routeConfig.update({
+  history: createHashHistory(),
+  history: createBrowserHistory(),
+  history: createMemoryHistory(),
+})
+```
+
+::: tip 
+Factory functions for this property is also can be exported from `mobx-route` package.  
+:::
+
+```ts
+import {
+  createHashHistory,
+  createBrowserHistory,
+  createMemoryHistory,
+} from "mobx-route";
+
+routeConfig.update({
+  history: createHashHistory(),
+  history: createBrowserHistory(),
+  history: createMemoryHistory(),
+})
+```
 
 ### `queryParams`  
 This is instance of the `QueryParams` class from [`mobx-location-history` package](https://github.com/js2me/mobx-location-history)  

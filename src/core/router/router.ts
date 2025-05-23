@@ -1,6 +1,6 @@
+import { computed, makeObservable } from 'mobx';
 import {
-  AnyHistory,
-  AnyLocation,
+  History,
   buildSearchString,
   IQueryParams,
 } from 'mobx-location-history';
@@ -17,16 +17,21 @@ import { RouterConfiguration, RouterNavigateOptions } from './router.types.js';
  */
 export class Router<TRoutesCollection extends RoutesCollection> {
   routes: TRoutesCollection;
-  history: AnyHistory;
-  location: AnyLocation;
+  history: History;
   query: IQueryParams;
 
   constructor(config: RouterConfiguration<TRoutesCollection>) {
     this.routes = config.routes;
     this.history = config.history ?? routeConfig.get().history;
-    this.location =
-      config.location ?? routeConfig.get().location ?? this.history.location;
     this.query = config.queryParams ?? routeConfig.get().queryParams;
+
+    computed.struct(this, 'location');
+
+    makeObservable(this);
+  }
+
+  get location() {
+    return this.history.location;
   }
 
   navigate(url: string, options?: RouterNavigateOptions) {
