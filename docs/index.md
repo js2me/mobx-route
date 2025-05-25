@@ -31,7 +31,7 @@ features:
     details: Route definitions without inline string paths
   - title: Isomorphic
     icon: 🌐
-    details: Passing your own history and location instances
+    details: Passing your own history
   - title: Flexible
     icon: 💪🏻
     details: Live without path-based routing
