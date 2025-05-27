@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 import { action, computed, makeObservable, observable } from 'mobx';
 import {
   buildSearchString,
@@ -11,6 +12,8 @@ import { routeConfig } from '../config/config.js';
 
 import {
   AnyRoute,
+  BeforeOpenCheckResult,
+  OpenData,
   ExtractPathParams,
   ParsedPathParams,
   RouteConfiguration,
@@ -140,7 +143,11 @@ export class Route<
    * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#isopened-boolean)
    */
   get isOpened() {
-    return this.data !== null;
+    if (this.data === null) {
+      return false;
+    }
+
+    return !this.config.checkOpened || this.config.checkOpened(this.data);
   }
 
   /**
@@ -233,7 +240,7 @@ export class Route<
           navigateParams?: RouteNavigateParams,
         ]
       : [params: ExtractPathParams<TPath>, navigateParams?: RouteNavigateParams]
-  ): void;
+  ): void | Promise<void>;
   open(
     ...args: AllPropertiesOptional<ExtractPathParams<TPath>> extends true
       ? [
@@ -246,13 +253,13 @@ export class Route<
           replace?: RouteNavigateParams['replace'],
           query?: RouteNavigateParams['query'],
         ]
-  ): void;
-  open(url: string, navigateParams?: RouteNavigateParams): void;
+  ): void | Promise<void>;
+  open(url: string, navigateParams?: RouteNavigateParams): void | Promise<void>;
   open(
     url: string,
     replace?: RouteNavigateParams['replace'],
     query?: RouteNavigateParams['query'],
-  ): void;
+  ): void | Promise<void>;
 
   /**
    * Navigates to this route.
@@ -260,17 +267,71 @@ export class Route<
    * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#open-args)
    */
   open(...args: any[]) {
-    const {
+    let {
       replace,
       state: rawState,
       query,
     } = typeof args[1] === 'boolean' || args.length > 2
       ? { replace: args[1], query: args[2] }
       : (args[1] ?? {});
-    const url =
-      typeof args[0] === 'string' ? args[0] : this.createUrl(args[0], query);
+    let url: string;
+    let params: Maybe<ExtractPathParams<TPath>>;
 
-    const state = rawState ?? null;
+    if (typeof args[0] === 'string') {
+      url = args[0];
+    } else {
+      params = args[0] as ExtractPathParams<TPath>;
+      url = this.createUrl(args[0], query);
+    }
+
+    let state = rawState ?? null;
+
+    const openData: OpenData = {
+      url,
+      params: params as AnyObject,
+      replace,
+      state,
+      query,
+    };
+
+    const beforeOpenResult = this.beforeOpen(openData);
+
+    if (beforeOpenResult && beforeOpenResult instanceof Promise) {
+      return beforeOpenResult.then((beforeOpenCheck) =>
+        this.applyOpen(openData, beforeOpenCheck),
+      );
+    } else {
+      this.applyOpen(openData, beforeOpenResult);
+    }
+  }
+
+  protected beforeOpen(
+    openData: OpenData,
+  ): BeforeOpenCheckResult | Promise<BeforeOpenCheckResult> {
+    if (this.config.beforeOpen) {
+      return this.config.beforeOpen(openData);
+    }
+
+    return true;
+  }
+
+  private applyOpen(
+    beforeOpenData: OpenData,
+    beforeOpenCheckResult: BeforeOpenCheckResult,
+  ) {
+    let url = beforeOpenData.url;
+    let replace = beforeOpenData.replace;
+    let state = beforeOpenData.state;
+
+    if (beforeOpenCheckResult === false) {
+      return;
+    }
+
+    if (typeof beforeOpenCheckResult === 'object') {
+      url = beforeOpenCheckResult.url;
+      replace = beforeOpenCheckResult.replace ?? beforeOpenData.replace;
+      state = beforeOpenCheckResult.state ?? beforeOpenData.state;
+    }
 
     if (replace) {
       this.history.replace(url, state);

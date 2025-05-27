@@ -1,26 +1,55 @@
-import { History, IQueryParams } from 'mobx-location-history';
 import { ParseOptions } from 'path-to-regexp';
 import { AnyObject } from 'yummies/utils/types';
 
-import { AnyRouter } from '../router/index.js';
+import { RouteGlobalConfig } from '../config/config.types.js';
 
 import type { Route } from './route.js';
 
-export interface RouteGlobalConfiguration {
-  history: History;
-  queryParams: IQueryParams;
-  router?: AnyRouter;
-  baseUrl?: string;
-}
+export type OpenData = {
+  state?: any;
+
+  /**
+   * path parameters
+   *
+   * can be received from extended routes
+   */
+  params?: AnyObject;
+
+  url: string;
+
+  replace?: boolean;
+
+  query?: AnyObject;
+};
+
+/**
+ * Returning `false` means ignore navigation
+ */
+export type BeforeOpenCheckResult =
+  | void
+  | boolean
+  | {
+      url: string;
+      state?: any;
+      replace?: boolean;
+    };
+
+export type BeforeOpenHandler = (
+  openData: OpenData,
+) => BeforeOpenCheckResult | Promise<BeforeOpenCheckResult>;
+
+export type RouteOpenedChecker = (data: AnyObject) => boolean;
 
 export interface RouteConfiguration<TParentRoute extends AnyRoute | null = null>
-  extends Partial<RouteGlobalConfiguration> {
+  extends Partial<Omit<RouteGlobalConfig, 'useHashRouting'>> {
   index?: boolean;
   hash?: boolean;
   meta?: AnyObject;
   parseOptions?: ParseOptions;
   parent?: TParentRoute;
   children?: AnyRoute[];
+  checkOpened?: RouteOpenedChecker;
+  beforeOpen?: BeforeOpenHandler;
 }
 
 export type AnyRoute = Route<string, any>;

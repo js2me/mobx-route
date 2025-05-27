@@ -53,9 +53,13 @@ First argument can be required based on path declaration (first argument)
 
 **API Signature**  
 ```ts
-open(params?, { query?, replace?, state? })
-open(params?, replace?, query?)
+open(params?, { query?, replace?, state? }): Promise<void> | void
+open(params?, replace?, query?): Promise<void> | void
 ```
+
+::: info This method can return `Promise<void>`
+In case `beforeOpen` returns a `Promise`
+:::
 
 Examples:  
 ```ts
@@ -186,3 +190,64 @@ Manually add child routes. Prefer `extend()` for typical use cases.
 
 ### `removeChildren(...routes: AnyRoute[]): void` <Badge type="info" text="action" />     
 Remove specified routes from children.  
+
+
+## Route configuration   
+This is the second argument when creating an instance of the `Route` class.  
+Required for route configuration  
+
+**API Signature**  
+```ts
+new Route('/foo/bar', {
+  history: History;
+  queryParams: IQueryParams;
+  router?: AnyRouter;
+  baseUrl?: string;
+  index?: boolean;
+  hash?: boolean;
+  meta?: AnyObject;
+  parseOptions?: ParseOptions;
+  parent?: AnyRoute;
+  children?: AnyRoute[];
+  beforeOpen?: BeforeOpenHandler;
+})
+```
+
+### `beforeOpen`  
+Event handler "before opening" a route, required for various checks before the route itself is opened.   
+With this handler, we can prevent the route from opening by returning `false`,  
+or override the navigation to another one by returning   
+```ts
+{
+  url: string;
+  state?: any;
+  replace?: boolean;
+}
+```
+
+Example:   
+```ts
+const route = new Route('/foo/bar', {
+  beforeOpen: () => {
+    if (!auth.isAuth) {
+      return false;
+    }
+  }
+})
+```
+
+### `checkOpened`   
+Allows additional check of route state "`isOpened`".   
+
+Example:   
+```ts
+const route = new Route('/foo/bar', {
+  checkOpened: () => {
+    if (auth.isAuth) {
+      return true;
+    }
+
+    return false;
+  }
+})
+```
