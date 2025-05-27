@@ -239,6 +239,10 @@ const route = new Route('/foo/bar', {
 ### `checkOpened`   
 Allows additional check of route state "`isOpened`".   
 
+::: info
+This check will only be called AFTER if this route is valid by `pathname`
+:::
+
 Example:   
 ```ts
 const route = new Route('/foo/bar', {
