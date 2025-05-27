@@ -29,7 +29,7 @@ import {
 export class Route<
   TPath extends string,
   TParentRoute extends Route<any, any> | null = null,
-> {
+> extends String {
   protected history: History;
   parent: TParentRoute;
 
@@ -59,6 +59,8 @@ export class Route<
     public path: TPath,
     protected config: RouteConfiguration<TParentRoute> = {},
   ) {
+    super(path);
+
     this.history = config.history ?? routeConfig.get().history;
     this.query = config.queryParams ?? routeConfig.get().queryParams;
     this.isIndex = !!this.config.index;
