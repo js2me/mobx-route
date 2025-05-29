@@ -34,6 +34,9 @@ export type LinkProps<TRoute extends AnyRoute> = Omit<
     | {
         to: string;
       }
+    | {
+        href: string;
+      }
   );
 
 type LinkComponentType = <TRoute extends AnyRoute>(
@@ -43,11 +46,23 @@ type LinkComponentType = <TRoute extends AnyRoute>(
 export const Link = observer(
   forwardRef<HTMLAnchorElement, AnyObject>(
     (
-      { to, asChild, query, replace, children, params, ...anchorProps },
+      {
+        to,
+        href: outerHref,
+        asChild,
+        query,
+        replace,
+        children,
+        params,
+        ...anchorProps
+      },
       ref,
     ) => {
       const href =
-        typeof to === 'string' ? to : (to as AnyRoute).createUrl(params, query);
+        outerHref ??
+        (typeof to === 'string'
+          ? to
+          : (to as AnyRoute).createUrl(params, query));
 
       const handleClick = (event: MouseEvent<HTMLElement>) => {
         if (
