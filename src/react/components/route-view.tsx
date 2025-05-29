@@ -51,7 +51,11 @@ function RouteViewBase<TRouteEntity extends AnyRouteEntity>(
 
   const params = 'params' in props.route ? props.route.params : {};
 
-  return Component && <Component params={params}>{props.children}</Component>;
+  return Component ? (
+    <Component params={params}>{props.children}</Component>
+  ) : (
+    props.children
+  );
 }
 
 export const RouteView = observer(RouteViewBase);
