@@ -1,9 +1,6 @@
 import { computed, makeObservable, observable } from 'mobx';
 
-import {
-  AnyRouteFromCollection,
-  RoutesCollection,
-} from './route-group.types.js';
+import { AnyRouteEntity, RoutesCollection } from './route-group.types.js';
 
 declare const process: { env: { NODE_ENV?: string } };
 
@@ -17,7 +14,7 @@ export class RouteGroup<TRoutesCollection extends RoutesCollection> {
 
   constructor(
     routes: TRoutesCollection,
-    private _indexRoute?: AnyRouteFromCollection<TRoutesCollection>,
+    private _indexRoute?: AnyRouteEntity,
   ) {
     this.routes = routes;
 
@@ -46,12 +43,12 @@ export class RouteGroup<TRoutesCollection extends RoutesCollection> {
    *
    * [**Documentation**](https://js2me.github.io/mobx-route/core/RouteGroup.html#indexroute-route-undefined)
    */
-  get indexRoute(): AnyRouteFromCollection<TRoutesCollection> | undefined {
+  get indexRoute(): AnyRouteEntity | undefined {
     return (
       this._indexRoute ??
-      (Object.values(this.routes).find(
+      Object.values(this.routes).find(
         (route) => 'isIndex' in route && route.isIndex,
-      ) as unknown as AnyRouteFromCollection<TRoutesCollection>)
+      )
     );
   }
 
@@ -64,7 +61,6 @@ export class RouteGroup<TRoutesCollection extends RoutesCollection> {
     let lastGroupRoute: RouteGroup<any> | undefined;
 
     if (this.indexRoute) {
-      // @ts-expect-error no way to handle this ts error
       this.indexRoute.open(...args);
       return;
     }
