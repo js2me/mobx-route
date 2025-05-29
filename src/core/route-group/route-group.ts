@@ -1,6 +1,9 @@
 import { computed, makeObservable, observable } from 'mobx';
 
-import { RoutesCollection } from './route-group.types.js';
+import {
+  AnyRouteFromCollection,
+  RoutesCollection,
+} from './route-group.types.js';
 
 declare const process: { env: { NODE_ENV?: string } };
 
@@ -9,10 +12,13 @@ declare const process: { env: { NODE_ENV?: string } };
  *
  * [**Documentation**](https://js2me.github.io/mobx-route/core/RouteGroup.html)
  */
-export class RouteGroup<const TRoutesCollection extends RoutesCollection> {
+export class RouteGroup<TRoutesCollection extends RoutesCollection> {
   routes: TRoutesCollection;
 
-  constructor(routes: TRoutesCollection) {
+  constructor(
+    routes: TRoutesCollection,
+    private _indexRoute?: AnyRouteFromCollection<TRoutesCollection>,
+  ) {
     this.routes = routes;
 
     computed.struct(this, 'isOpened');
@@ -40,9 +46,12 @@ export class RouteGroup<const TRoutesCollection extends RoutesCollection> {
    *
    * [**Documentation**](https://js2me.github.io/mobx-route/core/RouteGroup.html#indexroute-route-undefined)
    */
-  get indexRoute() {
-    return Object.values(this.routes).find(
-      (route) => 'isIndex' in route && route.isIndex,
+  get indexRoute(): AnyRouteFromCollection<TRoutesCollection> | undefined {
+    return (
+      this._indexRoute ??
+      (Object.values(this.routes).find(
+        (route) => 'isIndex' in route && route.isIndex,
+      ) as unknown as AnyRouteFromCollection<TRoutesCollection>)
     );
   }
 
@@ -55,6 +64,7 @@ export class RouteGroup<const TRoutesCollection extends RoutesCollection> {
     let lastGroupRoute: RouteGroup<any> | undefined;
 
     if (this.indexRoute) {
+      // @ts-expect-error no way to handle this ts error
       this.indexRoute.open(...args);
       return;
     }
