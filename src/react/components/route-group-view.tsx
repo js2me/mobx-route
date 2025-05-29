@@ -23,10 +23,16 @@ export type RouteGroupView<TRouteEntity extends AnyRouteEntity> =
 
 export type RouteGroupViews<TRoutes extends RoutesCollection> =
   TRoutes extends RoutesArrayCollection
-    ? RouteGroupView<TRoutes[number]>[]
+    ? {
+        [K in keyof TRoutes]: TRoutes[K] extends AnyRouteEntity
+          ? RouteGroupView<TRoutes[K]>
+          : never;
+      }
     : TRoutes extends RoutesObjectCollection
       ? {
-          [K in keyof TRoutes]: RouteGroupView<TRoutes[K]>;
+          [K in keyof TRoutes]: TRoutes[K] extends AnyRouteEntity
+            ? RouteGroupView<TRoutes[K]>
+            : never;
         }
       : EmptyObject;
 
