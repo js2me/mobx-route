@@ -1,5 +1,6 @@
 /* eslint-disable prefer-const */
-import { action, computed, makeObservable, observable } from 'mobx';
+import { LinkedAbortController } from 'linked-abort-controller';
+import { action, computed, makeObservable, observable, reaction } from 'mobx';
 import {
   buildSearchString,
   History,
@@ -30,6 +31,7 @@ export class Route<
   TPath extends string,
   TParentRoute extends Route<any, any> | null = null,
 > extends String {
+  protected abortController: AbortController;
   protected history: History;
   parent: TParentRoute;
 
@@ -57,10 +59,11 @@ export class Route<
 
   constructor(
     public path: TPath,
-    protected config: RouteConfiguration<TParentRoute> = {},
+    protected config: RouteConfiguration<TPath, TParentRoute> = {},
   ) {
     super(path);
 
+    this.abortController = new LinkedAbortController(config.abortSignal);
     this.history = config.history ?? routeConfig.get().history;
     this.query = config.queryParams ?? routeConfig.get().queryParams;
     this.isIndex = !!this.config.index;
@@ -80,6 +83,33 @@ export class Route<
     action(this, 'removeChildren');
 
     makeObservable(this);
+
+    if (config.onOpen || config.onClose) {
+      let firstReactionCall = true;
+
+      reaction(
+        () => this.isOpened,
+        (isOpened) => {
+          if (firstReactionCall) {
+            firstReactionCall = false;
+            // ignore first 'onClose' callback call
+            if (!isOpened) {
+              return;
+            }
+          }
+
+          if (isOpened) {
+            config.onOpen?.(this.data!, this);
+          } else {
+            config.onClose?.();
+          }
+        },
+        {
+          signal: this.abortController.signal,
+          fireImmediately: true,
+        },
+      );
+    }
   }
 
   protected get baseUrl() {
@@ -347,5 +377,9 @@ export class Route<
       this._tokenData = parse(this.path, this.config.parseOptions);
     }
     return this._tokenData;
+  }
+
+  destroy() {
+    this.abortController.abort();
   }
 }

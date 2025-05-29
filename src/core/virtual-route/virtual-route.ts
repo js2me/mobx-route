@@ -1,4 +1,5 @@
-import { action, computed, makeObservable, observable } from 'mobx';
+import { LinkedAbortController } from 'linked-abort-controller';
+import { action, computed, makeObservable, observable, reaction } from 'mobx';
 import { IQueryParams } from 'mobx-location-history';
 import { FnValue, resolveFnValue } from 'yummies/common';
 import {
@@ -19,13 +20,17 @@ import { VirtualRouteConfiguration } from './virtual-route.types.js';
  */
 export class VirtualRoute<
   TParams extends AnyObject | EmptyObject = EmptyObject,
-> {
+> extends String {
+  protected abortController: AbortController;
   query: IQueryParams;
   params: TParams | null;
 
   private checkOpened: FnValue<boolean, [route: this]>;
 
   constructor(protected config: VirtualRouteConfiguration<TParams> = {}) {
+    super(config.stringContent);
+
+    this.abortController = new LinkedAbortController(config.abortSignal);
     this.query = config.queryParams ?? routeConfig.get().queryParams;
     this.params = resolveFnValue(config.initialParams, this) ?? null;
     this.checkOpened = config.checkOpened as any;
@@ -36,6 +41,33 @@ export class VirtualRoute<
     action(this, 'open');
     action(this, 'close');
     makeObservable(this);
+
+    if (config.onOpen || config.onClose) {
+      let firstReactionCall = true;
+
+      reaction(
+        () => this.isOpened,
+        (isOpened) => {
+          if (firstReactionCall) {
+            firstReactionCall = false;
+            // ignore first 'onClose' callback call
+            if (!isOpened) {
+              return;
+            }
+          }
+
+          if (isOpened) {
+            config.onOpen?.(this.params!, this);
+          } else {
+            config.onClose?.();
+          }
+        },
+        {
+          signal: this.abortController.signal,
+          fireImmediately: true,
+        },
+      );
+    }
   }
 
   /**
@@ -83,5 +115,9 @@ export class VirtualRoute<
     }
 
     this.checkOpened = false;
+  }
+
+  destroy() {
+    this.abortController.abort();
   }
 }

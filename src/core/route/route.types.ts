@@ -40,8 +40,11 @@ export type BeforeOpenHandler = (
 
 export type RouteOpenedChecker = (data: AnyObject) => boolean;
 
-export interface RouteConfiguration<TParentRoute extends AnyRoute | null = null>
-  extends Partial<Omit<RouteGlobalConfig, 'useHashRouting'>> {
+export interface RouteConfiguration<
+  TPath extends string,
+  TParentRoute extends AnyRoute | null = null,
+> extends Partial<Omit<RouteGlobalConfig, 'useHashRouting'>> {
+  abortSignal?: AbortSignal;
   index?: boolean;
   hash?: boolean;
   meta?: AnyObject;
@@ -50,6 +53,11 @@ export interface RouteConfiguration<TParentRoute extends AnyRoute | null = null>
   children?: AnyRoute[];
   checkOpened?: RouteOpenedChecker;
   beforeOpen?: BeforeOpenHandler;
+  onOpen?: (
+    data: RouteMatchesData<TPath>,
+    route: Route<TPath, TParentRoute>,
+  ) => void;
+  onClose?: () => void;
 }
 
 export type AnyRoute = Route<string, any>;

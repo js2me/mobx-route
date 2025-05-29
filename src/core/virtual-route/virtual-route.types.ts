@@ -14,6 +14,7 @@ export type AnyVirtualRoute = VirtualRoute<any>;
 export interface VirtualRouteConfiguration<
   TParams extends AnyObject | EmptyObject = EmptyObject,
 > {
+  abortSignal?: AbortSignal;
   queryParams?: IQueryParams;
   checkOpened?: FnValue<boolean, [route: VirtualRoute<TParams>]>;
   initialParams?: FnValue<Maybe<TParams>, [route: VirtualRoute<TParams>]>;
@@ -28,4 +29,7 @@ export interface VirtualRouteConfiguration<
   // custom implementation of close behaviour for this route
   // if not provided, default implementation will be used
   close?: (route: VirtualRoute<TParams>) => boolean;
+  onOpen?: (params: TParams, route: VirtualRoute<TParams>) => void;
+  onClose?: () => void;
+  stringContent?: string;
 }
