@@ -89,6 +89,7 @@ export default defineConfig({
           { text: 'Memory routing', link: '/recipes/memory-routing' },
           { text: 'Hash routing', link: '/recipes/hash-routing' },
           { text: 'Protected routes', link: '/recipes/protected-routes' },
+          { text: 'Rest path params', link: '/recipes/rest-path-params' },
         ],
       }
     ],
