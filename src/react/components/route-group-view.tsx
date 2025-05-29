@@ -41,32 +41,34 @@ export interface RouteGroupViewProps<TRouteGroup extends AnyRouteGroup> {
   views: Partial<RouteGroupViews<TRouteGroup['routes']>>;
 }
 
+const RouteGroupViewBase = <TRouteGroup extends AnyRouteGroup>({
+  group,
+  views,
+}: RouteGroupViewProps<TRouteGroup>) => {
+  const viewEntries = Object.entries(views);
+
+  return (
+    <>
+      {viewEntries.map(([routeName, propsOrView]) => {
+        // @ts-expect-error Object.entries is not accept types for arrays
+        const route = group.routes[routeName];
+        const viewProps =
+          propsOrView &&
+          (typeof propsOrView === 'function' ||
+            'contextTypes' in propsOrView ||
+            '$$typeof' in propsOrView)
+            ? {
+                view: propsOrView as any,
+              }
+            : propsOrView;
+
+        return <RouteView key={routeName} route={route} {...viewProps} />;
+      })}
+    </>
+  );
+};
+
 export const RouteGroupView = memo(
-  <TRouteGroup extends AnyRouteGroup>({
-    group,
-    views,
-  }: RouteGroupViewProps<TRouteGroup>) => {
-    const viewEntries = Object.entries(views);
-
-    return (
-      <>
-        {viewEntries.map(([routeName, propsOrView]) => {
-          // @ts-expect-error Object.entries is not accept types for arrays
-          const route = group.routes[routeName];
-          const viewProps =
-            propsOrView &&
-            (typeof propsOrView === 'function' ||
-              'contextTypes' in propsOrView ||
-              '$$typeof' in propsOrView)
-              ? {
-                  view: propsOrView as any,
-                }
-              : propsOrView;
-
-          return <RouteView key={routeName} route={route} {...viewProps} />;
-        })}
-      </>
-    );
-  },
+  RouteGroupViewBase,
   () => true,
-);
+) as typeof RouteGroupViewBase;
