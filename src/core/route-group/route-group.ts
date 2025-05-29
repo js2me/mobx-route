@@ -9,7 +9,7 @@ declare const process: { env: { NODE_ENV?: string } };
  *
  * [**Documentation**](https://js2me.github.io/mobx-route/core/RouteGroup.html)
  */
-export class RouteGroup<TRoutesCollection extends RoutesCollection> {
+export class RouteGroup<const TRoutesCollection extends RoutesCollection> {
   routes: TRoutesCollection;
 
   constructor(routes: TRoutesCollection) {

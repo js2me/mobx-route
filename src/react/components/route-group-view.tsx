@@ -1,21 +1,38 @@
 import { memo } from 'react';
+import { EmptyObject } from 'yummies/utils/types';
 
-import { AnyRouteGroup } from '../../core/index.js';
+import {
+  AnyRouteEntity,
+  AnyRouteGroup,
+  RoutesArrayCollection,
+  RoutesCollection,
+  RoutesObjectCollection,
+} from '../../core/index.js';
 
-import { RouteView, RouteViewConfigProps } from './route-view.js';
+import {
+  RouteView,
+  RouteViewComponent,
+  RouteViewConfigProps,
+} from './route-view.js';
 
-export type RouteViewCollectionProps<TRouteGroup extends AnyRouteGroup> = {
-  [K in keyof TRouteGroup['routes']]:
-    | Omit<RouteViewConfigProps<TRouteGroup['routes'][K]>, 'route'>
-    | Exclude<
-        RouteViewConfigProps<TRouteGroup['routes'][K]>['view'],
-        undefined
-      >;
-};
+export type RouteGroupView<TRouteEntity extends AnyRouteEntity> =
+  // route view detailed configuration
+  | Omit<RouteViewConfigProps<TRouteEntity>, 'route'>
+  // only route view component
+  | RouteViewComponent<TRouteEntity>;
+
+export type RouteGroupViews<TRoutes extends RoutesCollection> =
+  TRoutes extends RoutesArrayCollection
+    ? RouteGroupView<TRoutes[number]>[]
+    : TRoutes extends RoutesObjectCollection
+      ? {
+          [K in keyof TRoutes]: RouteGroupView<TRoutes[K]>;
+        }
+      : EmptyObject;
 
 export interface RouteGroupViewProps<TRouteGroup extends AnyRouteGroup> {
   group: TRouteGroup;
-  views: Partial<RouteViewCollectionProps<TRouteGroup>>;
+  views: Partial<RouteGroupViews<TRouteGroup['routes']>>;
 }
 
 export const RouteGroupView = memo(
@@ -28,6 +45,7 @@ export const RouteGroupView = memo(
     return (
       <>
         {viewEntries.map(([routeName, propsOrView]) => {
+          // @ts-expect-error Object.entries is not accept types for arrays
           const route = group.routes[routeName];
           const viewProps =
             propsOrView &&

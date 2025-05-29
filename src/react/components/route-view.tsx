@@ -8,9 +8,12 @@ import type {
   AnyVirtualRoute,
 } from '../../core/index.js';
 
+export type RouteViewComponent<TRouteEntity extends AnyRouteEntity> =
+  ComponentType<RouteViewProps<TRouteEntity>>;
+
 export interface RouteViewConfigProps<TRouteEntity extends AnyRouteEntity> {
   route: TRouteEntity;
-  view?: ComponentType<RouteViewProps<TRouteEntity>>;
+  view?: RouteViewComponent<TRouteEntity>;
   lazyView?: () => Promise<ComponentType<RouteViewProps<TRouteEntity>>>;
   loader?: ComponentType;
   notOpenedContent?: ReactNode;

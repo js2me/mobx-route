@@ -7,4 +7,8 @@ export type AnyRouteGroup = RouteGroup<RoutesCollection>;
 
 export type AnyRouteEntity = AnyRoute | AnyRouteGroup | AnyVirtualRoute;
 
-export type RoutesCollection = Record<string, AnyRouteEntity>;
+export type RoutesArrayCollection = AnyRouteEntity[];
+
+export type RoutesObjectCollection = Record<string, AnyRouteEntity>;
+
+export type RoutesCollection = RoutesArrayCollection | RoutesObjectCollection;
