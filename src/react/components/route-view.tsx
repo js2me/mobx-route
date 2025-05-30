@@ -16,7 +16,7 @@ export interface RouteViewConfigProps<TRouteEntity extends AnyRouteEntity> {
   view?: RouteViewComponent<TRouteEntity>;
   lazyView?: () => Promise<ComponentType<RouteViewProps<TRouteEntity>>>;
   loader?: ComponentType;
-  notOpenedContent?: ReactNode;
+  fallbackView?: ReactNode;
   children?: ReactNode;
 }
 
@@ -37,7 +37,7 @@ function RouteViewBase<TRouteEntity extends AnyRouteEntity>(
   let Component: ComponentType<any> | undefined;
 
   if (!props.route.isOpened) {
-    return props.notOpenedContent ?? null;
+    return props.fallbackView ?? null;
   }
 
   if (props.lazyView) {

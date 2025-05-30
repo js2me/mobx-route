@@ -1,4 +1,5 @@
-import { memo, ReactNode } from 'react';
+import { observer } from 'mobx-react-lite';
+import { ReactNode, useLayoutEffect, useMemo } from 'react';
 import { EmptyObject } from 'yummies/utils/types';
 
 import {
@@ -39,15 +40,17 @@ export type RouteGroupViews<TRoutes extends RoutesCollection> =
 export interface RouteGroupViewProps<TRouteGroup extends AnyRouteGroup> {
   group: TRouteGroup;
   views: Partial<RouteGroupViews<TRouteGroup['routes']>>;
-  notOpenedContent?: ReactNode;
+  onFallback?: VoidFunction;
+  fallbackView?: ReactNode;
 }
 
 const RouteGroupViewBase = <TRouteGroup extends AnyRouteGroup>({
   group,
   views,
-  notOpenedContent,
+  fallbackView,
+  onFallback,
 }: RouteGroupViewProps<TRouteGroup>) => {
-  const viewEntries = Object.entries(views);
+  const viewEntries = useMemo(() => Object.entries(views), []);
 
   const openedRouteEntry = viewEntries.find(([routeName]) => {
     // @ts-expect-error Object.entries is not accept types for arrays
@@ -63,8 +66,14 @@ const RouteGroupViewBase = <TRouteGroup extends AnyRouteGroup>({
         group.routes[openedRouteName]
       : undefined;
 
+  useLayoutEffect(() => {
+    if (!openedRoute) {
+      onFallback?.();
+    }
+  }, [openedRoute]);
+
   if (!openedRoute) {
-    return notOpenedContent ?? null;
+    return fallbackView ?? null;
   }
 
   const openedRouteViewProps =
@@ -74,18 +83,14 @@ const RouteGroupViewBase = <TRouteGroup extends AnyRouteGroup>({
       '$$typeof' in openedRoutePropsOrView)
       ? {
           view: openedRoutePropsOrView as any,
-          notOpenedContent,
+          fallbackView,
         }
       : {
           ...openedRoutePropsOrView,
-          notOpenedContent:
-            openedRoutePropsOrView.notOpenedContent ?? notOpenedContent,
+          fallbackView: openedRoutePropsOrView?.fallbackView ?? fallbackView,
         };
 
   return <RouteView route={openedRoute} {...openedRouteViewProps} />;
 };
 
-export const RouteGroupView = memo(
-  RouteGroupViewBase,
-  () => true,
-) as typeof RouteGroupViewBase;
+export const RouteGroupView = observer(RouteGroupViewBase);
