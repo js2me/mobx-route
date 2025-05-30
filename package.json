@@ -1,6 +1,6 @@
 {
   "name": "mobx-route",
-  "version": "0.0.71",
+  "version": "0.0.72",
   "scripts": {
     "clean": "rimraf dist",
     "lint:check": "eslint . --fix",
