@@ -179,7 +179,14 @@ export class Route<
       return false;
     }
 
-    return !this.config.checkOpened || this.config.checkOpened(this.data);
+    const isOpenedCheckFailed =
+      !!this.config.checkOpened && !this.config.checkOpened(this.data);
+
+    if (isOpenedCheckFailed || !this.hasOpenedChildren) {
+      return false;
+    }
+
+    return true;
   }
 
   /**
