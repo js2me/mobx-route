@@ -347,10 +347,7 @@ export class Route<
     return true;
   }
 
-  private applyOpen(
-    openData: OpenData,
-    checkResult?: BeforeOpenCheckResult,
-  ) {
+  private applyOpen(openData: OpenData, checkResult?: BeforeOpenCheckResult) {
     let url = openData.url;
     let replace = openData.replace;
     let state = openData.state;
