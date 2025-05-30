@@ -348,21 +348,21 @@ export class Route<
   }
 
   private applyOpen(
-    beforeOpenData: OpenData,
-    beforeOpenCheckResult: BeforeOpenCheckResult,
+    openData: OpenData,
+    checkResult?: BeforeOpenCheckResult,
   ) {
-    let url = beforeOpenData.url;
-    let replace = beforeOpenData.replace;
-    let state = beforeOpenData.state;
+    let url = openData.url;
+    let replace = openData.replace;
+    let state = openData.state;
 
-    if (beforeOpenCheckResult === false) {
+    if (checkResult === false) {
       return;
     }
 
-    if (typeof beforeOpenCheckResult === 'object') {
-      url = beforeOpenCheckResult.url;
-      replace = beforeOpenCheckResult.replace ?? beforeOpenData.replace;
-      state = beforeOpenCheckResult.state ?? beforeOpenData.state;
+    if (typeof checkResult === 'object') {
+      url = checkResult.url;
+      replace = checkResult.replace ?? openData.replace;
+      state = checkResult.state ?? openData.state;
     }
 
     if (replace) {
