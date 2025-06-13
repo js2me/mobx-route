@@ -4,5 +4,4 @@ export interface RouteGlobalConfig {
   history: History;
   queryParams: IQueryParams;
   baseUrl?: string;
-  useHashRouting?: boolean;
 }

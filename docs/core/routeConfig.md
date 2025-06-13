@@ -13,7 +13,6 @@ const history = createBrowserHistory()
 routeConfig.update({
   history,
   baseUrl: '/',
-  useHashRouting: false, // default - false
 });
 
 routeConfig.get();
@@ -66,7 +65,3 @@ This class is also can be exported from `mobx-route` package.
 ### `baseUrl`
 
 Specifies the base URL for all routes. This is used as a prefix for every route path and helps in forming complete URLs relative to this base. It's particularly useful when your application is not hosted at the root of a domain and you need consistent URL structures.  
-
-### `useHashRouting`  
-Enables or disables hash routing.  
-Default is `false`.  

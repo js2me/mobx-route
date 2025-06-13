@@ -96,10 +96,6 @@ Useful with groupping routes using [`RouteGroup`](/core/RouteGroup)
 Indicates if this route is an hash based route.  
 Hash based routes work with only `#hashstrings` in browser address URL. This is useful when you want to create routes that only affect the hash part of the URL, such as for client-side routing or for creating routes that don't affect the server-side routing.  
 
-::: info  
-This parameter will be `true` if you set [`useHashRouting`](/core/routeConfig#usehashrouting) as `true` in [global `routeConfig`](/core/routeConfig)  
-:::
-
 ### `isOpened: boolean` <Badge type="tip" text="computed.struct" />   
 
 Defines the "open" state for this route.   

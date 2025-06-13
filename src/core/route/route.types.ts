@@ -43,7 +43,7 @@ export type RouteOpenedChecker = (data: AnyObject) => boolean;
 export interface RouteConfiguration<
   TPath extends string,
   TParentRoute extends AnyRoute | null = null,
-> extends Partial<Omit<RouteGlobalConfig, 'useHashRouting'>> {
+> extends Partial<RouteGlobalConfig> {
   abortSignal?: AbortSignal;
   index?: boolean;
   hash?: boolean;

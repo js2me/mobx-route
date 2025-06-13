@@ -67,7 +67,7 @@ export class Route<
     this.history = config.history ?? routeConfig.get().history;
     this.query = config.queryParams ?? routeConfig.get().queryParams;
     this.isIndex = !!this.config.index;
-    this.isHash = this.config.hash ?? !!routeConfig.get().useHashRouting;
+    this.isHash = this.config.hash;
     this.parent = config.parent ?? (null as unknown as TParentRoute);
 
     computed.struct(this, 'isOpened');
