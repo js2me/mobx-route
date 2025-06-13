@@ -8,7 +8,7 @@ pre-commit:
 pre-push:
   commands:
     check-typings:
-      run: pnpm ts:check
+      run: pnpm exec tsc --noEmit
 prepare-commit-msg:
   - name: format commit message
     run: commitfmt
