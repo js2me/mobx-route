@@ -1,0 +1,14 @@
+pre-commit:
+  parallel: true
+  commands:
+    lint:
+      glob: "*.{js,ts,jsx,tsx}"
+      run: pnpm lint {staged_files} --fix
+      stage_fixed: true
+pre-push:
+  commands:
+    check-typings:
+      run: pnpm ts:check
+prepare-commit-msg:
+  - name: format commit message
+    run: commitfmt
