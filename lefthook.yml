@@ -6,8 +6,9 @@ pre-commit:
       run: pnpm exec eslint {staged_files} --fix
       stage_fixed: true
 prepare-commit-msg:
-  - name: format commit message
-    run: pnpm exec commitfmt -v
+  commands:
+    format-commit-message:
+      run: pnpm exec commitfmt
 pre-push:
   commands:
     check-typings:
