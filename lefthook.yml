@@ -11,4 +11,4 @@ pre-push:
       run: pnpm exec tsc --noEmit
 prepare-commit-msg:
   - name: format commit message
-    run: commitfmt
+    run: pnpm exec commitfmt
