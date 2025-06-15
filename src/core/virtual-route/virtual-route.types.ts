@@ -30,6 +30,6 @@ export interface VirtualRouteConfiguration<
   // if not provided, default implementation will be used
   close?: (route: VirtualRoute<TParams>) => boolean;
   onOpen?: (params: TParams, route: VirtualRoute<TParams>) => void;
-  onClose?: () => void;
+  afterClose?: () => void;
   stringContent?: string;
 }

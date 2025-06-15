@@ -113,7 +113,7 @@ export class Route<
       (isOpened) => {
         if (firstReactionCall) {
           firstReactionCall = false;
-          // ignore first 'onClose' callback call
+          // ignore first 'afterClose' callback call
           if (!isOpened) {
             return;
           }

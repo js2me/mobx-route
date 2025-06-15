@@ -42,7 +42,7 @@ export class VirtualRoute<
     action(this, 'close');
     makeObservable(this);
 
-    if (config.onOpen || config.onClose) {
+    if (config.onOpen || config.afterClose) {
       let firstReactionCall = true;
 
       reaction(
@@ -50,7 +50,7 @@ export class VirtualRoute<
         (isOpened) => {
           if (firstReactionCall) {
             firstReactionCall = false;
-            // ignore first 'onClose' callback call
+            // ignore first 'afterClose' callback call
             if (!isOpened) {
               return;
             }
@@ -59,7 +59,7 @@ export class VirtualRoute<
           if (isOpened) {
             config.onOpen?.(this.params!, this);
           } else {
-            config.onClose?.();
+            config.afterClose?.();
           }
         },
         {
