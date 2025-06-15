@@ -39,20 +39,20 @@ describe('route', () => {
     history.clearMocks();
   });
 
-  it('empty string', () => {
+  it('empty string', async () => {
     const route = new Route('');
     expect(route.isOpened).toBe(true);
   });
 
-  it('/test', () => {
+  it('/test', async () => {
     const route = new Route('/test');
-    route.open();
+    await route.open();
     expect(history.spies.push).toBeCalledWith('/test', null);
   });
 
-  it('/test/:id/:bar{/:bar3}', () => {
+  it('/test/:id/:bar{/:bar3}', async () => {
     const route = new Route('/test/:id/:bar{/:bar3}');
-    route.open({
+    await route.open({
       id: 1,
       bar: 'barg',
     });
@@ -68,30 +68,30 @@ describe('route', () => {
     >();
   });
 
-  it('/test/*splat', () => {
+  it('/test/*splat', async () => {
     const route = new Route('/test/*splat');
-    route.open({
+    await route.open({
       splat: [1, 2, 3],
     });
     expect(history.spies.push).toBeCalledWith('/test/1/2/3', null);
   });
 
-  it('/users{/:id}/delete', () => {
+  it('/users{/:id}/delete', async () => {
     const route = new Route('/users{/:id}/delete');
-    route.open({
+    await route.open({
       id: 1,
     });
     expect(history.spies.push).toBeCalledWith('/users/1/delete', null);
 
     history.clearMocks();
 
-    route.open();
+    await route.open();
     expect(history.spies.push).toBeCalledWith('/users/delete', null);
 
     history.clearMocks();
 
     const childRoute = route.extend('/push/:id1{/:bar}');
-    childRoute.open({
+    await childRoute.open({
       id1: 1,
       bar: 2,
       id: 3,
@@ -99,9 +99,9 @@ describe('route', () => {
     expect(history.spies.push).toBeCalledWith('/users/3/delete/push/1/2', null);
   });
 
-  it('/posts{/:slug}/*rest', () => {
+  it('/posts{/:slug}/*rest', async () => {
     const route = new Route('/posts{/:slug}/*rest');
-    route.open({
+    await route.open({
       slug: true,
       rest: [1, 2, 3, 'bar'],
     });
@@ -122,9 +122,9 @@ describe('route', () => {
     });
   });
 
-  it('/test/:id/:bar + baseUrl + query params', () => {
+  it('/test/:id/:bar + baseUrl + query params', async () => {
     const route = new Route('/test/:id/:bar', { baseUrl: '/mobx-view-model' });
-    route.open(
+    await route.open(
       {
         id: 1,
         bar: 'barg',
@@ -140,9 +140,9 @@ describe('route', () => {
     expect(route.isOpened).toBe(true);
   });
 
-  it('/test/:id/:bar + baseUrl + query params + (query params tests)', () => {
+  it('/test/:id/:bar + baseUrl + query params + (query params tests)', async () => {
     const route = new Route('/test/:id/:bar', { baseUrl: '/mobx-view-model' });
-    route.open(
+    await route.open(
       {
         id: 1,
         bar: 'barg',
@@ -156,7 +156,7 @@ describe('route', () => {
     expect(route.query.data).toEqual({ a: '3', b: '1,2,3' });
   });
 
-  it('hierarchy test', () => {
+  it('hierarchy test', async () => {
     const routes = {
       private: new RouteGroup({
         index: new Route('/', { index: true }),
@@ -189,7 +189,7 @@ describe('route', () => {
 
     expect(routes.private.routes.techreview.isOpened).toBe(false);
 
-    routes.private.routes.index.open();
+    await routes.private.routes.index.open();
 
     expect(routes.private.isOpened).toBe(true);
     expect(routes.private.routes.index.isOpened).toBe(true);
@@ -200,7 +200,7 @@ describe('route', () => {
     history.clearMocks();
   });
 
-  it('test with root paths (/, "")', () => {
+  it('test with root paths (/, "")', async () => {
     const routes = {
       home: new Route('/'),
       root: new Route(''),
@@ -218,7 +218,7 @@ describe('route', () => {
     expect(routes.projects.routes.index.isOpened).toBe(false);
   });
 
-  it('parent test', () => {
+  it('parent test', async () => {
     history.push('/a/b/c', null);
 
     const routeA = new Route('/a');

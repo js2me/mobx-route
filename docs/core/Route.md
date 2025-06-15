@@ -53,24 +53,20 @@ First argument can be required based on path declaration (first argument)
 
 **API Signature**  
 ```ts
-open(params?, { query?, replace?, state? }): Promise<void> | void
-open(params?, replace?, query?): Promise<void> | void
+open(params?, { query?, replace?, state? }): Promise<void>
+open(params?, replace?, query?): Promise<void>
 ```
-
-::: info This method can return `Promise<void>`
-In case `beforeOpen` returns a `Promise`
-:::
 
 Examples:  
 ```ts
 const stars = new Route('/stars');
-stars.open();
+await stars.open();
 location.pathname; // /stars
 ```
 
 ```ts
 const starDetails = new Route('/stars/:starId');
-starDetails.open({ starId: 1 });
+await starDetails.open({ starId: 1 });
 
 const starsWithMeta = new Route('/stars{/:meta}');
 starsWithMeta();
@@ -84,7 +80,7 @@ Example:
 const stars = new Route('/stars');
 const starDetails = stars.extends('/:starId');
 starDetails.path; // '/stars/:starId'
-starDetails.open({ starId: 1 });
+await starDetails.open({ starId: 1 });
 location.pathname; // /stars/1
 ```
 
@@ -197,15 +193,22 @@ Required for route configuration
 new Route('/foo/bar', {
   history: History;
   queryParams: IQueryParams;
-  router?: AnyRouter;
-  baseUrl?: string;
+  abortSignal?: AbortSignal;
   index?: boolean;
   hash?: boolean;
   meta?: AnyObject;
   parseOptions?: ParseOptions;
-  parent?: AnyRoute;
+  parent?: TParentRoute;
   children?: AnyRoute[];
-  beforeOpen?: BeforeOpenHandler;
+  params?: (params: ExtractPathParams<TPath>) => TParams | null | false;
+  checkOpened?: (parsedPathData: ParsedPathData<NoInfer<TPath>>) => boolean;
+  beforeOpen?: BeforeEnterHandler<NoInfer<TParams>>;
+  afterClose?: AfterLeaveHandler;
+  onOpen?: (
+    data: ParsedPathData<NoInfer<TPath>>,
+    route: Route<NoInfer<TPath>, NoInfer<TParams>, NoInfer<TParentRoute>>,
+  ) => void;
+  onClose?: () => void;
 })
 ```
 

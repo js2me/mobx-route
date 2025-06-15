@@ -1,24 +1,35 @@
 /* eslint-disable prefer-const */
 import { LinkedAbortController } from 'linked-abort-controller';
-import { action, computed, makeObservable, observable, reaction } from 'mobx';
+import {
+  action,
+  computed,
+  makeObservable,
+  observable,
+  reaction,
+  when,
+} from 'mobx';
 import {
   buildSearchString,
   History,
   IQueryParams,
 } from 'mobx-location-history';
 import { compile, match, ParamData, parse, TokenData } from 'path-to-regexp';
-import { AllPropertiesOptional, AnyObject, Maybe } from 'yummies/utils/types';
+import {
+  AllPropertiesOptional,
+  AnyObject,
+  Maybe,
+  MaybePromise,
+} from 'yummies/utils/types';
 
 import { routeConfig } from '../config/config.js';
 
 import {
   AnyRoute,
-  BeforeOpenCheckResult,
-  OpenData,
+  BeforeEnterFeedback,
+  PreparedNavigationData,
   ExtractPathParams,
-  ParsedPathParams,
   RouteConfiguration,
-  RouteMatchesData,
+  ParsedPathData,
   RouteNavigateParams,
 } from './route.types.js';
 
@@ -29,8 +40,9 @@ import {
  */
 export class Route<
   TPath extends string,
-  TParentRoute extends Route<any, any> | null = null,
-> extends String {
+  TParams extends AnyObject = ExtractPathParams<TPath>,
+  TParentRoute extends Route<any, any, any> | null = null,
+> {
   protected abortController: AbortController;
   protected history: History;
   parent: TParentRoute;
@@ -59,10 +71,8 @@ export class Route<
 
   constructor(
     public path: TPath,
-    protected config: RouteConfiguration<TPath, TParentRoute> = {},
+    protected config: RouteConfiguration<TPath, TParams, TParentRoute> = {},
   ) {
-    super(path);
-
     this.abortController = new LinkedAbortController(config.abortSignal);
     this.history = config.history ?? routeConfig.get().history;
     this.query = config.queryParams ?? routeConfig.get().queryParams;
@@ -84,6 +94,10 @@ export class Route<
 
     makeObservable(this);
 
+    if (this.config.afterClose) {
+      when(() => !this.isOpened, this.config.afterClose);
+    }
+
     if (config.onOpen || config.onClose) {
       let firstReactionCall = true;
 
@@ -99,7 +113,7 @@ export class Route<
           }
 
           if (isOpened) {
-            config.onOpen?.(this.data!, this);
+            config.onOpen?.(this.parsedPathData!, this);
           } else {
             config.onClose?.();
           }
@@ -117,7 +131,7 @@ export class Route<
     return baseUrl?.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
   }
 
-  protected get data(): RouteMatchesData<TPath> | null {
+  protected get parsedPathData(): ParsedPathData<TPath> | null {
     let pathnameToCheck: string;
 
     if (this.isHash) {
@@ -148,7 +162,7 @@ export class Route<
       return null;
     }
 
-    return parsed as RouteMatchesData<TPath>;
+    return parsed as ParsedPathData<TPath>;
   }
 
   /**
@@ -157,7 +171,7 @@ export class Route<
    * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#currentpath-parsedpathname-null)
    */
   get currentPath(): string | null {
-    return this.data?.path ?? null;
+    return this.parsedPathData?.path ?? null;
   }
 
   /**
@@ -165,8 +179,24 @@ export class Route<
    *
    * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#params-parsedpathparams-null)
    */
-  get params(): ParsedPathParams<TPath> | null {
-    return this.data?.params ?? null;
+  get params(): TParams | null {
+    if (!this.parsedPathData?.params) {
+      return null;
+    }
+
+    let params: TParams | null =
+      (this.parsedPathData?.params as unknown as Maybe<TParams>) ?? null;
+
+    if (this.config.params) {
+      const result = this.config.params(this.parsedPathData.params);
+      if (result) {
+        params = result;
+      } else {
+        return null;
+      }
+    }
+
+    return params;
   }
 
   /**
@@ -175,11 +205,13 @@ export class Route<
    * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#isopened-boolean)
    */
   get isOpened() {
-    if (this.data === null) {
+    if (this.parsedPathData === null) {
       return false;
     }
 
-    return !this.config.checkOpened || this.config.checkOpened(this.data);
+    return (
+      !this.config.checkOpened || this.config.checkOpened(this.parsedPathData)
+    );
   }
 
   /**
@@ -187,16 +219,22 @@ export class Route<
    *
    * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#extend-path-config-route)
    */
-  extend<TExtendPath extends string>(
+  extend<
+    TExtendPath extends string,
+    TParams extends AnyObject = ExtractPathParams<`${TPath}${TExtendPath}`>,
+  >(
     path: TExtendPath,
-    config?: Omit<RouteConfiguration<any>, 'parent'>,
+    config?: Omit<
+      RouteConfiguration<`${TPath}${TExtendPath}`, TParams, any>,
+      'parent'
+    >,
   ) {
     type ExtendedRoutePath = `${TPath}${TExtendPath}`;
     type ParentRoute = this;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { index, ...configFromCurrentRoute } = this.config;
+    const { index, params, ...configFromCurrentRoute } = this.config;
 
-    const extendedChild = new Route<ExtendedRoutePath, ParentRoute>(
+    const extendedChild = new Route<ExtendedRoutePath, TParams, ParentRoute>(
       `${this.path}${path}`,
       {
         ...configFromCurrentRoute,
@@ -272,7 +310,7 @@ export class Route<
           navigateParams?: RouteNavigateParams,
         ]
       : [params: ExtractPathParams<TPath>, navigateParams?: RouteNavigateParams]
-  ): void | Promise<void>;
+  ): Promise<void>;
   open(
     ...args: AllPropertiesOptional<ExtractPathParams<TPath>> extends true
       ? [
@@ -285,20 +323,20 @@ export class Route<
           replace?: RouteNavigateParams['replace'],
           query?: RouteNavigateParams['query'],
         ]
-  ): void | Promise<void>;
-  open(url: string, navigateParams?: RouteNavigateParams): void | Promise<void>;
+  ): Promise<void>;
+  open(url: string, navigateParams?: RouteNavigateParams): Promise<void>;
   open(
     url: string,
     replace?: RouteNavigateParams['replace'],
     query?: RouteNavigateParams['query'],
-  ): void | Promise<void>;
+  ): Promise<void>;
 
   /**
    * Navigates to this route.
    *
    * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#open-args)
    */
-  open(...args: any[]) {
+  async open(...args: any[]) {
     let {
       replace,
       state: rawState,
@@ -318,7 +356,7 @@ export class Route<
 
     let state = rawState ?? null;
 
-    const openData: OpenData = {
+    const navigationData: PreparedNavigationData = {
       url,
       params: params as AnyObject,
       replace,
@@ -326,40 +364,14 @@ export class Route<
       query,
     };
 
-    const beforeOpenResult = this.beforeOpen(openData);
+    const feedback = await this.beforeOpen(navigationData);
 
-    if (beforeOpenResult && beforeOpenResult instanceof Promise) {
-      return beforeOpenResult.then((beforeOpenCheck) =>
-        this.applyOpen(openData, beforeOpenCheck),
-      );
-    } else {
-      this.applyOpen(openData, beforeOpenResult);
-    }
-  }
-
-  protected beforeOpen(
-    openData: OpenData,
-  ): BeforeOpenCheckResult | Promise<BeforeOpenCheckResult> {
-    if (this.config.beforeOpen) {
-      return this.config.beforeOpen(openData);
-    }
-
-    return true;
-  }
-
-  private applyOpen(openData: OpenData, checkResult?: BeforeOpenCheckResult) {
-    let url = openData.url;
-    let replace = openData.replace;
-    let state = openData.state;
-
-    if (checkResult === false) {
+    if (feedback === false) {
       return;
     }
 
-    if (typeof checkResult === 'object') {
-      url = checkResult.url;
-      replace = checkResult.replace ?? openData.replace;
-      state = checkResult.state ?? openData.state;
+    if (typeof feedback === 'object') {
+      Object.assign(navigationData, feedback);
     }
 
     if (replace) {
@@ -367,6 +379,24 @@ export class Route<
     } else {
       this.history.push(url, state);
     }
+  }
+
+  protected beforeOpen(
+    openData: PreparedNavigationData,
+  ): MaybePromise<BeforeEnterFeedback> {
+    if (this.config.beforeOpen) {
+      return this.config.beforeOpen(openData);
+    }
+
+    return true;
+  }
+
+  protected afterClose() {
+    if (this.config.afterClose) {
+      return this.config.afterClose();
+    }
+
+    return true;
   }
 
   protected get tokenData() {

@@ -36,8 +36,8 @@ importers:
         specifier: ^2.1.0
         version: 2.1.0(react@18.3.1)
       yummies:
-        specifier: ^3.2.8
-        version: 3.2.8
+        specifier: ^3.2.10
+        version: 3.2.10
     devDependencies:
       '@testing-library/react':
         specifier: ^16.3.0
@@ -3532,8 +3532,8 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
-  yummies@3.2.8:
-    resolution: {integrity: sha512-Cacn/mlsAPi822WBxgxIDfpZoqIISnE6rJYVT28XHEtHQ/BJy59nH6TXX6J6ITUl4KQjN9X/LZvFWVwjEwNP7g==}
+  yummies@3.2.10:
+    resolution: {integrity: sha512-K2ksTjbdOtHvkIOyvfuc/BnwnZIOea0+JZxz1CGaltE8amCq8jOD36V7Jj/LcpT2hHwyzuFIahoDoH5STacGyQ==}
 
 snapshots:
 
@@ -6470,7 +6470,7 @@ snapshots:
       history: 5.3.0
       linked-abort-controller: 1.1.0
       mobx: 6.13.7
-      yummies: 3.2.8
+      yummies: 3.2.10
 
   mobx-react-lite@4.1.0(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
@@ -6487,7 +6487,7 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
       react-simple-loadable: 2.1.0(react@18.3.1)
-      yummies: 3.2.8
+      yummies: 3.2.10
 
   mobx@6.13.7: {}
 
@@ -7420,7 +7420,7 @@ snapshots:
 
   yocto-queue@0.1.0: {}
 
-  yummies@3.2.8:
+  yummies@3.2.10:
     dependencies:
       '@types/insane': 1.0.0
       clsx: 2.1.1

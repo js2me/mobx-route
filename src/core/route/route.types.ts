@@ -1,11 +1,11 @@
 import { ParseOptions } from 'path-to-regexp';
-import { AnyObject } from 'yummies/utils/types';
+import { AnyObject, MaybePromise } from 'yummies/utils/types';
 
 import { RouteGlobalConfig } from '../config/config.types.js';
 
 import type { Route } from './route.js';
 
-export type OpenData = {
+export type PreparedNavigationData<TParams extends AnyObject = AnyObject> = {
   state?: any;
 
   /**
@@ -13,7 +13,7 @@ export type OpenData = {
    *
    * can be received from extended routes
    */
-  params?: AnyObject;
+  params?: TParams;
 
   url: string;
 
@@ -25,7 +25,7 @@ export type OpenData = {
 /**
  * Returning `false` means ignore navigation
  */
-export type BeforeOpenCheckResult =
+export type BeforeEnterFeedback =
   | void
   | boolean
   | {
@@ -34,14 +34,24 @@ export type BeforeOpenCheckResult =
       replace?: boolean;
     };
 
-export type BeforeOpenHandler = (
-  openData: OpenData,
-) => BeforeOpenCheckResult | Promise<BeforeOpenCheckResult>;
+export type AfterLeaveFeedback =
+  | void
+  | boolean
+  | {
+      url: string;
+      state?: any;
+      replace?: boolean;
+    };
 
-export type RouteOpenedChecker = (data: AnyObject) => boolean;
+export type BeforeOpenHandler<TParams extends AnyObject = AnyObject> = (
+  preparedNavigationData: PreparedNavigationData<TParams>,
+) => MaybePromise<BeforeEnterFeedback>;
+
+export type AfterCloseHandler = () => void;
 
 export interface RouteConfiguration<
   TPath extends string,
+  TParams extends AnyObject = ParsedPathParams<TPath>,
   TParentRoute extends AnyRoute | null = null,
 > extends Partial<RouteGlobalConfig> {
   abortSignal?: AbortSignal;
@@ -51,16 +61,18 @@ export interface RouteConfiguration<
   parseOptions?: ParseOptions;
   parent?: TParentRoute;
   children?: AnyRoute[];
-  checkOpened?: RouteOpenedChecker;
-  beforeOpen?: BeforeOpenHandler;
+  params?: (params: ExtractPathParams<TPath>) => TParams | null | false;
+  checkOpened?: (parsedPathData: ParsedPathData<NoInfer<TPath>>) => boolean;
+  beforeOpen?: BeforeOpenHandler<NoInfer<TParams>>;
+  afterClose?: AfterCloseHandler;
   onOpen?: (
-    data: RouteMatchesData<TPath>,
-    route: Route<TPath, TParentRoute>,
+    data: ParsedPathData<NoInfer<TPath>>,
+    route: Route<NoInfer<TPath>, NoInfer<TParams>, NoInfer<TParentRoute>>,
   ) => void;
   onClose?: () => void;
 }
 
-export type AnyRoute = Route<string, any>;
+export type AnyRoute = Route<string, AnyObject, any>;
 
 export type PathParam = string | number | boolean | null;
 // eslint-disable-next-line sonarjs/redundant-type-aliases
@@ -106,7 +118,7 @@ export interface RouteNavigateParams {
   query?: AnyObject;
 }
 
-export interface RouteMatchesData<TPath extends string> {
+export interface ParsedPathData<TPath extends string> {
   path: string;
   params: ParsedPathParams<TPath>;
 }
