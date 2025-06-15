@@ -208,7 +208,6 @@ new Route('/foo/bar', {
     data: ParsedPathData<NoInfer<TPath>>,
     route: Route<NoInfer<TPath>, NoInfer<TParams>, NoInfer<TParentRoute>>,
   ) => void;
-  onClose?: () => void;
 })
 ```
 

@@ -69,10 +69,9 @@ export interface RouteConfiguration<
     data: ParsedPathData<NoInfer<TPath>>,
     route: Route<NoInfer<TPath>, NoInfer<TParams>, NoInfer<TParentRoute>>,
   ) => void;
-  onClose?: () => void;
 }
 
-export type AnyRoute = Route<string, AnyObject, any>;
+export type AnyRoute = Route<string, any, any>;
 
 export type PathParam = string | number | boolean | null;
 // eslint-disable-next-line sonarjs/redundant-type-aliases

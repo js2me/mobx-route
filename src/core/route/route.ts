@@ -94,36 +94,42 @@ export class Route<
 
     makeObservable(this);
 
-    if (this.config.afterClose) {
-      when(() => !this.isOpened, this.config.afterClose);
-    }
-
-    if (config.onOpen || config.onClose) {
-      let firstReactionCall = true;
-
-      reaction(
+    if (this.config.onOpen) {
+      when(
         () => this.isOpened,
-        (isOpened) => {
-          if (firstReactionCall) {
-            firstReactionCall = false;
-            // ignore first 'onClose' callback call
-            if (!isOpened) {
-              return;
-            }
-          }
-
-          if (isOpened) {
-            config.onOpen?.(this.parsedPathData!, this);
-          } else {
-            config.onClose?.();
-          }
-        },
-        {
-          signal: this.abortController.signal,
-          fireImmediately: true,
-        },
+        () => this.config.onOpen!(this.parsedPathData!, this),
+        this.abortController,
       );
     }
+
+    if (!config.onOpen && !config.afterClose) {
+      return;
+    }
+
+    let firstReactionCall = true;
+
+    reaction(
+      () => this.isOpened,
+      (isOpened) => {
+        if (firstReactionCall) {
+          firstReactionCall = false;
+          // ignore first 'onClose' callback call
+          if (!isOpened) {
+            return;
+          }
+        }
+
+        if (isOpened) {
+          config.onOpen?.(this.parsedPathData!, this);
+        } else {
+          config.afterClose?.();
+        }
+      },
+      {
+        signal: this.abortController.signal,
+        fireImmediately: true,
+      },
+    );
   }
 
   protected get baseUrl() {
