@@ -25,7 +25,7 @@ export type PreparedNavigationData<TParams extends AnyObject = AnyObject> = {
 /**
  * Returning `false` means ignore navigation
  */
-export type BeforeEnterFeedback =
+export type BeforeOpenFeedback =
   | void
   | boolean
   | {
@@ -33,21 +33,6 @@ export type BeforeEnterFeedback =
       state?: any;
       replace?: boolean;
     };
-
-export type AfterLeaveFeedback =
-  | void
-  | boolean
-  | {
-      url: string;
-      state?: any;
-      replace?: boolean;
-    };
-
-export type BeforeOpenHandler<TParams extends AnyObject = AnyObject> = (
-  preparedNavigationData: PreparedNavigationData<TParams>,
-) => MaybePromise<BeforeEnterFeedback>;
-
-export type AfterCloseHandler = () => void;
 
 export interface RouteConfiguration<
   TPath extends string,
@@ -63,9 +48,11 @@ export interface RouteConfiguration<
   children?: AnyRoute[];
   params?: (params: ExtractPathParams<TPath>) => TParams | null | false;
   checkOpened?: (parsedPathData: ParsedPathData<NoInfer<TPath>>) => boolean;
-  beforeOpen?: BeforeOpenHandler<NoInfer<TParams>>;
-  afterClose?: AfterCloseHandler;
-  onOpen?: (
+  beforeOpen?: (
+    preparedNavigationData: PreparedNavigationData<NoInfer<TParams>>,
+  ) => MaybePromise<BeforeOpenFeedback>;
+  afterClose?: () => void;
+  afterOpen?: (
     data: ParsedPathData<NoInfer<TPath>>,
     route: Route<NoInfer<TPath>, NoInfer<TParams>, NoInfer<TParentRoute>>,
   ) => void;

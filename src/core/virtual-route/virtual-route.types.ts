@@ -1,23 +1,28 @@
 import { IQueryParams } from 'mobx-location-history';
-import { FnValue } from 'yummies/common';
 import {
   AllPropertiesOptional,
   AnyObject,
   EmptyObject,
   Maybe,
+  MaybeFn,
+  MaybePromise,
 } from 'yummies/utils/types';
 
 import type { VirtualRoute } from './virtual-route.js';
 
 export type AnyVirtualRoute = VirtualRoute<any>;
 
+export interface VirtualOpenExtraParams {
+  query?: AnyObject;
+  replace?: boolean;
+}
+
 export interface VirtualRouteConfiguration<
   TParams extends AnyObject | EmptyObject = EmptyObject,
 > {
   abortSignal?: AbortSignal;
   queryParams?: IQueryParams;
-  checkOpened?: FnValue<boolean, [route: VirtualRoute<TParams>]>;
-  initialParams?: FnValue<Maybe<TParams>, [route: VirtualRoute<TParams>]>;
+  initialParams?: MaybeFn<Maybe<TParams>, [route: VirtualRoute<TParams>]>;
 
   // custom implementation of open behaviour for this route
   // if not provided, default implementation will be used
@@ -25,11 +30,20 @@ export interface VirtualRouteConfiguration<
     ...args: AllPropertiesOptional<TParams> extends true
       ? [params: Maybe<TParams>, route: VirtualRoute<TParams>]
       : [params: TParams, route: VirtualRoute<TParams>]
-  ) => boolean;
+  ) => MaybePromise<boolean | void>;
   // custom implementation of close behaviour for this route
   // if not provided, default implementation will be used
-  close?: (route: VirtualRoute<TParams>) => boolean;
-  onOpen?: (params: TParams, route: VirtualRoute<TParams>) => void;
+  close?: (route: VirtualRoute<TParams>) => boolean | void;
+
+  checkOpened?: (route: VirtualRoute<TParams>) => boolean;
+  beforeOpen?: (
+    ...args: AllPropertiesOptional<TParams> extends true
+      ? [params: Maybe<TParams>, route: VirtualRoute<TParams>]
+      : [params: TParams, route: VirtualRoute<TParams>]
+  ) => MaybePromise<void | boolean>;
   afterClose?: () => void;
-  stringContent?: string;
+  afterOpen?: (
+    params: NoInfer<TParams>,
+    route: VirtualRoute<NoInfer<TParams>>,
+  ) => void;
 }

@@ -25,7 +25,7 @@ import { routeConfig } from '../config/config.js';
 
 import {
   AnyRoute,
-  BeforeEnterFeedback,
+  BeforeOpenFeedback,
   PreparedNavigationData,
   ExtractPathParams,
   RouteConfiguration,
@@ -94,15 +94,15 @@ export class Route<
 
     makeObservable(this);
 
-    if (this.config.onOpen) {
+    if (this.config.afterOpen) {
       when(
         () => this.isOpened,
-        () => this.config.onOpen!(this.parsedPathData!, this),
+        () => this.config.afterOpen!(this.parsedPathData!, this),
         this.abortController,
       );
     }
 
-    if (!config.onOpen && !config.afterClose) {
+    if (!config.afterOpen && !config.afterClose) {
       return;
     }
 
@@ -120,7 +120,7 @@ export class Route<
         }
 
         if (isOpened) {
-          config.onOpen?.(this.parsedPathData!, this);
+          config.afterOpen?.(this.parsedPathData!, this);
         } else {
           config.afterClose?.();
         }
@@ -211,7 +211,7 @@ export class Route<
    * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#isopened-boolean)
    */
   get isOpened() {
-    if (this.parsedPathData === null) {
+    if (this.params === null || this.parsedPathData === null) {
       return false;
     }
 
@@ -389,7 +389,7 @@ export class Route<
 
   protected beforeOpen(
     openData: PreparedNavigationData,
-  ): MaybePromise<BeforeEnterFeedback> {
+  ): MaybePromise<BeforeOpenFeedback> {
     if (this.config.beforeOpen) {
       return this.config.beforeOpen(openData);
     }

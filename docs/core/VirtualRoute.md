@@ -69,7 +69,7 @@ route.params?.userId; // '123'
 Interface for managing query parameters from [`mobx-location-history` package](https://github.com/js2me/mobx-location-history).  
 Automatically synchronized with current url.  
 
-### `open(params?, query?): void` <Badge type="info" text="action" />  
+### `open(params?, extraParams?: { query?, replace?   }): Promise<void> ` <Badge type="info" text="action" />  
 Activates the route with execution flow:  
 1. Updates params/query
 2. Uses custom `open` handler if provided for change `isOpened` or sets `isOpened` `true   
@@ -79,5 +79,6 @@ Deactivates the route. Behavior depends on configuration:
 1. Uses custom close handler if provided  
 2. Default behavior sets isOpened to false  
 
-### `setResolver(checkOpened): void` <Badge type="info" text="action" />
-Updates the activation condition dynamically  
+### `setOpenChecker(openChecker): void` <Badge type="info" text="action" />
+Updates the `openChecker` value with the provided one.   
+`openChecker` is a function or a boolean value that determines whether the route is open or not.
