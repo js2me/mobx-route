@@ -2,7 +2,7 @@
   "name": "mobx-route",
   "version": "0.0.78",
   "scripts": {
-    "postinstall": "pnpm dev:install-hooks",
+    "prepare": "pnpm dev:install-hooks",
     "clean": "rimraf dist",
     "lint:check": "eslint . --fix",
     "ts:check": "tsc --noEmit",
