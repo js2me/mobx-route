@@ -36,8 +36,8 @@ importers:
         specifier: ^2.1.0
         version: 2.1.0(react@18.3.1)
       yummies:
-        specifier: ^3.4.1
-        version: 3.4.1
+        specifier: ^4.0.0
+        version: 4.0.0
     devDependencies:
       '@testing-library/react':
         specifier: ^16.3.0
@@ -3534,6 +3534,9 @@ packages:
 
   yummies@3.4.1:
     resolution: {integrity: sha512-ciGMt5bv/kg0Kmp8eWIpolyg3QDa7KfAdp61myUm1pNeCQT2GXw0LGAL915PQNCwao1ReydaIg6N9Z1LbjDwbg==}
+
+  yummies@4.0.0:
+    resolution: {integrity: sha512-JpjliqOySAE6lanYPzB0bY5CTyCtQjBdIVA/TR21UnYpkfxxr85soB7JRZnwZ8ZH69UqHOtuikdxt/uujoZ3xw==}
 
 snapshots:
 
@@ -7421,6 +7424,15 @@ snapshots:
   yocto-queue@0.1.0: {}
 
   yummies@3.4.1:
+    dependencies:
+      '@types/insane': 1.0.0
+      clsx: 2.1.1
+      dayjs: 1.11.13
+      insane: 2.6.2
+      nanoid: 5.1.5
+      tailwind-merge: 2.6.0
+
+  yummies@4.0.0:
     dependencies:
       '@types/insane': 1.0.0
       clsx: 2.1.1

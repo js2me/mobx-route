@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { observer } from 'mobx-react-lite';
 import { Fragment, isValidElement, ReactElement, ReactNode } from 'react';
-import { flatMapDeep } from 'yummies';
+import { flatMapDeep } from 'yummies/data';
 
 import { AnyRouteEntity } from '../../core/index.js';
+import { isRouteEntity } from '../../core/utils/is-route-entity.js';
 
 export interface SwitchProps {
   children: ReactNode;
@@ -25,9 +26,7 @@ const isValidRouteElement = (
   return (
     isValidElement(element) &&
     // @ts-ignore
-    element.props?.route &&
-    // @ts-ignore
-    'isOpened' in element.props.route
+    isRouteEntity(element.props?.route)
   );
 };
 
