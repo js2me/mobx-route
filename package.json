@@ -1,6 +1,6 @@
 {
   "name": "mobx-route",
-  "version": "0.0.81",
+  "version": "0.0.82",
   "scripts": {
     "prepare": "pnpm dev:install-hooks",
     "clean": "rimraf dist",
