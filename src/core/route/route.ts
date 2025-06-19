@@ -31,7 +31,6 @@ import {
   RouteConfiguration,
   ParsedPathData,
   RouteNavigateParams,
-  ReadOnlyRoute,
 } from './route.types.js';
 
 /**
@@ -43,8 +42,7 @@ export class Route<
   TPath extends string,
   TParams extends AnyObject = ExtractPathParams<TPath>,
   TParentRoute extends Route<any, any, any> | null = null,
-> implements ReadOnlyRoute<TPath, TParams, TParentRoute>
-{
+> {
   protected abortController: AbortController;
   protected history: History;
   parent: TParentRoute;

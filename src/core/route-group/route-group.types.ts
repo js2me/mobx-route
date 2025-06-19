@@ -1,15 +1,11 @@
-import type { AnyReadOnlyRoute, AnyRoute } from '../route/index.js';
+import type { AnyRoute } from '../route/index.js';
 import { AnyVirtualRoute } from '../virtual-route/index.js';
 
 import type { RouteGroup } from './route-group.js';
 
 export type AnyRouteGroup = RouteGroup<RoutesCollection>;
 
-export type AnyRouteEntity =
-  | AnyReadOnlyRoute
-  | AnyRoute
-  | AnyRouteGroup
-  | AnyVirtualRoute;
+export type AnyRouteEntity = AnyRoute | AnyRouteGroup | AnyVirtualRoute;
 
 export type RoutesArrayCollection = AnyRouteEntity[];
 
