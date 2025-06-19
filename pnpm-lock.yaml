@@ -18,8 +18,8 @@ importers:
         specifier: ^6.12.4
         version: 6.13.7
       mobx-location-history:
-        specifier: ^6.1.0
-        version: 6.1.0(mobx@6.13.7)
+        specifier: ^7.0.3
+        version: 7.0.3(mobx@6.13.7)
       mobx-react-lite:
         specifier: ^4.0.7
         version: 4.1.0(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -36,8 +36,8 @@ importers:
         specifier: ^2.1.0
         version: 2.1.0(react@18.3.1)
       yummies:
-        specifier: ^3.2.13
-        version: 3.2.13
+        specifier: ^3.4.1
+        version: 3.4.1
     devDependencies:
       '@testing-library/react':
         specifier: ^16.3.0
@@ -2672,8 +2672,8 @@ packages:
     resolution: {integrity: sha512-qOOzS1cBTWYF4BH8fVePDBOO9iptMnGUEZwNc/cMWnTV2nVLZ7VoNWEPHkYczZA0pdoA7dl6e7FL659nX9S2aw==}
     engines: {node: '>=16 || 14 >=14.17'}
 
-  mobx-location-history@6.1.0:
-    resolution: {integrity: sha512-XNqcO/HrOTRz0/TY/Gte68AJnbojVqm9DjeLpHVilfmwtQaQwBDmvMLyPis371gEw/5NMhTF4+lLJNAtBCrtRw==}
+  mobx-location-history@7.0.3:
+    resolution: {integrity: sha512-K8ca9EKtf2z4+LxuOR5mUYGrpe8Veh+g8fLAEVsHJac/0KayroqiAXDDVXhQcVfnN+/aoK0D0CNZ5K9VceOSGA==}
     peerDependencies:
       mobx: ^6.13.3
 
@@ -3532,8 +3532,8 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
-  yummies@3.2.13:
-    resolution: {integrity: sha512-2JqnEgqUL20ZfUDjefEf5XhoavXgb5ACJAce9kyasMAHZqngqnIQS2HM0PBloGR+2DUPcZ/XfxZWhS1CNwA5ng==}
+  yummies@3.4.1:
+    resolution: {integrity: sha512-ciGMt5bv/kg0Kmp8eWIpolyg3QDa7KfAdp61myUm1pNeCQT2GXw0LGAL915PQNCwao1ReydaIg6N9Z1LbjDwbg==}
 
 snapshots:
 
@@ -6465,12 +6465,12 @@ snapshots:
 
   minipass@7.1.2: {}
 
-  mobx-location-history@6.1.0(mobx@6.13.7):
+  mobx-location-history@7.0.3(mobx@6.13.7):
     dependencies:
       history: 5.3.0
       linked-abort-controller: 1.1.0
       mobx: 6.13.7
-      yummies: 3.2.13
+      yummies: 3.4.1
 
   mobx-react-lite@4.1.0(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
@@ -6487,7 +6487,7 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
       react-simple-loadable: 2.1.0(react@18.3.1)
-      yummies: 3.2.13
+      yummies: 3.4.1
 
   mobx@6.13.7: {}
 
@@ -7420,7 +7420,7 @@ snapshots:
 
   yocto-queue@0.1.0: {}
 
-  yummies@3.2.13:
+  yummies@3.4.1:
     dependencies:
       '@types/insane': 1.0.0
       clsx: 2.1.1

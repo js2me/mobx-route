@@ -72,7 +72,8 @@ export default defineConfig({
         items: [
           { text: 'Link', link: '/react/Link' },
           { text: 'RouteView', link: '/react/RouteView' },
-          { text: 'RouteGroupView', link: '/react/RouteGroupView' },
+          { text: 'Switch', link: '/react/Switch' },
+          // { text: 'RouteGroupView', link: '/react/RouteGroupView' },
         ],
       },
       {

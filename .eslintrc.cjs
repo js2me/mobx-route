@@ -8,6 +8,7 @@ module.exports = {
       'error',
       { ignore: Object.keys(packageJson.peerDependencies) },
     ],
+    'sonarjs/no-commented-code': 'off'
   },
   overrides: [
     {

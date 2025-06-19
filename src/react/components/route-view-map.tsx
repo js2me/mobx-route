@@ -6,12 +6,12 @@ import { AnyRouteEntity } from '../../core/index.js';
 import {
   RouteView,
   RouteViewComponent,
-  RouteViewConfigProps,
+  RouteViewConfigWithRoute,
 } from './route-view.js';
 
 export type MappedRouteView<TRouteEntity extends AnyRouteEntity> =
   // route view detailed configuration
-  | Omit<RouteViewConfigProps<TRouteEntity>, 'route'>
+  | Omit<RouteViewConfigWithRoute<TRouteEntity>, 'route'>
   // only route view component
   | RouteViewComponent<TRouteEntity>;
 

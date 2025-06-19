@@ -7,6 +7,7 @@ Navigates user to provided route on click. Has similar props with `<a>` element 
 ```tsx
 import { Link } from 'mobx-route/react';
 import { routes } from '@/shared/config/routing';
+import { UiKitLink } from "@uikit";
 
 function Navbar({ user }) {
   return (
@@ -18,6 +19,11 @@ function Navbar({ user }) {
       <Link to={"/custom-url"} replace>Custom url</Link>
       <Link to={"/custom-url/meme"} query={{ foo: 1, bar: 2 }}>
         Url with query params
+      </Link>
+      <Link to={"/feed"} asChild>
+        <UiKitLink href=''>
+          go to feed
+        </UiKitLink>
       </Link>
     </>
   );
