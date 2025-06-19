@@ -32,10 +32,15 @@ const isValidRouteElement = (
 };
 
 export const Switch = observer(({ children }: SwitchProps) => {
+  let defaultElement: ReactNode = null;
+
   for (const element of flattenChildren(children)) {
-    if (isValidRouteElement(element) && element.props.route.isOpened)
+    if (isValidRouteElement(element) && element.props.route.isOpened) {
       return element;
+    } else {
+      defaultElement = element;
+    }
   }
 
-  return null;
+  return defaultElement;
 });
