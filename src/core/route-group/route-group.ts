@@ -60,7 +60,7 @@ export class RouteGroup<TRoutesCollection extends RoutesCollection> {
   open(...args: any[]) {
     let lastGroupRoute: RouteGroup<any> | undefined;
 
-    if (this.indexRoute) {
+    if (this.indexRoute && 'open' in this.indexRoute) {
       this.indexRoute.open(...args);
       return;
     }

@@ -1,9 +1,54 @@
+import { IQueryParams } from 'mobx-location-history';
 import { ParseOptions } from 'path-to-regexp';
 import { AnyObject, MaybePromise } from 'yummies/utils/types';
 
 import { RouteGlobalConfig } from '../config/config.types.js';
 
-import type { Route } from './route.js';
+import { Route } from './route.js';
+
+export interface ReadOnlyRoute<
+  TPath extends string,
+  TParams extends AnyObject = ExtractPathParams<TPath>,
+  TParentRoute extends AnyRoute | null = null,
+> {
+  readonly parent: NoInfer<TParentRoute>;
+  readonly query: IQueryParams;
+  /**
+   * Indicates if this route is an index route. Index routes activate when parent route path matches exactly.
+   *
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#isindex-boolean)
+   */
+  readonly isIndex: boolean;
+  /**
+   * Indicates if this route is an hash route.
+   *
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#ishash-boolean)
+   */
+  readonly isHash: boolean;
+  readonly children: AnyRoute[];
+  /**
+   * Matched path segment for current URL.
+   *
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#currentpath-parsedpathname-null)
+   */
+  readonly currentPath: string | null;
+  /**
+   * Current parsed path parameters.
+   *
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#params-parsedpathparams-null)
+   */
+  readonly params: TParams | null;
+  /**
+   * Defines the "open" state for this route.
+   *
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#isopened-boolean)
+   */
+  readonly isOpened: boolean;
+  /**
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#hasopenedchildren-boolean)
+   */
+  readonly hasOpenedChildren: boolean;
+}
 
 export type PreparedNavigationData<TParams extends AnyObject = AnyObject> = {
   state?: any;
@@ -54,9 +99,15 @@ export interface RouteConfiguration<
   afterClose?: () => void;
   afterOpen?: (
     data: ParsedPathData<NoInfer<TPath>>,
-    route: Route<NoInfer<TPath>, NoInfer<TParams>, NoInfer<TParentRoute>>,
+    route: ReadOnlyRoute<
+      NoInfer<TPath>,
+      NoInfer<TParams>,
+      NoInfer<TParentRoute>
+    >,
   ) => void;
 }
+
+export type AnyReadOnlyRoute = ReadOnlyRoute<string, any, any>;
 
 export type AnyRoute = Route<string, any, any>;
 

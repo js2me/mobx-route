@@ -14,7 +14,9 @@ export type RouteViewComponent<TRouteEntity extends AnyRouteEntity> =
 export interface RouteViewConfigProps<TRouteEntity extends AnyRouteEntity> {
   route: TRouteEntity;
   view?: RouteViewComponent<TRouteEntity>;
-  lazyView?: () => Promise<ComponentType<RouteViewProps<TRouteEntity>>>;
+  lazyView?: (
+    route: TRouteEntity,
+  ) => Promise<ComponentType<RouteViewProps<TRouteEntity>>>;
   loader?: ComponentType;
   fallbackView?: ReactNode;
   children?: ReactNode;
@@ -41,9 +43,12 @@ function RouteViewBase<TRouteEntity extends AnyRouteEntity>(
   }
 
   if (props.lazyView) {
-    lazyViewComponentRef.current = loadable(props.lazyView, {
-      loader: props.loader,
-    });
+    lazyViewComponentRef.current = loadable(
+      () => props.lazyView!(props.route),
+      {
+        loader: props.loader,
+      },
+    );
     Component = lazyViewComponentRef.current;
   } else {
     Component = props.view;
