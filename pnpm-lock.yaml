@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       '@types/react':
-        specifier: ^18.3.20
+        specifier: ^18.0.0 || ^19.0.0
         version: 18.3.20
       linked-abort-controller:
         specifier: ^1.1.0
@@ -24,13 +24,13 @@ importers:
         specifier: ^4.0.7
         version: 4.1.0(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       mobx-view-model:
-        specifier: ^6.5.0
-        version: 6.5.0(mobx-react-lite@4.1.0(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^6.9.0
+        version: 6.9.0(mobx-react-lite@4.1.0(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       path-to-regexp:
         specifier: ^8.2.0
         version: 8.2.0
       react:
-        specifier: ^18.3.1
+        specifier: ^18.0.0 || ^19.0.0
         version: 18.3.1
       react-simple-loadable:
         specifier: ^2.1.0
@@ -2690,13 +2690,13 @@ packages:
       react-native:
         optional: true
 
-  mobx-view-model@6.5.0:
-    resolution: {integrity: sha512-Kwg4FvsYqeu2T144CB9tIDouHJ2t0xFRC4wE1RjJb/jBIaGDMyd8HL0lehPhTrIWmsfNSpRtT2DhhhfNF5wkBQ==}
+  mobx-view-model@6.9.0:
+    resolution: {integrity: sha512-xClYCpSkcliWD1mvlPxcb3KWqyNlrujz9KM+dLikE9FiW/h9TignS7d05Sv3nAgeRWdPebVHFjj0XKLWa6Bwug==}
     peerDependencies:
       mobx: ^6.12.4
       mobx-react-lite: ^4.0.7
-      react: ^18.3.1
-      react-dom: ^18.3.1
+      react: ^18.0.0 || ^19.0.0
+      react-dom: ^18.0.0 || ^19.0.0
 
   mobx@6.13.7:
     resolution: {integrity: sha512-aChaVU/DO5aRPmk1GX8L+whocagUUpBQqoPtJk+cm7UOXUk87J4PeWCh6nNmTTIfEhiR9DI/+FnA8dln/hTK7g==}
@@ -2923,6 +2923,11 @@ packages:
     resolution: {integrity: sha512-5mF++exqgeAcBB716M1fekT3w/R+qiemKnnLMSEUQbMrarft78xlApI3Vw50xH4sUjzAkxEnzkJWztHBcs0t3g==}
     peerDependencies:
       react: ^18.3.1
+
+  react-simple-loadable@2.2.0:
+    resolution: {integrity: sha512-IEa6uyKmFOiKP/UY8ZR3cOzvJBwNWgyM5rOsF2qq9W4rvZzXhmlrsXU8EyeNVH+LTnfP6VNTgN1c9et5fSNTrA==}
+    peerDependencies:
+      react: ^17.0.0 || ^18.0.0 || ^19.0.0
 
   react@18.3.1:
     resolution: {integrity: sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==}
@@ -6483,14 +6488,14 @@ snapshots:
     optionalDependencies:
       react-dom: 18.3.1(react@18.3.1)
 
-  mobx-view-model@6.5.0(mobx-react-lite@4.1.0(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  mobx-view-model@6.9.0(mobx-react-lite@4.1.0(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       mobx: 6.13.7
       mobx-react-lite: 4.1.0(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-      react-simple-loadable: 2.1.0(react@18.3.1)
-      yummies: 3.4.1
+      react-simple-loadable: 2.2.0(react@18.3.1)
+      yummies: 4.0.0
 
   mobx@6.13.7: {}
 
@@ -6705,6 +6710,10 @@ snapshots:
   react-is@17.0.2: {}
 
   react-simple-loadable@2.1.0(react@18.3.1):
+    dependencies:
+      react: 18.3.1
+
+  react-simple-loadable@2.2.0(react@18.3.1):
     dependencies:
       react: 18.3.1
 
