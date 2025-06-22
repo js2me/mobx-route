@@ -45,13 +45,12 @@
   },
   "dependencies": {
     "linked-abort-controller": "^1.1.0",
-    "mobx-location-history": "^7.0.3",
+    "mobx-location-history": "^7.1.0",
     "path-to-regexp": "^8.2.0",
-    "react-simple-loadable": "^2.1.0",
+    "react-simple-loadable": "^2.3.4",
     "yummies": "^4.0.0"
   },
   "peerDependencies": {
-    "@types/react": "^18.0.0 || ^19.0.0",
     "mobx": "^6.12.4",
     "mobx-react-lite": "^4.0.7",
     "mobx-view-model": "^6.9.0",
@@ -64,14 +63,12 @@
     "react": {
       "optional": true
     },
-    "@types/react": {
-      "optional": true
-    },
     "mobx-react-lite": {
       "optional": true
     }
   },
   "devDependencies": {
+    "@types/react": "^18.0.0 || ^19.0.0",
     "@testing-library/react": "^16.3.0",
     "@types/lodash-es": "^4.17.12",
     "@types/node": "^20.17.30",

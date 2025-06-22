@@ -68,12 +68,10 @@ function RouteViewBase<TRoute extends AbstractRouteEntity>(
   }
 
   if (props.lazyView) {
-    lazyViewComponentRef.current = loadable(
-      () => props.lazyView!(props.route),
-      {
-        loader: props.loader,
-      },
-    );
+    lazyViewComponentRef.current = loadable({
+      load: () => props.lazyView!(props.route),
+      loader: props.loader,
+    });
     Component = lazyViewComponentRef.current;
   } else {
     Component = props.view;
