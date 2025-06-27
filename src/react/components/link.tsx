@@ -17,30 +17,34 @@ import {
   RouteNavigateParams,
 } from '../../core/index.js';
 
-export type LinkProps<TRoute extends AbstractPathRouteEntity> = Omit<
-  AnchorHTMLAttributes<HTMLAnchorElement>,
-  'href'
-> & {
+interface LinkAnchorProps
+  extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
   asChild?: boolean;
-} & RouteNavigateParams &
-  (
-    | ({
-        to: TRoute;
-      } & (AllPropertiesOptional<ExtractPathParams<TRoute['path']>> extends true
-        ? {
-            // eslint-disable-next-line sonarjs/no-redundant-optional
-            params?: ExtractPathParams<TRoute['path']> | null | undefined;
-          }
-        : { params: ExtractPathParams<TRoute['path']> }))
-    | {
-        to: string;
-      }
-    | {
-        href: string;
-      }
-  );
+}
 
-type LinkComponentType = <TRoute extends AnyRoute>(
+type LinkPathRouteProps<TRoute extends AbstractPathRouteEntity> = {
+  to: TRoute;
+} & (AllPropertiesOptional<ExtractPathParams<TRoute['path']>> extends true
+  ? {
+      // eslint-disable-next-line sonarjs/no-redundant-optional
+      params?: ExtractPathParams<TRoute['path']> | null | undefined;
+    }
+  : { params: ExtractPathParams<TRoute['path']> });
+
+type LinkSimpleRouteProps =
+  | {
+      to: string;
+    }
+  | {
+      href: string;
+    };
+
+export type LinkProps<TRoute extends AbstractPathRouteEntity> =
+  LinkAnchorProps &
+    RouteNavigateParams &
+    (LinkPathRouteProps<TRoute> | LinkSimpleRouteProps);
+
+type LinkComponentType = <TRoute extends AbstractPathRouteEntity>(
   props: LinkProps<TRoute>,
 ) => ReactNode;
 
@@ -51,11 +55,13 @@ export const Link = observer(
         to,
         href: outerHref,
         asChild,
-        query,
-        replace,
         children,
         params,
-        ...anchorProps
+        // route navigate params
+        query,
+        replace,
+        state,
+        ...outerAnchorProps
       },
       ref,
     ) => {
@@ -75,28 +81,29 @@ export const Link = observer(
         )
           return;
 
-        anchorProps.onClick?.(event);
+        outerAnchorProps.onClick?.(event);
 
         if (!event.defaultPrevented && typeof to !== 'string') {
           event.preventDefault();
-          (to as AnyRoute).open(href, { replace, query });
+          (to as AnyRoute).open(href, { replace, query, state });
         }
+      };
+
+      const anchorProps = {
+        ...outerAnchorProps,
+        href,
+        onClick: handleClick,
+        rel:
+          outerAnchorProps.target === '_blank' && !outerAnchorProps.rel
+            ? 'noopener noreferrer'
+            : outerAnchorProps.rel,
       };
 
       return asChild && isValidElement(children) ? (
         // @ts-ignore
-        cloneElement(children, { onClick: handleClick, href })
+        cloneElement(children, anchorProps)
       ) : (
-        <a
-          ref={ref}
-          href={href}
-          onClick={handleClick}
-          rel={
-            anchorProps.target === '_blank' && !anchorProps.rel
-              ? 'noopener noreferrer'
-              : anchorProps.rel
-          }
-        >
+        <a {...anchorProps} ref={ref}>
           {children}
         </a>
       );
