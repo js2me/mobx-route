@@ -11,12 +11,13 @@ import {
 import { AllPropertiesOptional, AnyObject } from 'yummies/utils/types';
 
 import {
+  AbstractPathRouteEntity,
   AnyRoute,
   ExtractPathParams,
   RouteNavigateParams,
 } from '../../core/index.js';
 
-export type LinkProps<TRoute extends AnyRoute> = Omit<
+export type LinkProps<TRoute extends AbstractPathRouteEntity> = Omit<
   AnchorHTMLAttributes<HTMLAnchorElement>,
   'href'
 > & {

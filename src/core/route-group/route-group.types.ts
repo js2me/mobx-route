@@ -7,6 +7,10 @@ export type AnyRouteGroup = RouteGroup<RoutesCollection>;
 
 export type AnyRouteEntity = AnyRoute | AnyRouteGroup | AnyVirtualRoute;
 
+export type AbstractPathRouteEntity = {
+  path: string;
+};
+
 export type AbstractRouteEntity = {
   isOpened: boolean;
 };
