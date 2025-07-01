@@ -15,14 +15,14 @@ importers:
         specifier: ^6.12.4
         version: 6.13.7
       mobx-location-history:
-        specifier: ^7.1.0
-        version: 7.1.0(mobx@6.13.7)
+        specifier: ^7.1.1
+        version: 7.1.1(mobx@6.13.7)
       mobx-react-lite:
         specifier: ^4.0.7
         version: 4.1.0(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       mobx-view-model:
-        specifier: ^6.9.0
-        version: 6.9.0(mobx-react-lite@4.1.0(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^6.9.6
+        version: 6.9.6(mobx-react-lite@4.1.0(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       path-to-regexp:
         specifier: ^8.2.0
         version: 8.2.0
@@ -30,11 +30,11 @@ importers:
         specifier: ^18.0.0 || ^19.0.0
         version: 18.3.1
       react-simple-loadable:
-        specifier: ^2.3.4
-        version: 2.3.4(react@18.3.1)
+        specifier: ^2.3.8
+        version: 2.3.8(react@18.3.1)
       yummies:
-        specifier: ^4.0.0
-        version: 4.0.0
+        specifier: ^4.2.1
+        version: 4.2.1
     devDependencies:
       '@testing-library/react':
         specifier: ^16.3.0
@@ -1676,6 +1676,9 @@ packages:
     resolution: {integrity: sha512-cYY9mypksY8NRqgDB1XD1RiJL338v/551niynFTGkZOO2LHuB2OmOYxDIe/ttN9AHwrqdum1360G3ald0W9kCg==}
     engines: {node: '>=8'}
 
+  class-variance-authority@0.7.1:
+    resolution: {integrity: sha512-Ka+9Trutv7G8M6WT6SeiRWz792K5qEqIGEGzXKhAE6xOWAY6pPH8U+9IY3oCMv6kqTmLsv7Xh/2w2RigkePMsg==}
+
   clean-regexp@1.0.0:
     resolution: {integrity: sha512-GfisEZEJvzKrmGWkvfhgzcz/BllN1USeqD2V6tg14OAOgaCD2Z/PUEuxnAZ/nPvmaHRG7a8y77p1T/IRQ4D1Hw==}
     engines: {node: '>=4'}
@@ -2672,8 +2675,8 @@ packages:
     resolution: {integrity: sha512-qOOzS1cBTWYF4BH8fVePDBOO9iptMnGUEZwNc/cMWnTV2nVLZ7VoNWEPHkYczZA0pdoA7dl6e7FL659nX9S2aw==}
     engines: {node: '>=16 || 14 >=14.17'}
 
-  mobx-location-history@7.1.0:
-    resolution: {integrity: sha512-znA6IOWawCzUF9dkA0IHe0DGA9v2lTHtOxLoSrn1nSsQACyULM37RfTUtj3jiEOUTFu5LjitG9qflv7Cx1OdQw==}
+  mobx-location-history@7.1.1:
+    resolution: {integrity: sha512-2v9Mq7nRsw95dJ2FDJZaGVr3ZE4fwbGOMB3dzdL5otUo9zw20umFL/mtbjv5fQS4QyVvPeXPunzxTnkFkSW3DQ==}
     peerDependencies:
       mobx: ^6.13.3
 
@@ -2690,8 +2693,8 @@ packages:
       react-native:
         optional: true
 
-  mobx-view-model@6.9.0:
-    resolution: {integrity: sha512-xClYCpSkcliWD1mvlPxcb3KWqyNlrujz9KM+dLikE9FiW/h9TignS7d05Sv3nAgeRWdPebVHFjj0XKLWa6Bwug==}
+  mobx-view-model@6.9.6:
+    resolution: {integrity: sha512-+TYlGFjsRbv+aXdb5/ChQURVeluUJPvdY/qDMGK8x0HJLTaqjiZjnKwmzn39bXA5itmJg3wK5hDv0Kxhlh3Axg==}
     peerDependencies:
       mobx: ^6.12.4
       mobx-react-lite: ^4.0.7
@@ -2919,8 +2922,8 @@ packages:
   react-is@17.0.2:
     resolution: {integrity: sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==}
 
-  react-simple-loadable@2.3.4:
-    resolution: {integrity: sha512-MqX9jwcrRUEjCBiyy8uHAMMu4FkHIzS3iLsBuei/MySl3+H0Rx5DmENMjkqu607BgMwj7EXcJeer6Or+Tt/z7g==}
+  react-simple-loadable@2.3.8:
+    resolution: {integrity: sha512-wx8Bs8x8hckMzbvNLfrS2/xAvWtYjy9+/0rWoIBAtb+oLgW/SAutYzQitiCG11p53Deh9I17a0vG2//GjhdhDg==}
     peerDependencies:
       react: ^18.0.0 || ^19.0.0
 
@@ -3532,8 +3535,8 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
-  yummies@4.0.0:
-    resolution: {integrity: sha512-JpjliqOySAE6lanYPzB0bY5CTyCtQjBdIVA/TR21UnYpkfxxr85soB7JRZnwZ8ZH69UqHOtuikdxt/uujoZ3xw==}
+  yummies@4.2.1:
+    resolution: {integrity: sha512-y3ENtzE8sNKS4BaXDBJ+UdXaqlal++BrLezjT56Whg3d3vRGtaos3DYbp2ymsCBDVoHkuHqXpqbaE9HMrDK/Rw==}
 
 snapshots:
 
@@ -5258,6 +5261,10 @@ snapshots:
 
   ci-info@4.2.0: {}
 
+  class-variance-authority@0.7.1:
+    dependencies:
+      clsx: 2.1.1
+
   clean-regexp@1.0.0:
     dependencies:
       escape-string-regexp: 1.0.5
@@ -6465,12 +6472,12 @@ snapshots:
 
   minipass@7.1.2: {}
 
-  mobx-location-history@7.1.0(mobx@6.13.7):
+  mobx-location-history@7.1.1(mobx@6.13.7):
     dependencies:
       history: 5.3.0
       linked-abort-controller: 1.1.0
       mobx: 6.13.7
-      yummies: 4.0.0
+      yummies: 4.2.1
 
   mobx-react-lite@4.1.0(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
@@ -6480,14 +6487,14 @@ snapshots:
     optionalDependencies:
       react-dom: 18.3.1(react@18.3.1)
 
-  mobx-view-model@6.9.0(mobx-react-lite@4.1.0(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  mobx-view-model@6.9.6(mobx-react-lite@4.1.0(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       mobx: 6.13.7
       mobx-react-lite: 4.1.0(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-      react-simple-loadable: 2.3.4(react@18.3.1)
-      yummies: 4.0.0
+      react-simple-loadable: 2.3.8(react@18.3.1)
+      yummies: 4.2.1
 
   mobx@6.13.7: {}
 
@@ -6701,7 +6708,7 @@ snapshots:
 
   react-is@17.0.2: {}
 
-  react-simple-loadable@2.3.4(react@18.3.1):
+  react-simple-loadable@2.3.8(react@18.3.1):
     dependencies:
       react: 18.3.1
 
@@ -7420,9 +7427,10 @@ snapshots:
 
   yocto-queue@0.1.0: {}
 
-  yummies@4.0.0:
+  yummies@4.2.1:
     dependencies:
       '@types/insane': 1.0.0
+      class-variance-authority: 0.7.1
       clsx: 2.1.1
       dayjs: 1.11.13
       insane: 2.6.2

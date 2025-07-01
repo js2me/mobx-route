@@ -1,27 +1,35 @@
-import { computed, makeObservable } from 'mobx';
-import { ViewModelBase, ViewModelParams } from 'mobx-view-model';
+import { computed } from 'mobx';
+import {
+  applyObservable,
+  ViewModelBase,
+  ViewModelParams,
+} from 'mobx-view-model';
 import { AnyObject, EmptyObject } from 'yummies/utils/types';
 
 import {
   routeConfig,
   Route,
   ParsedPathParams,
-  AnyRouteEntity,
   VirtualRoute,
+  AnyAbstractRouteEntity,
 } from '../core/index.js';
 
 export abstract class RouteViewModel<
-  TRoute extends AnyRouteEntity = AnyRouteEntity,
+  TRoute extends AnyAbstractRouteEntity = AnyAbstractRouteEntity,
 > extends ViewModelBase<AnyObject> {
   abstract readonly route: TRoute;
 
   constructor(params: ViewModelParams<any, any>) {
     super(params);
 
-    computed.struct(this, 'pathParams');
-    computed(this, 'query');
-
-    makeObservable(this);
+    applyObservable(
+      this,
+      [
+        ['pathParams', computed.struct],
+        ['query', computed],
+      ],
+      this.vmConfig.observable.viewModelStores,
+    );
   }
 
   override get payload(): TRoute extends Route<string, any>
