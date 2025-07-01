@@ -4,7 +4,7 @@ import {
   ViewModelBase,
   ViewModelParams,
 } from 'mobx-view-model';
-import { AnyObject, EmptyObject } from 'yummies/utils/types';
+import { EmptyObject } from 'yummies/utils/types';
 
 import {
   routeConfig,
@@ -16,10 +16,10 @@ import {
 
 export abstract class RouteViewModel<
   TRoute extends AnyAbstractRouteEntity = AnyAbstractRouteEntity,
-> extends ViewModelBase<AnyObject> {
+> extends ViewModelBase<EmptyObject> {
   abstract readonly route: TRoute;
 
-  constructor(params: ViewModelParams<any, any>) {
+  constructor(params: ViewModelParams<EmptyObject, any>) {
     super(params);
 
     applyObservable(
