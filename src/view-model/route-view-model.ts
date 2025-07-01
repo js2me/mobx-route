@@ -9,9 +9,9 @@ import { AnyObject, EmptyObject } from 'yummies/utils/types';
 import {
   routeConfig,
   Route,
-  ParsedPathParams,
   VirtualRoute,
   AnyAbstractRouteEntity,
+  RouteParams,
 } from '../core/index.js';
 
 export abstract class RouteViewModel<
@@ -32,11 +32,7 @@ export abstract class RouteViewModel<
     );
   }
 
-  override get payload(): TRoute extends Route<string, any>
-    ? ParsedPathParams<TRoute['path']>
-    : TRoute extends VirtualRoute<infer Params>
-      ? Params
-      : EmptyObject {
+  override get payload(): RouteParams<TRoute> {
     if (this.route instanceof Route) {
       return this.route.params || ({} as any);
     }

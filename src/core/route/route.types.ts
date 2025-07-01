@@ -2,7 +2,7 @@ import { ParseOptions } from 'path-to-regexp';
 import { AnyObject, MaybePromise } from 'yummies/utils/types';
 
 import { RouteGlobalConfig } from '../config/config.types.js';
-import type { AbstractVirtualRoute } from '../virtual-route/virtual-route.types.js';
+import { AnyAbstractRouteEntity } from '../route-group/route-group.types.js';
 
 import { Route } from './route.js';
 
@@ -72,13 +72,12 @@ export type PathParsedParam = string;
 
 type Simplify<T> = T extends infer U ? { [K in keyof U]: U[K] } : never;
 
-export type RouteParams<
-  TRoute extends AbstractPathRoute | AbstractVirtualRoute<any>,
-> = TRoute extends { path: string }
-  ? ParsedPathParams<TRoute['path']>
-  : TRoute extends { params: infer TParams }
-    ? Exclude<TParams, null>
-    : never;
+export type RouteParams<TRoute extends AnyAbstractRouteEntity> =
+  TRoute extends { path: string }
+    ? ParsedPathParams<TRoute['path']>
+    : TRoute extends { params: infer TParams }
+      ? Exclude<TParams, null>
+      : AnyObject;
 
 export type ParsedPathParams<Path extends string> = Simplify<
   Path extends `${infer Prefix}{${infer Optional}}${infer Suffix}`
