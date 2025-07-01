@@ -1,14 +1,37 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { observer } from 'mobx-react-lite';
-import { Fragment, isValidElement, ReactElement, ReactNode } from 'react';
+import {
+  Fragment,
+  isValidElement,
+  ReactElement,
+  ReactNode,
+  useEffect,
+} from 'react';
 import { flatMapDeep } from 'yummies/data';
+import { AllPropertiesOptional, Maybe } from 'yummies/utils/types';
 
-import { AnyRouteEntity } from '../../core/index.js';
+import {
+  AnyRouteEntity,
+  RouteNavigateParams,
+  RouteParams,
+} from '../../core/index.js';
 import { isRouteEntity } from '../../core/utils/is-route-entity.js';
 
-export interface SwitchProps {
+type SwitchBaseProps = {
   children: ReactNode;
-}
+};
+
+export type SwitchProps<TRoute extends AnyRouteEntity> = {
+  default?: TRoute;
+} & (AllPropertiesOptional<RouteParams<TRoute>> extends true
+  ? {
+      params?: Maybe<RouteParams<TRoute>>;
+    }
+  : {
+      params: RouteParams<TRoute>;
+    }) &
+  SwitchBaseProps &
+  RouteNavigateParams;
 
 const flattenChildren = (children: ReactNode) =>
   flatMapDeep(children, (c): any =>
@@ -30,16 +53,31 @@ const isValidRouteElement = (
   );
 };
 
-export const Switch = observer(({ children }: SwitchProps) => {
+export const Switch = observer(function <TRoute extends AnyRouteEntity>({
+  children,
+  default: defaultRoute,
+  params,
+  ...navigateParams
+}: SwitchProps<TRoute>) {
+  let resultElement: ReactElement<any> | ReactNode = null;
   let defaultElement: ReactNode = null;
 
   for (const element of flattenChildren(children)) {
     if (isValidRouteElement(element) && element.props.route.isOpened) {
-      return element;
+      resultElement = element;
+      break;
     } else {
       defaultElement = element;
     }
   }
 
-  return defaultElement;
+  const isResultElementFound = !!resultElement;
+
+  useEffect(() => {
+    if (!isResultElementFound && defaultRoute && !defaultRoute.isOpened) {
+      defaultRoute?.open(params, navigateParams);
+    }
+  }, [isResultElementFound]);
+
+  return resultElement ?? defaultElement;
 });
