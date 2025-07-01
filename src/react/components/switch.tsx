@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+import { buildSearchString } from 'mobx-location-history';
 import { observer } from 'mobx-react-lite';
 import {
   Fragment,
@@ -12,6 +13,7 @@ import { AllPropertiesOptional, Maybe } from 'yummies/utils/types';
 
 import {
   AnyRouteEntity,
+  routeConfig,
   RouteNavigateParams,
   RouteParams,
 } from '../../core/index.js';
@@ -21,7 +23,7 @@ type SwitchBaseProps = {
   children: ReactNode;
 };
 
-export type SwitchProps<TRoute extends AnyRouteEntity> = {
+type SwitchPropsWithDefaultRoute<TRoute extends AnyRouteEntity> = {
   default?: TRoute;
 } & (AllPropertiesOptional<RouteParams<TRoute>> extends true
   ? {
@@ -32,6 +34,15 @@ export type SwitchProps<TRoute extends AnyRouteEntity> = {
     }) &
   SwitchBaseProps &
   RouteNavigateParams;
+
+type SwitchPropsWithDefaultUrl = {
+  default?: string;
+} & SwitchBaseProps &
+  RouteNavigateParams;
+
+export type SwitchProps<TRoute extends AnyRouteEntity> =
+  | SwitchPropsWithDefaultRoute<TRoute>
+  | SwitchPropsWithDefaultUrl;
 
 const flattenChildren = (children: ReactNode) =>
   flatMapDeep(children, (c): any =>
@@ -55,7 +66,8 @@ const isValidRouteElement = (
 
 export const Switch = observer(function <TRoute extends AnyRouteEntity>({
   children,
-  default: defaultRoute,
+  default: defaultNavigation,
+  // @ts-ignore
   params,
   ...navigateParams
 }: SwitchProps<TRoute>) {
@@ -74,10 +86,21 @@ export const Switch = observer(function <TRoute extends AnyRouteEntity>({
   const isResultElementFound = !!resultElement;
 
   useEffect(() => {
-    if (!isResultElementFound && defaultRoute && !defaultRoute.isOpened) {
-      defaultRoute?.open(params, navigateParams);
+    if (!isResultElementFound && defaultNavigation) {
+      if (typeof defaultNavigation === 'string') {
+        const history = routeConfig.get().history;
+        const url = `${defaultNavigation}${buildSearchString(navigateParams.query || {})}`;
+
+        if (navigateParams.replace) {
+          history.replace(url, navigateParams.state);
+        } else {
+          history.push(url, navigateParams.state);
+        }
+      } else if (!defaultNavigation.isOpened) {
+        defaultNavigation.open(params, navigateParams);
+      }
     }
-  }, [isResultElementFound]);
+  }, [isResultElementFound, defaultNavigation]);
 
   return resultElement ?? defaultElement;
 });
