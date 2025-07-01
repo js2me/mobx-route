@@ -3,15 +3,15 @@ import { ComponentType, ReactNode, useRef } from 'react';
 import { loadable } from 'react-simple-loadable';
 
 import {
-  AbstractRouteEntity,
+  AnyAbstractRouteEntity,
   type AnyRoute,
   type AnyVirtualRoute,
 } from '../../core/index.js';
 
-export type RouteViewComponent<TRoute extends AbstractRouteEntity> =
+export type RouteViewComponent<TRoute extends AnyAbstractRouteEntity> =
   ComponentType<RouteViewProps<TRoute>>;
 
-export interface RouteViewConfigProps<TRoute extends AbstractRouteEntity> {
+export interface RouteViewConfigProps<TRoute extends AnyAbstractRouteEntity> {
   route: TRoute;
   view?: RouteViewComponent<TRoute>;
   lazyView?: (route: TRoute) => Promise<ComponentType<RouteViewProps<TRoute>>>;
@@ -26,7 +26,9 @@ interface RouteViewConfigWithoutRoute {
   children?: ReactNode | (() => ReactNode);
 }
 
-export interface RouteViewConfigWithRoute<TRoute extends AbstractRouteEntity> {
+export interface RouteViewConfigWithRoute<
+  TRoute extends AnyAbstractRouteEntity,
+> {
   route: TRoute;
   view?: RouteViewComponent<TRoute>;
   lazyView?: (route: TRoute) => Promise<ComponentType<RouteViewProps<TRoute>>>;
@@ -37,11 +39,11 @@ export interface RouteViewConfigWithRoute<TRoute extends AbstractRouteEntity> {
     | ((params: RouteViewProps<TRoute>['params'], route: TRoute) => ReactNode);
 }
 
-export type RouteViewConfig<TRoute extends AbstractRouteEntity> =
+export type RouteViewConfig<TRoute extends AnyAbstractRouteEntity> =
   | RouteViewConfigWithRoute<TRoute>
   | RouteViewConfigWithoutRoute;
 
-export type RouteViewProps<TRoute extends AbstractRouteEntity> = {
+export type RouteViewProps<TRoute extends AnyAbstractRouteEntity> = {
   children?: ReactNode;
   params: TRoute extends AnyRoute
     ? Exclude<TRoute['params'], null | undefined>
@@ -50,7 +52,7 @@ export type RouteViewProps<TRoute extends AbstractRouteEntity> = {
       : never;
 };
 
-function RouteViewBase<TRoute extends AbstractRouteEntity>(
+function RouteViewBase<TRoute extends AnyAbstractRouteEntity>(
   props: Readonly<RouteViewConfig<TRoute>>,
 ): ReactNode {
   const lazyViewComponentRef = useRef<ComponentType<any>>();

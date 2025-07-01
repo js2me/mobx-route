@@ -20,6 +20,7 @@ import {
 import { routeConfig } from '../config/index.js';
 
 import {
+  AbstractVirtualRoute,
   VirtualOpenExtraParams,
   VirtualRouteConfiguration,
 } from './virtual-route.types.js';
@@ -29,9 +30,9 @@ import {
  *
  * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html)
  */
-export class VirtualRoute<
-  TParams extends AnyObject | EmptyObject = EmptyObject,
-> {
+export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
+  implements AbstractVirtualRoute<TParams>
+{
   protected abortController: AbortController;
   query: IQueryParams;
   params: TParams | null;

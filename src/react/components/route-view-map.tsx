@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import { ReactNode, useLayoutEffect, useMemo } from 'react';
 
-import { AnyRouteEntity } from '../../core/index.js';
+import { AnyAbstractRouteEntity } from '../../core/index.js';
 
 import {
   RouteView,
@@ -9,15 +9,15 @@ import {
   RouteViewConfigWithRoute,
 } from './route-view.js';
 
-export type MappedRouteView<TRouteEntity extends AnyRouteEntity> =
+export type MappedRouteView<TRouteEntity extends AnyAbstractRouteEntity> =
   // route view detailed configuration
   | Omit<RouteViewConfigWithRoute<TRouteEntity>, 'route'>
   // only route view component
   | RouteViewComponent<TRouteEntity>;
 
 type RouteViewMapArrayType = [
-  AnyRouteEntity,
-  MappedRouteView<AnyRouteEntity>,
+  AnyAbstractRouteEntity,
+  MappedRouteView<AnyAbstractRouteEntity>,
 ][];
 
 // eslint-disable-next-line sonarjs/redundant-type-aliases

@@ -17,6 +17,13 @@ export interface VirtualOpenExtraParams {
   replace?: boolean;
 }
 
+export interface AbstractVirtualRoute<
+  TParams extends AnyObject | EmptyObject = EmptyObject,
+> {
+  isOpened: boolean;
+  params: TParams | null;
+}
+
 export interface VirtualRouteConfiguration<
   TParams extends AnyObject | EmptyObject = EmptyObject,
 > {

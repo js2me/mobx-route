@@ -1,6 +1,10 @@
 import { computed, makeObservable, observable } from 'mobx';
 
-import { AnyRouteEntity, RoutesCollection } from './route-group.types.js';
+import {
+  AbstractRouteGroup,
+  AnyRouteEntity,
+  RoutesCollection,
+} from './route-group.types.js';
 
 declare const process: { env: { NODE_ENV?: string } };
 
@@ -9,7 +13,9 @@ declare const process: { env: { NODE_ENV?: string } };
  *
  * [**Documentation**](https://js2me.github.io/mobx-route/core/RouteGroup.html)
  */
-export class RouteGroup<TRoutesCollection extends RoutesCollection> {
+export class RouteGroup<TRoutesCollection extends RoutesCollection>
+  implements AbstractRouteGroup<TRoutesCollection>
+{
   routes: TRoutesCollection;
 
   constructor(
@@ -44,12 +50,10 @@ export class RouteGroup<TRoutesCollection extends RoutesCollection> {
    * [**Documentation**](https://js2me.github.io/mobx-route/core/RouteGroup.html#indexroute-route-undefined)
    */
   get indexRoute(): AnyRouteEntity | undefined {
-    return (
-      this._indexRoute ??
+    return (this._indexRoute ??
       Object.values(this.routes).find(
         (route) => 'isIndex' in route && route.isIndex,
-      )
-    );
+      )) as unknown as AnyRouteEntity;
   }
 
   /**

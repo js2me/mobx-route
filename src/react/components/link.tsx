@@ -11,7 +11,7 @@ import {
 import { AllPropertiesOptional, AnyObject } from 'yummies/utils/types';
 
 import {
-  AbstractPathRouteEntity,
+  AbstractPathRoute,
   AnyRoute,
   ExtractPathParams,
   RouteNavigateParams,
@@ -22,7 +22,7 @@ interface LinkAnchorProps
   asChild?: boolean;
 }
 
-type LinkPathRouteProps<TRoute extends AbstractPathRouteEntity> = {
+type LinkPathRouteProps<TRoute extends AbstractPathRoute> = {
   to: TRoute;
 } & (AllPropertiesOptional<ExtractPathParams<TRoute['path']>> extends true
   ? {
@@ -39,12 +39,11 @@ type LinkSimpleRouteProps =
       href: string;
     };
 
-export type LinkProps<TRoute extends AbstractPathRouteEntity> =
-  LinkAnchorProps &
-    RouteNavigateParams &
-    (LinkPathRouteProps<TRoute> | LinkSimpleRouteProps);
+export type LinkProps<TRoute extends AbstractPathRoute> = LinkAnchorProps &
+  RouteNavigateParams &
+  (LinkPathRouteProps<TRoute> | LinkSimpleRouteProps);
 
-type LinkComponentType = <TRoute extends AbstractPathRouteEntity>(
+type LinkComponentType = <TRoute extends AbstractPathRoute>(
   props: LinkProps<TRoute>,
 ) => ReactNode;
 

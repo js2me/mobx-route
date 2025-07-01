@@ -3,6 +3,7 @@ import { ReactNode, useLayoutEffect, useMemo } from 'react';
 import { EmptyObject } from 'yummies/utils/types';
 
 import {
+  AnyAbstractRouteEntity,
   AnyRouteEntity,
   AnyRouteGroup,
   RoutesArrayCollection,
@@ -16,7 +17,7 @@ import {
   RouteViewConfigWithRoute,
 } from './route-view.js';
 
-export type RouteGroupView<TRouteEntity extends AnyRouteEntity> =
+export type RouteGroupView<TRouteEntity extends AnyAbstractRouteEntity> =
   // route view detailed configuration
   | Omit<RouteViewConfigWithRoute<TRouteEntity>, 'route'>
   // only route view component
@@ -25,13 +26,13 @@ export type RouteGroupView<TRouteEntity extends AnyRouteEntity> =
 export type RouteGroupViews<TRoutes extends RoutesCollection> =
   TRoutes extends RoutesArrayCollection
     ? {
-        [K in keyof TRoutes]: TRoutes[K] extends AnyRouteEntity
+        [K in keyof TRoutes]: TRoutes[K] extends AnyAbstractRouteEntity
           ? RouteGroupView<TRoutes[K]>
           : never;
       }
     : TRoutes extends RoutesObjectCollection
       ? {
-          [K in keyof TRoutes]: TRoutes[K] extends AnyRouteEntity
+          [K in keyof TRoutes]: TRoutes[K] extends AnyAbstractRouteEntity
             ? RouteGroupView<TRoutes[K]>
             : never;
         }
