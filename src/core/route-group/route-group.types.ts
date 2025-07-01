@@ -1,4 +1,4 @@
-import type { AbstractPathRoute, AnyRoute } from '../route/index.js';
+import type { AnyRoute } from '../route/index.js';
 import {
   AbstractVirtualRoute,
   AnyVirtualRoute,
@@ -17,7 +17,7 @@ export interface AbstractRouteGroup<
   isOpened: boolean;
 }
 
-export type AnyAbstractRoute = AbstractPathRoute | AbstractVirtualRoute<any>;
+export type AnyAbstractRoute = AnyRoute | AbstractVirtualRoute<any>;
 
 export type AnyAbstractRouteEntity = AnyAbstractRoute | AbstractRouteGroup;
 

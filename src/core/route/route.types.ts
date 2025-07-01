@@ -1,5 +1,10 @@
 import { ParseOptions } from 'path-to-regexp';
-import { AnyObject, MaybePromise } from 'yummies/utils/types';
+import {
+  AllPropertiesOptional,
+  AnyObject,
+  Maybe,
+  MaybePromise,
+} from 'yummies/utils/types';
 
 import { RouteGlobalConfig } from '../config/config.types.js';
 import { AnyAbstractRouteEntity } from '../route-group/route-group.types.js';
@@ -64,7 +69,60 @@ export interface RouteConfiguration<
   ) => void;
 }
 
-export type AnyRoute = Omit<Route<string, any, any>, 'config'>;
+export type AnyRoute = IRoute;
+
+export interface IRoute<TPath extends string = string> {
+  isOpened: boolean;
+  path: TPath;
+
+  /**
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#hasopenedchildren-boolean)
+   */
+  hasOpenedChildren: boolean;
+
+  /**
+   * Navigates to this route.
+   *
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#open-args)
+   */
+  open(
+    ...args: AllPropertiesOptional<ExtractPathParams<TPath>> extends true
+      ? [
+          params?: ExtractPathParams<TPath> | null | undefined,
+          navigateParams?: RouteNavigateParams,
+        ]
+      : [params: ExtractPathParams<TPath>, navigateParams?: RouteNavigateParams]
+  ): Promise<void>;
+  open(
+    ...args: AllPropertiesOptional<ExtractPathParams<TPath>> extends true
+      ? [
+          params?: ExtractPathParams<TPath> | null | undefined,
+          replace?: RouteNavigateParams['replace'],
+          query?: RouteNavigateParams['query'],
+        ]
+      : [
+          params: ExtractPathParams<TPath>,
+          replace?: RouteNavigateParams['replace'],
+          query?: RouteNavigateParams['query'],
+        ]
+  ): Promise<void>;
+  open(url: string, navigateParams?: RouteNavigateParams): Promise<void>;
+  open(
+    url: string,
+    replace?: RouteNavigateParams['replace'],
+    query?: RouteNavigateParams['query'],
+  ): Promise<void>;
+
+  createUrl(
+    ...args: AllPropertiesOptional<ExtractPathParams<TPath>> extends true
+      ? [params?: Maybe<ExtractPathParams<TPath>>, query?: AnyObject]
+      : [params: ExtractPathParams<TPath>, query?: AnyObject]
+  ): string;
+
+  destroy(): void;
+
+  params: any;
+}
 
 export type PathParam = string | number | boolean | null;
 // eslint-disable-next-line sonarjs/redundant-type-aliases

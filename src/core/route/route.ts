@@ -31,7 +31,7 @@ import {
   RouteConfiguration,
   ParsedPathData,
   RouteNavigateParams,
-  AbstractPathRoute,
+  IRoute,
 } from './route.types.js';
 
 /**
@@ -43,7 +43,7 @@ export class Route<
   TPath extends string,
   TParams extends AnyObject = ExtractPathParams<TPath>,
   TParentRoute extends Route<any, any, any> | null = null,
-> implements AbstractPathRoute<TPath>
+> implements IRoute<TPath>
 {
   protected abortController: AbortController;
   protected history: History;

@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+import { buildSearchString } from 'mobx-location-history';
 import { observer } from 'mobx-react-lite';
 import {
   AnchorHTMLAttributes,
@@ -11,9 +12,9 @@ import {
 import { AllPropertiesOptional, AnyObject } from 'yummies/utils/types';
 
 import {
-  AbstractPathRoute,
   AnyRoute,
   ExtractPathParams,
+  routeConfig,
   RouteNavigateParams,
 } from '../../core/index.js';
 
@@ -22,7 +23,7 @@ interface LinkAnchorProps
   asChild?: boolean;
 }
 
-type LinkPathRouteProps<TRoute extends AbstractPathRoute> = {
+type LinkPathRouteProps<TRoute extends AnyRoute> = {
   to: TRoute;
 } & (AllPropertiesOptional<ExtractPathParams<TRoute['path']>> extends true
   ? {
@@ -39,11 +40,11 @@ type LinkSimpleRouteProps =
       href: string;
     };
 
-export type LinkProps<TRoute extends AbstractPathRoute> = LinkAnchorProps &
+export type LinkProps<TRoute extends AnyRoute> = LinkAnchorProps &
   RouteNavigateParams &
   (LinkPathRouteProps<TRoute> | LinkSimpleRouteProps);
 
-type LinkComponentType = <TRoute extends AbstractPathRoute>(
+type LinkComponentType = <TRoute extends AnyRoute>(
   props: LinkProps<TRoute>,
 ) => ReactNode;
 
@@ -67,7 +68,7 @@ export const Link = observer(
       const href =
         outerHref ??
         (typeof to === 'string'
-          ? to
+          ? `${to}${buildSearchString(query || {})}`
           : (to as AnyRoute).createUrl(params, query));
 
       const handleClick = (event: MouseEvent<HTMLElement>) => {
@@ -82,9 +83,14 @@ export const Link = observer(
 
         outerAnchorProps.onClick?.(event);
 
-        if (!event.defaultPrevented && typeof to !== 'string') {
+        if (!event.defaultPrevented && to) {
           event.preventDefault();
-          (to as AnyRoute).open(href, { replace, query, state });
+
+          if (typeof to === 'string') {
+            routeConfig.get().history.push(href, state);
+          } else {
+            (to as AnyRoute).open(href, { replace, query, state });
+          }
         }
       };
 
