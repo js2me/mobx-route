@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import { ComponentType, ReactNode, useRef } from 'react';
-import { loadable } from 'react-simple-loadable';
+import { loadable, LoadableConfig } from 'react-simple-loadable';
 
 import {
   AnyAbstractRouteEntity,
@@ -26,13 +26,11 @@ interface RouteViewConfigWithoutRoute {
   children?: ReactNode | (() => ReactNode);
 }
 
-export interface RouteViewConfigWithRoute<
-  TRoute extends AnyAbstractRouteEntity,
-> {
+export interface RouteViewConfigWithRoute<TRoute extends AnyAbstractRouteEntity>
+  extends Pick<LoadableConfig, 'loading' | 'preload' | 'throwOnError'> {
   route: TRoute;
   view?: RouteViewComponent<TRoute>;
   lazyView?: (route: TRoute) => Promise<ComponentType<RouteViewProps<TRoute>>>;
-  loader?: ComponentType;
   fallbackView?: ReactNode;
   children?:
     | ReactNode
@@ -72,7 +70,9 @@ function RouteViewBase<TRoute extends AnyAbstractRouteEntity>(
   if (props.lazyView) {
     lazyViewComponentRef.current = loadable({
       load: () => props.lazyView!(props.route),
-      loader: props.loader,
+      loading: props.loading,
+      preload: props.preload,
+      throwOnError: props.throwOnError,
     });
     Component = lazyViewComponentRef.current;
   } else {
