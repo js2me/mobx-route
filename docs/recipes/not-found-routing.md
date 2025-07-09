@@ -73,4 +73,4 @@ export const App = () => {
 }
 ```
 
-You can also use `mobx-view-model` and the `<OnlyViewModel />` component.  
+You can also use [`mobx-view-model`](https://js2me.github.io/mobx-view-model) and the [`<OnlyViewModel />` component](https://js2me.github.io/mobx-view-model/react/api/only-view-model).  
