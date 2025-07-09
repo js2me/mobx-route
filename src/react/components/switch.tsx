@@ -83,7 +83,7 @@ export const Switch = observer(function <TRoute extends AnyRouteEntity>({
     }
   }
 
-  const isResultElementFound = resultElement;
+  const isResultElementFound = !!resultElement;
 
   useEffect(() => {
     if (!isResultElementFound && defaultNavigation) {

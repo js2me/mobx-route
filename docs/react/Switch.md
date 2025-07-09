@@ -30,3 +30,25 @@ function Routing() {
   );
 }
 ```
+
+
+## Props   
+
+
+### `default`   
+
+This prop sets the "default" route to be opened when no other child routes are opened.   
+
+Example:   
+```tsx
+<Switch default={defaultRouteToOpen}>
+  <RouteView route={route1} />
+  <RouteView route={route2} />
+  <RouteView route={routeN} />
+</Switch>
+```
+
+Also you can pass `string` as default url which is needed to navigate   
+
+### `replace`   
+This is additional navigation param for `default` prop   

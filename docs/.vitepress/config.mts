@@ -88,6 +88,7 @@ export default defineConfig({
           { text: 'Routing declarations', link: '/recipes/routing-declarations' },
           { text: 'Modal routes', link: '/recipes/modal-routes' },
           { text: 'Memory routing', link: '/recipes/memory-routing' },
+          { text: 'Not Found routing', link: '/recipes/not-found-routing' },
           { text: 'Hash routing', link: '/recipes/hash-routing' },
           { text: 'Protected routes', link: '/recipes/protected-routes' },
           { text: 'Rest path params', link: '/recipes/rest-path-params' },
