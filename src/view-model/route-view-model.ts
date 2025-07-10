@@ -1,4 +1,5 @@
 import { computed } from 'mobx';
+import { IQueryParams } from 'mobx-location-history';
 import {
   applyObservable,
   ViewModelBase,
@@ -44,9 +45,9 @@ export abstract class RouteViewModel<
     return {} as EmptyObject as any;
   }
 
-  get query() {
+  get query(): IQueryParams {
     if ('query' in this.route) {
-      return this.route.query;
+      return this.route.query as IQueryParams;
     }
 
     return routeConfig.get().queryParams;
