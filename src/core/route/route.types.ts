@@ -1,10 +1,5 @@
 import { ParseOptions } from 'path-to-regexp';
-import {
-  AllPropertiesOptional,
-  AnyObject,
-  Maybe,
-  MaybePromise,
-} from 'yummies/utils/types';
+import { IsPartial, AnyObject, Maybe, MaybePromise } from 'yummies/utils/types';
 
 import { RouteGlobalConfig } from '../config/config.types.js';
 import { AnyAbstractRouteEntity } from '../route-group/route-group.types.js';
@@ -86,7 +81,7 @@ export interface IRoute<TPath extends string = string> {
    * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#open-args)
    */
   open(
-    ...args: AllPropertiesOptional<ExtractPathParams<TPath>> extends true
+    ...args: IsPartial<ExtractPathParams<TPath>> extends true
       ? [
           params?: ExtractPathParams<TPath> | null | undefined,
           navigateParams?: RouteNavigateParams,
@@ -94,7 +89,7 @@ export interface IRoute<TPath extends string = string> {
       : [params: ExtractPathParams<TPath>, navigateParams?: RouteNavigateParams]
   ): Promise<void>;
   open(
-    ...args: AllPropertiesOptional<ExtractPathParams<TPath>> extends true
+    ...args: IsPartial<ExtractPathParams<TPath>> extends true
       ? [
           params?: ExtractPathParams<TPath> | null | undefined,
           replace?: RouteNavigateParams['replace'],
@@ -114,7 +109,7 @@ export interface IRoute<TPath extends string = string> {
   ): Promise<void>;
 
   createUrl(
-    ...args: AllPropertiesOptional<ExtractPathParams<TPath>> extends true
+    ...args: IsPartial<ExtractPathParams<TPath>> extends true
       ? [params?: Maybe<ExtractPathParams<TPath>>, query?: AnyObject]
       : [params: ExtractPathParams<TPath>, query?: AnyObject]
   ): string;

@@ -4,7 +4,7 @@
 import { buildSearchString } from 'mobx-location-history';
 import { observer } from 'mobx-react-lite';
 import { Fragment, isValidElement, ReactNode, useEffect } from 'react';
-import { AllPropertiesOptional, Maybe } from 'yummies/utils/types';
+import { IsPartial, Maybe } from 'yummies/utils/types';
 
 import {
   AnyRouteEntity,
@@ -14,31 +14,31 @@ import {
 } from '../../core/index.js';
 import { isRouteEntity } from '../../core/utils/is-route-entity.js';
 
-type SwitchBaseProps = {
+interface BaseProps extends RouteNavigateParams {
   children: ReactNode;
+}
+
+type PropsWithDefaultRoute<TRoute extends AnyRouteEntity> = BaseProps & {
+  default?: TRoute;
+} & (IsPartial<RouteParams<TRoute>> extends true
+    ? {
+        params?: Maybe<RouteParams<TRoute>>;
+      }
+    : {
+        params: RouteParams<TRoute>;
+      });
+
+type PropsWithDefaultUrl = BaseProps & {
+  default?: string;
 };
 
-type SwitchPropsWithDefaultRoute<TRoute extends AnyRouteEntity> = {
-  default?: TRoute;
-} & (AllPropertiesOptional<RouteParams<TRoute>> extends true
-  ? {
-      params?: Maybe<RouteParams<TRoute>>;
-    }
-  : {
-      params: RouteParams<TRoute>;
-    }) &
-  SwitchBaseProps &
-  RouteNavigateParams;
-
-type SwitchPropsWithDefaultUrl = {
-  default?: string;
-} & SwitchBaseProps &
-  RouteNavigateParams;
-
 export type SwitchProps<TRoute extends AnyRouteEntity> =
-  | SwitchPropsWithDefaultRoute<TRoute>
-  | SwitchPropsWithDefaultUrl;
+  | PropsWithDefaultRoute<TRoute>
+  | PropsWithDefaultUrl;
 
+/**
+ * WIP
+ */
 export const Switch = observer(function <TRoute extends AnyRouteEntity>({
   children,
   default: defaultNavigation,

@@ -1,6 +1,6 @@
 import { IQueryParams } from 'mobx-location-history';
 import {
-  AllPropertiesOptional,
+  IsPartial,
   AnyObject,
   EmptyObject,
   Maybe,
@@ -34,7 +34,7 @@ export interface VirtualRouteConfiguration<
   // custom implementation of open behaviour for this route
   // if not provided, default implementation will be used
   open?: (
-    ...args: AllPropertiesOptional<TParams> extends true
+    ...args: IsPartial<TParams> extends true
       ? [params: Maybe<TParams>, route: VirtualRoute<TParams>]
       : [params: TParams, route: VirtualRoute<TParams>]
   ) => MaybePromise<boolean | void>;
@@ -44,7 +44,7 @@ export interface VirtualRouteConfiguration<
 
   checkOpened?: (route: VirtualRoute<TParams>) => boolean;
   beforeOpen?: (
-    ...args: AllPropertiesOptional<TParams> extends true
+    ...args: IsPartial<TParams> extends true
       ? [params: Maybe<TParams>, route: VirtualRoute<TParams>]
       : [params: TParams, route: VirtualRoute<TParams>]
   ) => MaybePromise<void | boolean>;

@@ -10,12 +10,7 @@ import {
 } from 'mobx';
 import { IQueryParams } from 'mobx-location-history';
 import { callFunction } from 'yummies/common';
-import {
-  AllPropertiesOptional,
-  AnyObject,
-  EmptyObject,
-  Maybe,
-} from 'yummies/utils/types';
+import { IsPartial, AnyObject, EmptyObject, Maybe } from 'yummies/utils/types';
 
 import { routeConfig } from '../config/index.js';
 
@@ -105,7 +100,7 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
    * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#open-params-extraparams-query-replace-promise-void)
    */
   open(
-    ...args: AllPropertiesOptional<TParams> extends true
+    ...args: IsPartial<TParams> extends true
       ? [params?: Maybe<TParams>, extraParams?: VirtualOpenExtraParams]
       : [params: TParams, extraParams?: VirtualOpenExtraParams]
   ): Promise<void>;

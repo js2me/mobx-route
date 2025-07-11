@@ -9,7 +9,7 @@ import {
   MouseEvent,
   ReactNode,
 } from 'react';
-import { AllPropertiesOptional, AnyObject } from 'yummies/utils/types';
+import { IsPartial, AnyObject } from 'yummies/utils/types';
 
 import {
   AnyRoute,
@@ -25,7 +25,7 @@ interface LinkAnchorProps
 
 type LinkPathRouteProps<TRoute extends AnyRoute> = {
   to: TRoute;
-} & (AllPropertiesOptional<ExtractPathParams<TRoute['path']>> extends true
+} & (IsPartial<ExtractPathParams<TRoute['path']>> extends true
   ? {
       // eslint-disable-next-line sonarjs/no-redundant-optional
       params?: ExtractPathParams<TRoute['path']> | null | undefined;

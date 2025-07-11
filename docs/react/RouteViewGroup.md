@@ -1,12 +1,11 @@
-# Switch
+# RouteViewGroup
 
 React components which **renders only the first matching route**.   
 
 ### Example
 
 ```tsx
-import { RouteView } from 'mobx-route/react';
-
+import { RouteView, RouteViewGroup } from 'mobx-route/react';
 
 const routes = {
   allOrders: new Route('/orders'),
@@ -16,16 +15,16 @@ const routes = {
 function Routing() {
   return (
     <>
-      <Switch>
+      <RouteViewGroup>
         <RouteView route={routes.allOrders} component={AllOrders} />
         <RouteView route={routes.order} component={OrderDetails} />
         {/* 
           in mobx-route, any RouteView without provider route is considered always active. 
-          This can be used to achieve "default" route behaviour within Switch. 
+          This can be used to achieve "otherwise" route behaviour within RouteViewGroup. 
           Note: the order matters!
         */}
         <RouteView>This is rendered when nothing above has matched</RouteView>
-      </Switch>;
+      </RouteViewGroup>;
     </>
   );
 }
@@ -34,21 +33,51 @@ function Routing() {
 
 ## Props   
 
+### `layout`   
+You can use this prop if you want to wrap all child `RouteViews` into React component  
 
-### `default`   
+```tsx
+const Layout = ({ children }) => {
+  return (
+    <div>
+      <span>hello</span>
+      {children}
+    </div>
+  )
+}
+...
+route2.open()
+...
+<RouteViewGroup otherwise={otherwiseRouteToOpen}>
+  <RouteView route={route2}>
+    <div>world</div>
+  </RouteView>
+</RouteViewGroup>
+```
+output:  
+```html
+<div>
+  <div>
+    <span>hello</span>
+    <div>world</div>
+  </div>
+</div>
+```
+
+### `otherwise`   
 
 This prop sets the "default" route to be opened when no other child routes are opened.   
 
 Example:   
 ```tsx
-<Switch default={defaultRouteToOpen}>
+<RouteViewGroup otherwise={otherwiseRouteToOpen}>
   <RouteView route={route1} />
   <RouteView route={route2} />
   <RouteView route={routeN} />
-</Switch>
+</RouteViewGroup>
 ```
 
 Also you can pass `string` as default url which is needed to navigate   
 
 ### `replace`   
-This is additional navigation param for `default` prop   
+This is additional navigation param for `otherwise` prop   

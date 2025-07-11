@@ -11,17 +11,6 @@ import {
 export type RouteViewComponent<TRoute extends AnyAbstractRouteEntity> =
   ComponentType<RouteViewProps<TRoute>>;
 
-export interface RouteViewConfigProps<TRoute extends AnyAbstractRouteEntity> {
-  route: TRoute;
-  view?: RouteViewComponent<TRoute>;
-  lazyView?: (route: TRoute) => Promise<ComponentType<RouteViewProps<TRoute>>>;
-  loader?: ComponentType;
-  fallbackView?: ReactNode;
-  children?:
-    | ReactNode
-    | ((params: RouteViewProps<TRoute>['params'], route: TRoute) => ReactNode);
-}
-
 interface RouteViewConfigWithoutRoute {
   children?: ReactNode | (() => ReactNode);
 }
@@ -30,8 +19,11 @@ export interface RouteViewConfigWithRoute<TRoute extends AnyAbstractRouteEntity>
   extends Pick<LoadableConfig, 'loading' | 'preload' | 'throwOnError'> {
   route: TRoute;
   view?: RouteViewComponent<TRoute>;
-  lazyView?: (route: TRoute) => Promise<ComponentType<RouteViewProps<TRoute>>>;
-  fallbackView?: ReactNode;
+  loadView?: (route: TRoute) => Promise<RouteViewComponent<TRoute>>;
+  /**
+   * Case when route is not opened
+   */
+  fallback?: ReactNode;
   children?:
     | ReactNode
     | ((params: RouteViewProps<TRoute>['params'], route: TRoute) => ReactNode);
@@ -64,13 +56,13 @@ function RouteViewBase<TRoute extends AnyAbstractRouteEntity>(
   }
 
   if (!props.route.isOpened) {
-    return props.fallbackView ?? null;
+    return props.fallback ?? null;
   }
 
-  if (props.lazyView) {
+  if (props.loadView) {
     if (!lazyViewComponentRef.current) {
       lazyViewComponentRef.current = loadable({
-        load: () => props.lazyView!(props.route),
+        load: () => props.loadView!(props.route),
         loading: props.loading,
         preload: props.preload,
         throwOnError: props.throwOnError,
