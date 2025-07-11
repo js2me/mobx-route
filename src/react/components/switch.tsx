@@ -1,14 +1,9 @@
+/* eslint-disable sonarjs/no-nested-conditional */
+/* eslint-disable unicorn/no-nested-ternary */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { buildSearchString } from 'mobx-location-history';
 import { observer } from 'mobx-react-lite';
-import {
-  Fragment,
-  isValidElement,
-  ReactElement,
-  ReactNode,
-  useEffect,
-} from 'react';
-import { flatMapDeep } from 'yummies/data';
+import { Fragment, isValidElement, ReactNode, useEffect } from 'react';
 import { AllPropertiesOptional, Maybe } from 'yummies/utils/types';
 
 import {
@@ -44,26 +39,6 @@ export type SwitchProps<TRoute extends AnyRouteEntity> =
   | SwitchPropsWithDefaultRoute<TRoute>
   | SwitchPropsWithDefaultUrl;
 
-const flattenChildren = (children: ReactNode) =>
-  flatMapDeep(children, (c): any =>
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    c && c.type === Fragment ? c.props.children : c,
-  );
-
-const isValidRouteElement = (
-  element: any,
-): element is ReactElement<
-  { route: AnyRouteEntity },
-  string | React.JSXElementConstructor<any>
-> => {
-  return (
-    isValidElement(element) &&
-    // @ts-ignore
-    isRouteEntity(element.props?.route)
-  );
-};
-
 export const Switch = observer(function <TRoute extends AnyRouteEntity>({
   children,
   default: defaultNavigation,
@@ -71,22 +46,83 @@ export const Switch = observer(function <TRoute extends AnyRouteEntity>({
   params,
   ...navigateParams
 }: SwitchProps<TRoute>) {
-  let resultElement: ReactElement<any> | ReactNode = null;
-  let defaultElement: ReactNode = null;
+  let activeElement: ReactNode = null;
+  let lastInactiveElement: ReactNode = null;
+  let foundActive = false;
 
-  for (const element of flattenChildren(children)) {
-    if (isValidRouteElement(element) && element.props.route.isOpened) {
-      resultElement = element;
-      break;
+  const stack: ReactNode[] = Array.isArray(children)
+    ? [...children].reverse()
+    : children
+      ? [children]
+      : [];
+
+  while (stack.length > 0) {
+    const node = stack.pop();
+
+    if (node == null || typeof node === 'boolean') {
+      continue;
+    }
+
+    if (Array.isArray(node)) {
+      for (let i = node.length - 1; i >= 0; i--) {
+        stack.push(node[i]);
+      }
+      continue;
+    }
+
+    if (isValidElement(node) && node.type === Fragment) {
+      const fragmentChildren = node.props.children;
+      if (fragmentChildren) {
+        if (Array.isArray(fragmentChildren)) {
+          for (let i = fragmentChildren.length - 1; i >= 0; i--) {
+            stack.push(fragmentChildren[i]);
+          }
+        } else {
+          stack.push(fragmentChildren);
+        }
+      }
+      continue;
+    }
+
+    let isActive = false;
+    const checkStack: ReactNode[] = [node];
+
+    while (checkStack.length > 0) {
+      const checkNode = checkStack.pop();
+
+      if (checkNode == null || typeof checkNode === 'boolean') {
+        continue;
+      }
+
+      if (Array.isArray(checkNode)) {
+        for (const element of checkNode) {
+          checkStack.push(element);
+        }
+      } else if (isValidElement(checkNode)) {
+        if (
+          isRouteEntity(checkNode.props?.route) &&
+          checkNode.props.route.isOpened
+        ) {
+          isActive = true;
+          break;
+        }
+
+        if (checkNode.props.children) {
+          checkStack.push(checkNode.props.children);
+        }
+      }
+    }
+
+    if (isActive) {
+      activeElement = node;
+      foundActive = true;
     } else {
-      defaultElement = element;
+      lastInactiveElement = node;
     }
   }
 
-  const isResultElementFound = !!resultElement;
-
   useEffect(() => {
-    if (!isResultElementFound && defaultNavigation) {
+    if (!foundActive && defaultNavigation) {
       if (typeof defaultNavigation === 'string') {
         const history = routeConfig.get().history;
         const url = `${defaultNavigation}${buildSearchString(navigateParams.query || {})}`;
@@ -100,7 +136,15 @@ export const Switch = observer(function <TRoute extends AnyRouteEntity>({
         defaultNavigation.open(params, navigateParams);
       }
     }
-  }, [isResultElementFound, defaultNavigation]);
+  }, [foundActive, defaultNavigation]);
 
-  return resultElement ?? defaultElement;
+  if (foundActive) {
+    return activeElement;
+  }
+
+  if (defaultNavigation) {
+    return null;
+  }
+
+  return lastInactiveElement ?? null;
 });
