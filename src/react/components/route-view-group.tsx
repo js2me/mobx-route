@@ -14,9 +14,13 @@ import {
 } from '../../core/index.js';
 import { isRouteEntity } from '../../core/utils/is-route-entity.js';
 
+type LayoutComponent =
+  | ComponentType<{ children?: ReactNode }>
+  | ComponentType<{ children: ReactNode }>;
+
 interface BaseProps extends RouteNavigateParams {
   children: ReactNode;
-  layout?: ComponentType<{ children?: ReactNode }>;
+  layout?: LayoutComponent;
 }
 
 type PropsWithDefaultRoute<TRoute extends AnyRouteEntity> = BaseProps & {
