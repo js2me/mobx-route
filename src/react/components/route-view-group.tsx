@@ -4,7 +4,7 @@
 import { buildSearchString } from 'mobx-location-history';
 import { observer } from 'mobx-react-lite';
 import { ComponentType, isValidElement, ReactNode, useEffect } from 'react';
-import { IsPartial, PartialIf } from 'yummies/utils/types';
+import { IsPartial, Maybe } from 'yummies/utils/types';
 
 import {
   AnyRouteEntity,
@@ -25,12 +25,13 @@ interface BaseProps extends RouteNavigateParams {
 
 type PropsWithDefaultRoute<TRoute extends AnyRouteEntity> = BaseProps & {
   otherwise?: TRoute;
-} & PartialIf<
-    IsPartial<RouteParams<TRoute>>,
-    {
-      params: RouteParams<TRoute>;
-    }
-  >;
+} & (IsPartial<RouteParams<TRoute>> extends true
+    ? {
+        params?: Maybe<RouteParams<TRoute>>;
+      }
+    : {
+        params: RouteParams<TRoute>;
+      });
 
 type PropsWithDefaultUrl = BaseProps & {
   otherwise?: string;
@@ -89,11 +90,7 @@ export const RouteViewGroup = observer(function <
     }
   }, [hasActiveChildNode, otherwiseNavigation]);
 
-  if (hasActiveChildNode) {
-    return activeChildNode;
-  }
-
-  if (otherwiseNavigation) {
+  if (otherwiseNavigation && !activeChildNode) {
     return null;
   }
 
