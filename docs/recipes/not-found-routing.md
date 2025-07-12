@@ -1,6 +1,10 @@
 # Not found routing   
 
-To handle "not found" route behavior, you can achieve this using the `React` component `<Switch />` along with either a `React` component or `VirtualRoute`.    
+To handle "not found" route behavior, you can achieve this using the `React` component `<RouteViewGroup />` along with either a `React` component or `VirtualRoute`.   
+
+There are two ways to implement "not found" routing behaviour:   
+
+## Redirect to another route   
 
 1.  Create an instance of the `VirtualRoute` class   
 
@@ -24,32 +28,32 @@ It's also important **not** to physically change the "open" state of this route.
     return false;
 ```
 
-2. Connect this `notFoundRoute` to your `<Switch />` component using [`default` prop](/react/Switch#default)  
+2. Connect this `notFoundRoute` to your `<RouteViewGroup />` component using [`otherwise` prop](/react/RouteViewGroup#otherwise)  
 
 ```tsx{7}
-import { Switch, RouteView } from "mobx-route/react"
+import { RouteViewGroup, RouteView } from "mobx-route/react"
 import { notFoundRoute } from "@/pages/not-found"
 ...
 export const App = () => {
   ...
   return (
-    <Switch default={notFoundRoute}>
+    <RouteViewGroup otherwise={notFoundRoute}>
       <RouteView route={homeRoute} view={HomePage} />
-    </Switch>
+    </RouteViewGroup>
   )
 }
 ```
 
-This way, when the `<Switch/>` component determines that no internal route is open, it will open the `notFoundRoute`.  
+This way, when the `<RouteViewGroup/>` component determines that no internal route is open, it will open the `notFoundRoute`.  
 
 
-## Alternative Approach    
+### Alternative Approach    
 
-You can simply specify as the last child element in the `<Switch />` component a component that will render when no route is open:  
+You can simply specify as the last child element in the `<RouteViewGroup />` component a component that will render when no route is open:  
 
 
 ```tsx{19}
-import { Switch, RouteView } from "mobx-route/react"
+import { RouteViewGroup, RouteView } from "mobx-route/react"
 import { homeRoute } from "@/pages/home"
 import { useEffect } from "react"
 ...
@@ -65,12 +69,43 @@ const NotFoundComponent = () =>{
 export const App = () => {
   ...
   return (
-    <Switch>
+    <RouteViewGroup>
       <RouteView route={homeRoute} view={HomePage} />
       <NotFoundComponent />
-    </Switch>
+    </RouteViewGroup>
   )
 }
 ```
 
 You can also use [`mobx-view-model`](https://js2me.github.io/mobx-view-model) and the [`<OnlyViewModel />` component](https://js2me.github.io/mobx-view-model/react/api/only-view-model).  
+
+
+
+## Not found page     
+
+
+1.  Create an instance of the `VirtualRoute` class   
+
+
+```ts
+import { VirtualRoute } from "mobx-route";
+
+export const notFoundRoute = new VirtualRoute({})
+```
+
+2. Connect this `notFoundRoute` to your `<RouteViewGroup />` component using [`otherwise` prop](/react/RouteViewGroup#otherwise) and create `RouteView` for this route    
+
+```tsx{7,9}
+import { RouteViewGroup, RouteView } from "mobx-route/react"
+import { notFoundRoute } from "@/pages/not-found"
+...
+export const App = () => {
+  ...
+  return (
+    <RouteViewGroup otherwise={notFoundRoute}>
+      <RouteView route={homeRoute} view={HomePage} />
+      <RouteView route={notFoundRoute} view={NotFoundPage} />
+    </RouteViewGroup>
+  )
+}
+```
