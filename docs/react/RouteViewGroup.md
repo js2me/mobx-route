@@ -36,7 +36,7 @@ function Routing() {
 ### `layout`   
 You can use this prop if you want to wrap all child `RouteViews` into React component  
 
-```tsx
+```tsx{12}
 const Layout = ({ children }) => {
   return (
     <div>
@@ -48,7 +48,7 @@ const Layout = ({ children }) => {
 ...
 route2.open()
 ...
-<RouteViewGroup otherwise={otherwiseRouteToOpen}>
+<RouteViewGroup layout={Layout}>
   <RouteView route={route2}>
     <div>world</div>
   </RouteView>
