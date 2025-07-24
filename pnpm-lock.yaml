@@ -15,8 +15,8 @@ importers:
         specifier: ^6.12.4
         version: 6.13.7
       mobx-location-history:
-        specifier: ^7.1.1
-        version: 7.1.1(mobx@6.13.7)
+        specifier: ^7.3.0
+        version: 7.3.0(mobx@6.13.7)
       mobx-react-lite:
         specifier: ^4.0.7
         version: 4.1.0(mobx@6.13.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2675,8 +2675,8 @@ packages:
     resolution: {integrity: sha512-qOOzS1cBTWYF4BH8fVePDBOO9iptMnGUEZwNc/cMWnTV2nVLZ7VoNWEPHkYczZA0pdoA7dl6e7FL659nX9S2aw==}
     engines: {node: '>=16 || 14 >=14.17'}
 
-  mobx-location-history@7.1.1:
-    resolution: {integrity: sha512-2v9Mq7nRsw95dJ2FDJZaGVr3ZE4fwbGOMB3dzdL5otUo9zw20umFL/mtbjv5fQS4QyVvPeXPunzxTnkFkSW3DQ==}
+  mobx-location-history@7.3.0:
+    resolution: {integrity: sha512-fjhv+/tUC5c/QMeqgyBvIQxqFc1O59kXWmVbl+Ih2RHGZ+ojkqZhLT5Ggn7b0CImIXZ2rkxYMFG/ZsLZwKWbow==}
     peerDependencies:
       mobx: ^6.13.3
 
@@ -6472,7 +6472,7 @@ snapshots:
 
   minipass@7.1.2: {}
 
-  mobx-location-history@7.1.1(mobx@6.13.7):
+  mobx-location-history@7.3.0(mobx@6.13.7):
     dependencies:
       history: 5.3.0
       linked-abort-controller: 1.1.0
