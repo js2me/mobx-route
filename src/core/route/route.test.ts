@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable sonarjs/no-dead-store */
 /* eslint-disable sonarjs/sonar-no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -8,7 +9,7 @@ import { routeConfig } from '../config/config.js';
 import { RouteGroup } from '../route-group/route-group.js';
 
 import { Route } from './route.js';
-import { PathParam } from './route.types.js';
+import { InputPathParam } from './route.types.js';
 
 export const mockHistory = (history: History) => {
   const spies = {
@@ -61,9 +62,9 @@ describe('route', () => {
     expectTypeOf(route.open).parameter(0).toEqualTypeOf<
       | string
       | {
-          id: PathParam;
-          bar: PathParam;
-          bar3?: PathParam;
+          id: InputPathParam;
+          bar: InputPathParam;
+          bar3?: InputPathParam;
         }
     >();
   });
@@ -232,5 +233,58 @@ describe('route', () => {
     expect(routeA.isOpened).toBe(false);
     expect(routeB.isOpened).toBe(false);
     expect(routeC.isOpened).toBe(true);
+  });
+
+  it('test param typings (no options)', () => {
+    const foo = new Route<
+      '/foo/:bar/:baz',
+      { bar: number; baz: string; bad: string },
+      { memData: { bar: number; baz: string; bad: string } }
+    >('/foo/:bar/:baz', {});
+
+    expectTypeOf(foo.open).toBeFunction();
+    expectTypeOf(foo.open)
+      .parameter(0)
+      .toEqualTypeOf<{ bar: number; baz: string; bad: string } | string>();
+
+    expectTypeOf(foo.params).toEqualTypeOf<null | {
+      memData: { bar: number; baz: string; bad: string };
+    }>();
+
+    expect(foo).toBeDefined();
+  });
+
+  it('test param typings (with options)', () => {
+    const foo = new Route('/foo/:bar/:baz', {
+      params: (params) => {
+        return {
+          bad: 1,
+        };
+      },
+    });
+
+    expectTypeOf(foo.open).toBeFunction();
+    expectTypeOf(foo.open)
+      .parameter(0)
+      .toEqualTypeOf<{ bar: InputPathParam; baz: InputPathParam } | string>();
+
+    expectTypeOf(foo.params).toEqualTypeOf<null | {
+      bad: number;
+    }>();
+
+    expect(foo).toBeDefined();
+  });
+
+  it('test customized param typings', () => {
+    const foo = new Route<'/', { foo: string }>('/', {});
+
+    expectTypeOf(foo.open).toBeFunction();
+    expectTypeOf(foo.open)
+      .parameter(0)
+      .toEqualTypeOf<{ foo: string } | string>();
+
+    expectTypeOf(foo.params).toEqualTypeOf<null | {}>();
+
+    expect(foo).toBeDefined();
   });
 });

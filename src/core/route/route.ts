@@ -5,8 +5,9 @@ import {
   computed,
   makeObservable,
   observable,
+  onBecomeObserved,
+  onBecomeUnobserved,
   reaction,
-  when,
 } from 'mobx';
 import {
   buildSearchString,
@@ -22,11 +23,12 @@ import {
   AnyRoute,
   BeforeOpenFeedback,
   PreparedNavigationData,
-  ExtractPathParams,
+  InputPathParams,
   RouteConfiguration,
   ParsedPathData,
   RouteNavigateParams,
   IRoute,
+  ParsedPathParams,
 } from './route.types.js';
 
 /**
@@ -36,9 +38,10 @@ import {
  */
 export class Route<
   TPath extends string,
-  TParams extends AnyObject = ExtractPathParams<TPath>,
-  TParentRoute extends Route<any, any, any> | null = null,
-> implements IRoute<TPath>
+  TInputParams extends InputPathParams<TPath> = InputPathParams<TPath>,
+  TOutputParams extends AnyObject = ParsedPathParams<TPath>,
+  TParentRoute extends Route<any, any, any, any> | null = null,
+> implements IRoute<TPath, TInputParams, TOutputParams>
 {
   protected abortController: AbortController;
   protected history: History;
@@ -68,7 +71,12 @@ export class Route<
 
   constructor(
     public path: TPath,
-    protected config: RouteConfiguration<TPath, TParams, TParentRoute> = {},
+    protected config: RouteConfiguration<
+      TPath,
+      TInputParams,
+      TOutputParams,
+      TParentRoute
+    > = {},
   ) {
     this.abortController = new LinkedAbortController(config.abortSignal);
     this.history = config.history ?? routeConfig.get().history;
@@ -91,42 +99,40 @@ export class Route<
 
     makeObservable(this);
 
-    if (this.config.afterOpen) {
-      when(
-        () => this.isOpened,
-        () => this.config.afterOpen!(this.parsedPathData!, this),
-        this.abortController,
-      );
-    }
-
-    if (!config.afterOpen && !config.afterClose) {
-      return;
-    }
-
+    let dispose: Maybe<VoidFunction>;
     let firstReactionCall = true;
+    onBecomeObserved(this, 'isOpened', () => {
+      if (!config.afterOpen && !config.afterClose) {
+        return;
+      }
 
-    reaction(
-      () => this.isOpened,
-      (isOpened) => {
-        if (firstReactionCall) {
-          firstReactionCall = false;
-          // ignore first 'afterClose' callback call
-          if (!isOpened) {
-            return;
+      dispose = reaction(
+        () => this.isOpened,
+        (isOpened) => {
+          if (firstReactionCall) {
+            firstReactionCall = false;
+            // ignore first 'afterClose' callback call
+            if (!isOpened) {
+              return;
+            }
           }
-        }
 
-        if (isOpened) {
-          config.afterOpen?.(this.parsedPathData!, this);
-        } else {
-          config.afterClose?.();
-        }
-      },
-      {
-        signal: this.abortController.signal,
-        fireImmediately: true,
-      },
-    );
+          if (isOpened) {
+            config.afterOpen?.(this.parsedPathData!, this);
+          } else {
+            config.afterClose?.();
+          }
+        },
+        {
+          signal: this.abortController.signal,
+          fireImmediately: true,
+        },
+      );
+    });
+    onBecomeUnobserved(this, 'isOpened', () => {
+      dispose?.();
+      dispose = undefined;
+    });
   }
 
   protected get baseUrl() {
@@ -182,13 +188,13 @@ export class Route<
    *
    * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#params-parsedpathparams-null)
    */
-  get params(): TParams | null {
+  get params(): TOutputParams | null {
     if (!this.parsedPathData?.params) {
       return null;
     }
 
-    let params: TParams | null =
-      (this.parsedPathData?.params as unknown as Maybe<TParams>) ?? null;
+    let params: TOutputParams | null =
+      (this.parsedPathData?.params as unknown as Maybe<TOutputParams>) ?? null;
 
     if (this.config.params) {
       const result = this.config.params(this.parsedPathData.params);
@@ -224,11 +230,19 @@ export class Route<
    */
   extend<
     TExtendPath extends string,
-    TParams extends AnyObject = ExtractPathParams<`${TPath}${TExtendPath}`>,
+    TInputParams extends
+      InputPathParams<`${TPath}${TExtendPath}`> = InputPathParams<`${TPath}${TExtendPath}`>,
+    TOutputParams extends
+      AnyObject = ParsedPathParams<`${TPath}${TExtendPath}`>,
   >(
     path: TExtendPath,
     config?: Omit<
-      RouteConfiguration<`${TPath}${TExtendPath}`, TParams, any>,
+      RouteConfiguration<
+        `${TPath}${TExtendPath}`,
+        TInputParams,
+        TOutputParams,
+        any
+      >,
       'parent'
     >,
   ) {
@@ -237,14 +251,16 @@ export class Route<
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { index, params, ...configFromCurrentRoute } = this.config;
 
-    const extendedChild = new Route<ExtendedRoutePath, TParams, ParentRoute>(
-      `${this.path}${path}`,
-      {
-        ...configFromCurrentRoute,
-        ...config,
-        parent: this,
-      } as any,
-    );
+    const extendedChild = new Route<
+      ExtendedRoutePath,
+      TInputParams,
+      TOutputParams,
+      ParentRoute
+    >(`${this.path}${path}`, {
+      ...configFromCurrentRoute,
+      ...config,
+      parent: this,
+    } as any);
 
     this.addChildren(extendedChild as any);
 
@@ -269,7 +285,7 @@ export class Route<
   }
 
   protected processParams(
-    params?: ExtractPathParams<TPath> | null | undefined,
+    params?: TInputParams | null | undefined,
   ): ParamData | undefined {
     if (params == null) return undefined;
 
@@ -282,9 +298,9 @@ export class Route<
   }
 
   createUrl(
-    ...args: IsPartial<ExtractPathParams<TPath>> extends true
-      ? [params?: Maybe<ExtractPathParams<TPath>>, query?: AnyObject]
-      : [params: ExtractPathParams<TPath>, query?: AnyObject]
+    ...args: IsPartial<TInputParams> extends true
+      ? [params?: Maybe<TInputParams>, query?: AnyObject]
+      : [params: TInputParams, query?: AnyObject]
   ) {
     const pathParams = args[0];
     const queryParams = args[1];
@@ -307,22 +323,22 @@ export class Route<
    * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#open-args)
    */
   open(
-    ...args: IsPartial<ExtractPathParams<TPath>> extends true
+    ...args: IsPartial<TInputParams> extends true
       ? [
-          params?: ExtractPathParams<TPath> | null | undefined,
+          params?: TInputParams | null | undefined,
           navigateParams?: RouteNavigateParams,
         ]
-      : [params: ExtractPathParams<TPath>, navigateParams?: RouteNavigateParams]
+      : [params: TInputParams, navigateParams?: RouteNavigateParams]
   ): Promise<void>;
   open(
-    ...args: IsPartial<ExtractPathParams<TPath>> extends true
+    ...args: IsPartial<TInputParams> extends true
       ? [
-          params?: ExtractPathParams<TPath> | null | undefined,
+          params?: TInputParams | null | undefined,
           replace?: RouteNavigateParams['replace'],
           query?: RouteNavigateParams['query'],
         ]
       : [
-          params: ExtractPathParams<TPath>,
+          params: TInputParams,
           replace?: RouteNavigateParams['replace'],
           query?: RouteNavigateParams['query'],
         ]
@@ -348,20 +364,20 @@ export class Route<
       ? { replace: args[1], query: args[2] }
       : (args[1] ?? {});
     let url: string;
-    let params: Maybe<ExtractPathParams<TPath>>;
+    let params: Maybe<InputPathParams<TPath>>;
 
     if (typeof args[0] === 'string') {
       url = args[0];
     } else {
-      params = args[0] as ExtractPathParams<TPath>;
+      params = args[0] as InputPathParams<TPath>;
       url = this.createUrl(args[0], query);
     }
 
     let state = rawState ?? null;
 
-    const navigationData: PreparedNavigationData = {
+    const navigationData: PreparedNavigationData<TInputParams> = {
       url,
-      params: params as AnyObject,
+      params: params as TInputParams,
       replace,
       state,
       query,
@@ -385,7 +401,7 @@ export class Route<
   }
 
   protected beforeOpen(
-    openData: PreparedNavigationData,
+    openData: PreparedNavigationData<TInputParams>,
   ): MaybePromise<BeforeOpenFeedback> {
     if (this.config.beforeOpen) {
       return this.config.beforeOpen(openData);

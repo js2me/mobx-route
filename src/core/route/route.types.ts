@@ -42,8 +42,9 @@ export interface AbstractPathRoute<TPath extends string = string> {
 
 export interface RouteConfiguration<
   TPath extends string,
-  TParams extends AnyObject = ParsedPathParams<TPath>,
-  TParentRoute extends Route<string, any, any> | null = null,
+  TInputParams extends InputPathParams<TPath> = InputPathParams<TPath>,
+  TOutputParams extends AnyObject = ParsedPathParams<TPath>,
+  TParentRoute extends Route<string, any, any, any> | null = null,
 > extends Partial<RouteGlobalConfig> {
   abortSignal?: AbortSignal;
   index?: boolean;
@@ -52,21 +53,30 @@ export interface RouteConfiguration<
   parseOptions?: ParseOptions;
   parent?: TParentRoute;
   children?: AnyRoute[];
-  params?: (params: ExtractPathParams<TPath>) => TParams | null | false;
+  params?: (params: ParsedPathParams<TPath>) => TOutputParams | null | false;
   checkOpened?: (parsedPathData: ParsedPathData<NoInfer<TPath>>) => boolean;
   beforeOpen?: (
-    preparedNavigationData: PreparedNavigationData<NoInfer<TParams>>,
+    preparedNavigationData: PreparedNavigationData<NoInfer<TInputParams>>,
   ) => MaybePromise<BeforeOpenFeedback>;
   afterClose?: () => void;
   afterOpen?: (
     data: ParsedPathData<NoInfer<TPath>>,
-    route: Route<NoInfer<TPath>, NoInfer<TParams>, NoInfer<TParentRoute>>,
+    route: Route<
+      NoInfer<TPath>,
+      NoInfer<TInputParams>,
+      NoInfer<TOutputParams>,
+      NoInfer<TParentRoute>
+    >,
   ) => void;
 }
 
 export type AnyRoute = IRoute;
 
-export interface IRoute<TPath extends string = string> {
+export interface IRoute<
+  TPath extends string = string,
+  TInputParams extends InputPathParams<TPath> = InputPathParams<TPath>,
+  TOutputParams extends AnyObject = ParsedPathParams<TPath>,
+> {
   isOpened: boolean;
   path: TPath;
 
@@ -81,22 +91,22 @@ export interface IRoute<TPath extends string = string> {
    * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#open-args)
    */
   open(
-    ...args: IsPartial<ExtractPathParams<TPath>> extends true
+    ...args: IsPartial<TInputParams> extends true
       ? [
-          params?: ExtractPathParams<TPath> | null | undefined,
+          params?: TInputParams | null | undefined,
           navigateParams?: RouteNavigateParams,
         ]
-      : [params: ExtractPathParams<TPath>, navigateParams?: RouteNavigateParams]
+      : [params: TInputParams, navigateParams?: RouteNavigateParams]
   ): Promise<void>;
   open(
-    ...args: IsPartial<ExtractPathParams<TPath>> extends true
+    ...args: IsPartial<TInputParams> extends true
       ? [
-          params?: ExtractPathParams<TPath> | null | undefined,
+          params?: TInputParams | null | undefined,
           replace?: RouteNavigateParams['replace'],
           query?: RouteNavigateParams['query'],
         ]
       : [
-          params: ExtractPathParams<TPath>,
+          params: TInputParams,
           replace?: RouteNavigateParams['replace'],
           query?: RouteNavigateParams['query'],
         ]
@@ -109,19 +119,19 @@ export interface IRoute<TPath extends string = string> {
   ): Promise<void>;
 
   createUrl(
-    ...args: IsPartial<ExtractPathParams<TPath>> extends true
-      ? [params?: Maybe<ExtractPathParams<TPath>>, query?: AnyObject]
-      : [params: ExtractPathParams<TPath>, query?: AnyObject]
+    ...args: IsPartial<TInputParams> extends true
+      ? [params?: Maybe<TInputParams>, query?: AnyObject]
+      : [params: TInputParams, query?: AnyObject]
   ): string;
 
   destroy(): void;
 
-  params: any;
+  readonly params: TOutputParams | null;
 }
 
-export type PathParam = string | number | boolean | null;
+export type InputPathParam = string | number | boolean | null;
 // eslint-disable-next-line sonarjs/redundant-type-aliases
-export type PathParsedParam = string;
+export type ParsedPathParam = string;
 
 type Simplify<T> = T extends infer U ? { [K in keyof U]: U[K] } : never;
 
@@ -132,36 +142,33 @@ export type RouteParams<TRoute extends AnyAbstractRouteEntity> =
       ? Exclude<TParams, null>
       : AnyObject;
 
-export type ParsedPathParams<Path extends string> = Simplify<
+export type PathToObject<
+  Path extends string,
+  PropertyValue = string,
+> = Simplify<
   Path extends `${infer Prefix}{${infer Optional}}${infer Suffix}`
-    ? ParsedPathParams<`${Prefix}${Suffix}`> &
-        Partial<ParsedPathParams<Optional>>
+    ? PathToObject<`${Prefix}${Suffix}`, PropertyValue> &
+        Partial<PathToObject<Optional, PropertyValue>>
     : Path extends `${infer PartA}/${infer PartB}`
-      ? ParsedPathParams<PartA> & ParsedPathParams<PartB>
+      ? PathToObject<PartA, PropertyValue> & PathToObject<PartB, PropertyValue>
       : Path extends `:${infer Param}?`
-        ? { [K in Param]?: PathParsedParam }
+        ? { [K in Param]?: PropertyValue }
         : Path extends `:${infer Param}`
-          ? { [K in Param]: PathParsedParam }
+          ? { [K in Param]: PropertyValue }
           : Path extends `*${infer Wildcard}`
-            ? { [K in Wildcard]: PathParsedParam[] }
+            ? { [K in Wildcard]: PropertyValue[] }
             : // eslint-disable-next-line @typescript-eslint/ban-types
               {}
 >;
 
-export type ExtractPathParams<Path extends string> = Simplify<
-  Path extends `${infer Prefix}{${infer Optional}}${infer Suffix}`
-    ? ExtractPathParams<`${Prefix}${Suffix}`> &
-        Partial<ExtractPathParams<Optional>>
-    : Path extends `${infer PartA}/${infer PartB}`
-      ? ExtractPathParams<PartA> & ExtractPathParams<PartB>
-      : Path extends `:${infer Param}?`
-        ? { [K in Param]?: PathParam }
-        : Path extends `:${infer Param}`
-          ? { [K in Param]: PathParam }
-          : Path extends `*${infer Wildcard}`
-            ? { [K in Wildcard]: PathParam[] }
-            : // eslint-disable-next-line @typescript-eslint/ban-types
-              {}
+export type ParsedPathParams<Path extends string> = PathToObject<
+  Path,
+  ParsedPathParam
+>;
+
+export type InputPathParams<Path extends string> = PathToObject<
+  Path,
+  InputPathParam
 >;
 
 export interface RouteNavigateParams {

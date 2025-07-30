@@ -5,6 +5,8 @@ import {
   IObservableValue,
   makeObservable,
   observable,
+  onBecomeObserved,
+  onBecomeUnobserved,
   reaction,
   runInAction,
 } from 'mobx';
@@ -51,10 +53,14 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
     action(this, 'close');
     makeObservable(this);
 
-    if (config.afterOpen || config.afterClose) {
-      let firstReactionCall = true;
+    let dispose: Maybe<VoidFunction>;
+    let firstReactionCall = true;
+    onBecomeObserved(this, 'isOpened', () => {
+      if (!config.afterOpen && !config.afterClose) {
+        return;
+      }
 
-      reaction(
+      dispose = reaction(
         () => this.isOpened,
         (isOpened) => {
           if (firstReactionCall) {
@@ -76,7 +82,11 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
           fireImmediately: true,
         },
       );
-    }
+    });
+    onBecomeUnobserved(this, 'isOpened', () => {
+      dispose?.();
+      dispose = undefined;
+    });
   }
 
   /**

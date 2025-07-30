@@ -13,7 +13,7 @@ import { IsPartial, AnyObject } from 'yummies/utils/types';
 
 import {
   AnyRoute,
-  ExtractPathParams,
+  InputPathParams,
   routeConfig,
   RouteNavigateParams,
 } from '../../core/index.js';
@@ -25,12 +25,12 @@ interface LinkAnchorProps
 
 type LinkPathRouteProps<TRoute extends AnyRoute> = {
   to: TRoute;
-} & (IsPartial<ExtractPathParams<TRoute['path']>> extends true
+} & (IsPartial<InputPathParams<TRoute['path']>> extends true
   ? {
       // eslint-disable-next-line sonarjs/no-redundant-optional
-      params?: ExtractPathParams<TRoute['path']> | null | undefined;
+      params?: InputPathParams<TRoute['path']> | null | undefined;
     }
-  : { params: ExtractPathParams<TRoute['path']> });
+  : { params: InputPathParams<TRoute['path']> });
 
 type LinkSimpleRouteProps =
   | {
