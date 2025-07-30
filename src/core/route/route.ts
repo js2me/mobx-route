@@ -54,6 +54,8 @@ export class Route<
   private _compiler?: ReturnType<typeof compile>;
   private reactionDisposer: Maybe<VoidFunction>;
 
+  meta?: AnyObject;
+
   /**
    * Indicates if this route is an index route. Index routes activate when parent route path matches exactly.
    *
@@ -84,6 +86,7 @@ export class Route<
     this.query = config.queryParams ?? routeConfig.get().queryParams;
     this.isIndex = !!this.config.index;
     this.isHash = !!this.config.hash;
+    this.meta = this.config.meta;
     this.parent = config.parent ?? (null as unknown as TParentRoute);
 
     computed.struct(this, 'isOpened');
@@ -182,7 +185,10 @@ export class Route<
       (this.parsedPathData?.params as unknown as Maybe<TOutputParams>) ?? null;
 
     if (this.config.params) {
-      const result = this.config.params(this.parsedPathData.params);
+      const result = this.config.params(
+        this.parsedPathData.params,
+        this.config.meta,
+      );
       if (result) {
         params = result;
       } else {

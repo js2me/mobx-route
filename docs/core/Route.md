@@ -43,7 +43,6 @@ route.open({
 })
 ```
 
-
 ## Methods and properties  
 
 ### `open(...args)`   
@@ -184,32 +183,83 @@ Manually add child routes. Prefer `extend()` for typical use cases.
 Remove specified routes from children.  
 
 
-## Route configuration   
-This is the second argument when creating an instance of the `Route` class.  
-Required for route configuration  
 
-**API Signature**  
+## `RouteConfiguration`     
+This is specific object used to detailed configure route.  
+Here is list of configuration properties which can be helpful:  
+
+### `abortSignal`   
+`AbortSignal` used to destroy\cleanup route subscriptions  
+
+### `meta`  
+Additional object which can contains meta information   
+
 ```ts
-new Route('/foo/bar', {
-  history: History;
-  queryParams: IQueryParams;
-  abortSignal?: AbortSignal;
-  index?: boolean;
-  hash?: boolean;
-  meta?: AnyObject;
-  parseOptions?: ParseOptions;
-  parent?: TParentRoute;
-  children?: AnyRoute[];
-  params?: (params: ExtractPathParams<TPath>) => TParams | null | false;
-  checkOpened?: (parsedPathData: ParsedPathData<NoInfer<TPath>>) => boolean;
-  beforeOpen?: BeforeEnterHandler<NoInfer<TParams>>;
-  afterClose?: AfterLeaveHandler;
-  onOpen?: (
-    data: ParsedPathData<NoInfer<TPath>>,
-    route: Route<NoInfer<TPath>, NoInfer<TParams>, NoInfer<TParentRoute>>,
-  ) => void;
-})
+const route = createRoute('/fruits/apples', {
+  meta: {
+    memes: true
+  }
+});
+
+console.log(route.meta?.memes); // true
 ```
+
+### `params()`   
+A function that can be needed when it is necessary to cast parsed path parameters from route to a certain type.   
+
+```ts
+const route = createRoute('/fruits/apples/:appleId', {
+  params: (params) => {
+    return {
+      appleId: params.appleId,
+      isIphone: params.appleId.includes('iphone')
+    }
+  }
+});
+
+route.open({ appleId: 'iphone' })
+
+route.params?.isIphone; // true
+```
+
+Also it can block "opened" statement for route if you will return `false` or `null` value from this function.   
+
+```ts
+const route = createRoute('/numbers/:number', {
+  params: (params) => {
+    if (Number.isNaN(Number(params.number))) {
+      return null
+    }
+
+    return {
+      number: Number(params.number)
+    }
+  }
+});
+
+route.open({ number: 'string' })
+
+route.isOpened; // false
+```
+
+### `checkOpened()`   
+Function allows you to add custom logic for "opened" statement   
+
+::: info This check will only be called AFTER if this route is valid by `pathname`
+:::
+
+```ts
+const route = createRoute('/numbers/:number', {
+  checkOpened: (params) => {
+    return !Number.isNaN(Number(params.number))
+  }
+});
+
+route.open({ number: 'string' })
+
+route.isOpened; // false
+```
+
 
 ### `beforeOpen`  
 Event handler "before opening" a route, required for various checks before the route itself is opened.   
@@ -234,22 +284,10 @@ const route = new Route('/foo/bar', {
 })
 ```
 
-### `checkOpened`   
-Allows additional check of route state "`isOpened`".   
+### `afterClose()`  
+Calls after close route.   
 
-::: info
-This check will only be called AFTER if this route is valid by `pathname`
-:::
+### `afterOpen()`  
+Calls after open route.   
 
-Example:   
-```ts
-const route = new Route('/foo/bar', {
-  checkOpened: () => {
-    if (auth.isAuth) {
-      return true;
-    }
 
-    return false;
-  }
-})
-```

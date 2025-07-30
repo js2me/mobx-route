@@ -47,19 +47,43 @@ export interface RouteConfiguration<
   TOutputParams extends AnyObject = ParsedPathParams<TPath>,
   TParentRoute extends Route<string, any, any, any> | null = null,
 > extends Partial<RouteGlobalConfig> {
+  /**
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#abortsignal)
+   */
   abortSignal?: AbortSignal;
   index?: boolean;
   hash?: boolean;
+  /**
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#meta)
+   */
   meta?: AnyObject;
   parseOptions?: ParseOptions;
   parent?: TParentRoute;
   children?: AnyRoute[];
-  params?: (params: ParsedPathParams<TPath>) => TOutputParams | null | false;
+  /**
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#params)
+   */
+  params?: (
+    params: ParsedPathParams<TPath>,
+    meta: AnyObject | undefined,
+  ) => TOutputParams | null | false;
+  /**
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#checkopened)
+   */
   checkOpened?: (parsedPathData: ParsedPathData<NoInfer<TPath>>) => boolean;
+  /**
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#beforeopen)
+   */
   beforeOpen?: (
     preparedNavigationData: PreparedNavigationData<NoInfer<TInputParams>>,
   ) => MaybePromise<BeforeOpenFeedback>;
+  /**
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#afterclose)
+   */
   afterClose?: () => void;
+  /**
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#afteropen)
+   */
   afterOpen?: (
     data: ParsedPathData<NoInfer<TPath>>,
     route: Route<
