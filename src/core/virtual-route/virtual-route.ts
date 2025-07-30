@@ -2,7 +2,6 @@ import { LinkedAbortController } from 'linked-abort-controller';
 import {
   action,
   computed,
-  IObservableValue,
   makeObservable,
   observable,
   onBecomeObserved,
@@ -34,7 +33,7 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
   query: IQueryParams;
   params: TParams | null;
 
-  private isLocalOpened: IObservableValue<boolean>;
+  private isLocalOpened: boolean;
 
   private openChecker: Maybe<VirtualRouteConfiguration<TParams>['checkOpened']>;
 
@@ -43,9 +42,10 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
     this.query = config.queryParams ?? routeConfig.get().queryParams;
     this.params = callFunction(config.initialParams, this) ?? null;
     this.openChecker = config.checkOpened;
-    this.isLocalOpened = observable.box(this.openChecker?.(this) ?? false);
+    this.isLocalOpened = this.openChecker?.(this) ?? false;
 
     observable(this, 'params');
+    observable.ref(this, 'isLocalOpened');
     observable.ref(this, '_isOpened');
     computed.struct(this, 'isOpened');
     action(this, 'setOpenChecker');
@@ -94,7 +94,7 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
    */
   get isOpened() {
     const isOuterOpened = this.openChecker == null || this.openChecker(this);
-    return this.isLocalOpened.get() && isOuterOpened;
+    return this.isLocalOpened && isOuterOpened;
   }
 
   /**
@@ -126,11 +126,15 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
     }
 
     if (this.config.open == null) {
-      this.isLocalOpened.set(true);
+      runInAction(() => {
+        this.isLocalOpened = true;
+      });
     } else {
       const result = await this.config.open(params, this);
       // because result can return void so this is truthy for opening state
-      this.isLocalOpened.set(result !== false);
+      runInAction(() => {
+        this.isLocalOpened = result !== false;
+      });
     }
 
     if (!this.isLocalOpened) {
@@ -151,16 +155,14 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
    */
   close() {
     if (this.config.close == null) {
-      this.isLocalOpened.set(false);
+      this.isLocalOpened = false;
     } else {
       const result = this.config.close(this);
       // because result can return void so this is truthy for opening state
-      this.isLocalOpened.set(result !== false);
+      this.isLocalOpened = result !== false;
     }
 
-    runInAction(() => {
-      this.params = null;
-    });
+    this.params = null;
   }
 
   destroy() {
