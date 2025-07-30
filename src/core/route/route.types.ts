@@ -3,6 +3,7 @@ import { IsPartial, AnyObject, Maybe, MaybePromise } from 'yummies/utils/types';
 
 import { RouteGlobalConfig } from '../config/config.types.js';
 import { AnyAbstractRouteEntity } from '../route-group/route-group.types.js';
+import { VirtualRoute } from '../virtual-route/virtual-route.js';
 
 import { Route } from './route.js';
 
@@ -186,7 +187,15 @@ export type InferPath<T extends AnyRoute> =
   T extends IRoute<infer TPath, any, any> ? TPath : never;
 
 export type InferInputParams<T extends AnyRoute> =
-  T extends IRoute<any, infer TInputParams, any> ? TInputParams : never;
+  T extends VirtualRoute<infer TParams>
+    ? TParams
+    : T extends IRoute<any, infer TInputParams, any>
+      ? TInputParams
+      : never;
 
 export type InferParams<T extends AnyRoute> =
-  T extends IRoute<any, any, infer TParams> ? TParams : never;
+  T extends VirtualRoute<infer TParams>
+    ? TParams
+    : T extends IRoute<any, any, infer TParams>
+      ? TParams
+      : never;
