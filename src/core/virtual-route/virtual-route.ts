@@ -54,34 +54,15 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
     makeObservable(this);
 
     let dispose: Maybe<VoidFunction>;
-    let firstReactionCall = true;
     onBecomeObserved(this, 'isOpened', () => {
       if (!config.afterOpen && !config.afterClose) {
         return;
       }
 
-      dispose = reaction(
-        () => this.isOpened,
-        (isOpened) => {
-          if (firstReactionCall) {
-            firstReactionCall = false;
-            // ignore first 'afterClose' callback call
-            if (!isOpened) {
-              return;
-            }
-          }
-
-          if (isOpened) {
-            config.afterOpen?.(this.params!, this);
-          } else {
-            config.afterClose?.();
-          }
-        },
-        {
-          signal: this.abortController.signal,
-          fireImmediately: true,
-        },
-      );
+      dispose = reaction(() => this.isOpened, this.processOpenedState, {
+        signal: this.abortController.signal,
+        fireImmediately: true,
+      });
     });
     onBecomeUnobserved(this, 'isOpened', () => {
       dispose?.();
@@ -141,6 +122,10 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
       return;
     }
 
+    if (this.isOpened) {
+      this.config.afterOpen?.(this.params!, this);
+    }
+
     if (extraParams?.query) {
       this.query.update(extraParams.query, extraParams.replace);
     }
@@ -164,6 +149,23 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
 
     this.params = null;
   }
+
+  private firstOpenedStateCheck = true;
+  private processOpenedState = (isOpened: boolean) => {
+    if (this.firstOpenedStateCheck) {
+      this.firstOpenedStateCheck = false;
+      // ignore first 'afterClose' callback call
+      if (!isOpened) {
+        return;
+      }
+    }
+
+    if (isOpened) {
+      this.config.afterOpen?.(this.params!, this);
+    } else {
+      this.config.afterClose?.();
+    }
+  };
 
   destroy() {
     this.abortController.abort();
