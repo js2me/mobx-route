@@ -46,3 +46,7 @@ export class Router<TRoutesCollection extends RoutesCollection> {
     }
   }
 }
+
+export const createRouter = <TRoutesCollection extends RoutesCollection>(
+  config: RouterConfiguration<TRoutesCollection>,
+) => new Router(config);

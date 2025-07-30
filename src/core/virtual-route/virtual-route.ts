@@ -175,3 +175,9 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
     this.abortController.abort();
   }
 }
+
+export const createVirtualRoute = <
+  TParams extends AnyObject | EmptyObject = EmptyObject,
+>(
+  config?: VirtualRouteConfiguration<TParams>,
+) => new VirtualRoute<TParams>(config);

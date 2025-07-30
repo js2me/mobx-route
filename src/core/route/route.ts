@@ -435,3 +435,13 @@ export class Route<
     this.abortController.abort();
   }
 }
+
+export const createRoute = <
+  TPath extends string,
+  TInputParams extends InputPathParams<TPath> = InputPathParams<TPath>,
+  TOutputParams extends AnyObject = ParsedPathParams<TPath>,
+  TParentRoute extends Route<any, any, any, any> | null = null,
+>(
+  path: TPath,
+  config?: RouteConfiguration<TPath, TInputParams, TOutputParams, TParentRoute>,
+) => new Route<TPath, TInputParams, TOutputParams, TParentRoute>(path, config);

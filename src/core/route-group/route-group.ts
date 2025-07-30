@@ -85,3 +85,8 @@ export class RouteGroup<TRoutesCollection extends RoutesCollection>
     }
   }
 }
+
+export const createRouteGroup = <TRoutesCollection extends RoutesCollection>(
+  routes: TRoutesCollection,
+  indexRoute?: AnyRouteEntity,
+) => new RouteGroup<TRoutesCollection>(routes, indexRoute);
