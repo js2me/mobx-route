@@ -36,6 +36,7 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
   private isLocalOpened: boolean;
 
   private openChecker: Maybe<VirtualRouteConfiguration<TParams>['checkOpened']>;
+  private reactionDisposer: Maybe<VoidFunction>;
 
   constructor(protected config: VirtualRouteConfiguration<TParams> = {}) {
     this.abortController = new LinkedAbortController(config.abortSignal);
@@ -53,20 +54,23 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
     action(this, 'close');
     makeObservable(this);
 
-    let dispose: Maybe<VoidFunction>;
     onBecomeObserved(this, 'isOpened', () => {
       if (!config.afterOpen && !config.afterClose) {
         return;
       }
 
-      dispose = reaction(() => this.isOpened, this.processOpenedState, {
-        signal: this.abortController.signal,
-        fireImmediately: true,
-      });
+      this.reactionDisposer = reaction(
+        () => this.isOpened,
+        this.processOpenedState,
+        {
+          signal: this.abortController.signal,
+          fireImmediately: true,
+        },
+      );
     });
     onBecomeUnobserved(this, 'isOpened', () => {
-      dispose?.();
-      dispose = undefined;
+      this.reactionDisposer?.();
+      this.reactionDisposer = undefined;
     });
   }
 
@@ -122,10 +126,6 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
       return;
     }
 
-    if (this.isOpened) {
-      this.config.afterOpen?.(this.params!, this);
-    }
-
     if (extraParams?.query) {
       this.query.update(extraParams.query, extraParams.replace);
     }
@@ -133,6 +133,10 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
     runInAction(() => {
       this.params = params;
     });
+
+    if (!this.reactionDisposer && this.isOpened) {
+      this.config.afterOpen?.(this.params!, this);
+    }
   }
 
   /**

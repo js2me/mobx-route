@@ -52,6 +52,7 @@ export class Route<
   private _tokenData: TokenData | undefined;
   private _matcher?: ReturnType<typeof match>;
   private _compiler?: ReturnType<typeof compile>;
+  private reactionDisposer: Maybe<VoidFunction>;
 
   /**
    * Indicates if this route is an index route. Index routes activate when parent route path matches exactly.
@@ -99,30 +100,14 @@ export class Route<
 
     makeObservable(this);
 
-    let dispose: Maybe<VoidFunction>;
-    let firstReactionCall = true;
     onBecomeObserved(this, 'isOpened', () => {
       if (!config.afterOpen && !config.afterClose) {
         return;
       }
 
-      dispose = reaction(
+      this.reactionDisposer = reaction(
         () => this.isOpened,
-        (isOpened) => {
-          if (firstReactionCall) {
-            firstReactionCall = false;
-            // ignore first 'afterClose' callback call
-            if (!isOpened) {
-              return;
-            }
-          }
-
-          if (isOpened) {
-            config.afterOpen?.(this.parsedPathData!, this);
-          } else {
-            config.afterClose?.();
-          }
-        },
+        this.processOpenedState,
         {
           signal: this.abortController.signal,
           fireImmediately: true,
@@ -130,8 +115,8 @@ export class Route<
       );
     });
     onBecomeUnobserved(this, 'isOpened', () => {
-      dispose?.();
-      dispose = undefined;
+      this.reactionDisposer?.();
+      this.reactionDisposer = undefined;
     });
   }
 
@@ -398,6 +383,10 @@ export class Route<
     } else {
       this.history.push(url, state);
     }
+
+    if (!this.reactionDisposer && this.isOpened) {
+      this.config.afterOpen?.(this.parsedPathData!, this);
+    }
   }
 
   protected beforeOpen(
@@ -424,6 +413,23 @@ export class Route<
     }
     return this._tokenData;
   }
+
+  private firstOpenedStateCheck = true;
+  private processOpenedState = (isOpened: boolean) => {
+    if (this.firstOpenedStateCheck) {
+      this.firstOpenedStateCheck = false;
+      // ignore first 'afterClose' callback call
+      if (!isOpened) {
+        return;
+      }
+    }
+
+    if (isOpened) {
+      this.config.afterOpen?.(this.parsedPathData!, this);
+    } else {
+      this.config.afterClose?.();
+    }
+  };
 
   destroy() {
     this.abortController.abort();
