@@ -27,28 +27,66 @@ export interface AbstractVirtualRoute<
 export interface VirtualRouteConfiguration<
   TParams extends AnyObject | EmptyObject = EmptyObject,
 > {
+  /**
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#abortsignal)
+   */
   abortSignal?: AbortSignal;
-  queryParams?: IQueryParams;
-  initialParams?: MaybeFn<Maybe<TParams>, [route: VirtualRoute<TParams>]>;
 
-  // custom implementation of open behaviour for this route
-  // if not provided, default implementation will be used
+  queryParams?: IQueryParams;
+
+  /**
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#initialparams)
+   */
+  initialParams?: MaybeFn<
+    Maybe<TParams>,
+    [route: VirtualRoute<NoInfer<TParams>>]
+  >;
+
+  /**
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#meta)
+   */
+  meta?: AnyObject;
+
+  /**
+   * Custom implementation of open behaviour for this route
+   *
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#open)
+   */
   open?: (
     ...args: IsPartial<TParams> extends true
       ? [params: Maybe<TParams>, route: VirtualRoute<TParams>]
       : [params: TParams, route: VirtualRoute<TParams>]
   ) => MaybePromise<boolean | void>;
-  // custom implementation of close behaviour for this route
-  // if not provided, default implementation will be used
+
+  /**
+   * Custom implementation of close behaviour for this route
+   *
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#close)
+   */
   close?: (route: VirtualRoute<TParams>) => boolean | void;
 
+  /**
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#checkopened)
+   */
   checkOpened?: (route: VirtualRoute<TParams>) => boolean;
+
+  /**
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#beforeopen)
+   */
   beforeOpen?: (
     ...args: IsPartial<TParams> extends true
       ? [params: Maybe<TParams>, route: VirtualRoute<TParams>]
       : [params: TParams, route: VirtualRoute<TParams>]
   ) => MaybePromise<void | boolean>;
+
+  /**
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#afterclose)
+   */
   afterClose?: () => void;
+
+  /**
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#afteropen)
+   */
   afterOpen?: (
     params: NoInfer<TParams>,
     route: VirtualRoute<NoInfer<TParams>>,

@@ -184,7 +184,8 @@ Remove specified routes from children.
 
 
 
-## `RouteConfiguration`     
+## Configuration   
+**Interface**: `RouteConfiguration`  
 This is specific object used to detailed configure route.  
 Here is list of configuration properties which can be helpful:  
 

@@ -82,3 +82,113 @@ Deactivates the route. Behavior depends on configuration:
 ### `setOpenChecker(openChecker): void` <Badge type="info" text="action" />
 Updates the `openChecker` value with the provided one.   
 `openChecker` is a function or a boolean value that determines whether the route is open or not.
+
+## Configuration   
+**Interface**: `VirtualRouteConfiguration`  
+
+This is specific object used to detailed configure virtual route.  
+Here is list of configuration properties which can be helpful:  
+
+### `abortSignal`   
+`AbortSignal` used to destroy\cleanup route subscriptions  
+
+### `meta`  
+Additional object which can contains meta information   
+
+```ts
+const route = createVirtualRoute({
+  meta: {
+    memes: true
+  }
+});
+
+console.log(route.meta?.memes); // true
+```
+
+### `open()`  
+Custom implementation of open behaviour for this route.  
+It can be helpful if you need custom open/close behaviour  
+
+::: tip if not provided then will be used default implementation:
+:::
+
+```ts
+defaultOpenImplementation = () => true;
+```
+
+Examples:   
+```ts
+const route = new VirtualRoute({
+  checkOpened: () => !!queryParams.data.yummiesDialog,
+  open: () => {
+    queryParams.update({ yummiesDialog: true });
+    return true
+  }
+})
+```
+
+
+### `close()`  
+Custom implementation of close behaviour for this route  
+It can be helpful if you need custom open/close behaviour  
+
+::: tip if not provided then will be used default implementation:
+:::
+
+```ts
+defaultCloseImplementation = () => false;
+```
+
+Examples:   
+```ts
+const route = new VirtualRoute({
+  checkOpened: () => !!queryParams.data.yummiesDialog,
+  close: () => {
+    queryParams.update({ yummiesDialog: false });
+    return false
+  }
+})
+```
+
+### `checkOpened()`   
+Custom implementation of close/open statement for this route  
+It can be helpful if you need custom open/close behaviour  
+
+Examples:   
+```ts
+const route = new VirtualRoute({
+  checkOpened: () => !!queryParams.data.yummiesDialog,
+})
+```
+
+
+### `beforeOpen`  
+Event handler "before opening" a route, required for various checks before the route itself is opened.   
+With this handler, we can prevent the route from opening by returning `false`,  
+or override the navigation to another one by returning   
+```ts
+{
+  url: string;
+  state?: any;
+  replace?: boolean;
+}
+```
+
+Example:   
+```ts
+const route = new VirtualRoute('/foo/bar', {
+  beforeOpen: () => {
+    if (!auth.isAuth) {
+      return false;
+    }
+  }
+})
+```
+
+### `afterClose()`  
+Calls after close route.   
+
+### `afterOpen()`  
+Calls after open route.   
+
+
