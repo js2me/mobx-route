@@ -45,6 +45,7 @@ export type RouteViewProps<TRoute extends AnyAbstractRouteEntity> = {
 function RouteViewBase<TRoute extends AnyAbstractRouteEntity>(
   props: Readonly<RouteViewConfig<TRoute>>,
 ): ReactNode {
+  // @ts-expect-error redundand pass first argument
   const lazyViewComponentRef = useRef<ComponentType<any>>();
 
   let Component: ComponentType<any> | undefined;

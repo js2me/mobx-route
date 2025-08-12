@@ -71,7 +71,8 @@ export const Switch = observer(function <TRoute extends AnyRouteEntity>({
     }
 
     if (isValidElement(node) && node.type === Fragment) {
-      const fragmentChildren = node.props.children;
+      // @ts-expect-error redundand checks better to wrap in this directive
+      const fragmentChildren = node.props?.children;
       if (fragmentChildren) {
         if (Array.isArray(fragmentChildren)) {
           for (let i = fragmentChildren.length - 1; i >= 0; i--) {
@@ -100,14 +101,18 @@ export const Switch = observer(function <TRoute extends AnyRouteEntity>({
         }
       } else if (isValidElement(checkNode)) {
         if (
+          // @ts-expect-error redundand checks better to wrap in this directive
           isRouteEntity(checkNode.props?.route) &&
+          // @ts-expect-error redundand checks better to wrap in this directive
           checkNode.props.route.isOpened
         ) {
           isActive = true;
           break;
         }
 
+        // @ts-expect-error redundand checks better to wrap in this directive
         if (checkNode.props.children) {
+          // @ts-expect-error redundand checks better to wrap in this directive
           checkStack.push(checkNode.props.children);
         }
       }

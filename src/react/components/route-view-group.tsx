@@ -61,7 +61,9 @@ export const RouteViewGroup = observer(function <
   for (const childNode of childNodes) {
     if (
       isValidElement(childNode) &&
+      // @ts-expect-error redundand checks better to wrap in this directive
       isRouteEntity(childNode.props?.route) &&
+      // @ts-expect-error redundand checks better to wrap in this directive
       childNode.props.route.isOpened
     ) {
       activeChildNode = childNode;
