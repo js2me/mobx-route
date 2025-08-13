@@ -1,10 +1,10 @@
 {
   "name": "mobx-route",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "scripts": {
     "prepare": "pnpm dev:install-hooks",
     "clean": "rimraf dist",
-		"lint:check": "pnpm exec biome check --write --no-errors-on-unmatched --files-ignore-unknown=true",
+    "lint:check": "pnpm exec biome check --write --no-errors-on-unmatched --files-ignore-unknown=true",
     "ts:check": "tsc --noEmit",
     "check": "npm run lint:check && npm run ts:check",
     "prebuild": "npm run clean && npm run check",
@@ -72,7 +72,7 @@
   "devDependencies": {
     "@changesets/changelog-github": "^0.5.1",
     "@changesets/cli": "^2.29.5",
-		"@biomejs/biome": "2.1.4",
+    "@biomejs/biome": "2.1.4",
     "@types/react": "^18.0.0 || ^19.0.0",
     "@testing-library/react": "^16.3.0",
     "@types/lodash-es": "^4.17.12",
