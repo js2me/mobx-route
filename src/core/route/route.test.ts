@@ -1,15 +1,11 @@
-/* eslint-disable @typescript-eslint/ban-types */
-/* eslint-disable sonarjs/no-dead-store */
-/* eslint-disable sonarjs/sonar-no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { createBrowserHistory, History } from 'mobx-location-history';
+import { createBrowserHistory, type History } from 'mobx-location-history';
 import { beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 
 import { routeConfig } from '../config/config.js';
 import { RouteGroup } from '../route-group/route-group.js';
 
 import { Route } from './route.js';
-import { InputPathParam } from './route.types.js';
+import type { InputPathParam } from './route.types.js';
 
 export const mockHistory = (history: History) => {
   const spies = {
@@ -256,7 +252,7 @@ describe('route', () => {
 
   it('test param typings (with options)', () => {
     const foo = new Route('/foo/:bar/:baz', {
-      params: (params) => {
+      params: (_params) => {
         return {
           bad: 1,
         };

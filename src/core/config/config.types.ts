@@ -1,4 +1,4 @@
-import { History, IQueryParams } from 'mobx-location-history';
+import type { History, IQueryParams } from 'mobx-location-history';
 
 export interface RouteGlobalConfig {
   history: History;

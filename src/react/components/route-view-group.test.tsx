@@ -1,13 +1,11 @@
-/* eslint-disable sonarjs/no-unstable-nested-components */
 import { act, render } from '@testing-library/react';
 import { createBrowserHistory } from 'mobx-location-history';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { Route, routeConfig } from '../../core/index.js';
 import { mockHistory } from '../../core/route/route.test.js';
-
-import { RouteViewGroup } from './route-view-group.js';
 import { RouteView } from './route-view.js';
+import { RouteViewGroup } from './route-view-group.js';
 
 describe('<RouteViewGroup />', () => {
   it('Should render nothing when no one route is opened', async () => {
@@ -15,10 +13,6 @@ describe('<RouteViewGroup />', () => {
 
     routeConfig.update({
       history,
-    });
-
-    beforeEach(() => {
-      history.clearMocks();
     });
 
     const route1 = new Route('/test1');
@@ -47,10 +41,6 @@ describe('<RouteViewGroup />', () => {
       history,
     });
 
-    beforeEach(() => {
-      history.clearMocks();
-    });
-
     const route1 = new Route('/test1');
     const route2 = new Route('/test2');
     const route3 = new Route('/test3');
@@ -76,10 +66,6 @@ describe('<RouteViewGroup />', () => {
 
     routeConfig.update({
       history,
-    });
-
-    beforeEach(() => {
-      history.clearMocks();
     });
 
     const route1 = new Route('/test1');
@@ -111,10 +97,6 @@ describe('<RouteViewGroup />', () => {
       history,
     });
 
-    beforeEach(() => {
-      history.clearMocks();
-    });
-
     const route1 = new Route('/test1');
     const route2 = new Route('/test2');
     const route3 = new Route('/test3');
@@ -144,10 +126,6 @@ describe('<RouteViewGroup />', () => {
       history,
     });
 
-    beforeEach(() => {
-      history.clearMocks();
-    });
-
     const route1 = new Route('/test1');
     const route2 = new Route('/test2');
     const route3 = new Route('/test3');
@@ -175,10 +153,6 @@ describe('<RouteViewGroup />', () => {
 
     routeConfig.update({
       history,
-    });
-
-    beforeEach(() => {
-      history.clearMocks();
     });
 
     const route1 = new Route('/test');

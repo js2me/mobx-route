@@ -1,6 +1,6 @@
 import { computed, makeObservable, observable } from 'mobx';
 
-import {
+import type {
   AbstractRouteGroup,
   AnyRouteEntity,
   RoutesCollection,

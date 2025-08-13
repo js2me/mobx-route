@@ -1,5 +1,5 @@
 import type { AnyRoute } from '../route/index.js';
-import {
+import type {
   AbstractVirtualRoute,
   AnyVirtualRoute,
 } from '../virtual-route/index.js';

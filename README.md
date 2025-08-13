@@ -32,3 +32,7 @@ userDetails.open({ id: 1 }); // path params are required
 
 userDetails.isOpened; // true;
 ```
+
+## Contribution Guide    
+
+Want to contribute ? [Follow this guide](https://github.com/js2me/mobx-route/blob/master/CONTRIBUTING.md)  

@@ -1,21 +1,19 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { buildSearchString } from 'mobx-location-history';
 import { observer } from 'mobx-react-lite';
 import {
-  AnchorHTMLAttributes,
+  type AnchorHTMLAttributes,
   cloneElement,
   forwardRef,
   isValidElement,
-  MouseEvent,
-  ReactNode,
+  type MouseEvent,
 } from 'react';
-import { IsPartial, AnyObject } from 'yummies/utils/types';
+import type { AnyObject, IsPartial } from 'yummies/utils/types';
 
 import {
-  AnyRoute,
-  InputPathParams,
+  type AnyRoute,
+  type InputPathParams,
+  type RouteNavigateParams,
   routeConfig,
-  RouteNavigateParams,
 } from '../../core/index.js';
 
 interface LinkAnchorProps
@@ -27,7 +25,6 @@ type LinkPathRouteProps<TRoute extends AnyRoute> = {
   to: TRoute;
 } & (IsPartial<InputPathParams<TRoute['path']>> extends true
   ? {
-      // eslint-disable-next-line sonarjs/no-redundant-optional
       params?: InputPathParams<TRoute['path']> | null | undefined;
     }
   : { params: InputPathParams<TRoute['path']> });
@@ -46,7 +43,7 @@ export type LinkProps<TRoute extends AnyRoute> = LinkAnchorProps &
 
 type LinkComponentType = <TRoute extends AnyRoute>(
   props: LinkProps<TRoute>,
-) => ReactNode;
+) => React.ReactNode;
 
 export const Link = observer(
   forwardRef<HTMLAnchorElement, AnyObject>(

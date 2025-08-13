@@ -1,4 +1,3 @@
-/* eslint-disable prefer-const */
 import { LinkedAbortController } from 'linked-abort-controller';
 import {
   action,
@@ -11,24 +10,35 @@ import {
 } from 'mobx';
 import {
   buildSearchString,
-  History,
-  IQueryParams,
+  type History,
+  type IQueryParams,
 } from 'mobx-location-history';
-import { compile, match, ParamData, parse, TokenData } from 'path-to-regexp';
-import { IsPartial, AnyObject, Maybe, MaybePromise } from 'yummies/utils/types';
+import {
+  compile,
+  match,
+  type ParamData,
+  parse,
+  type TokenData,
+} from 'path-to-regexp';
+import type {
+  AnyObject,
+  IsPartial,
+  Maybe,
+  MaybePromise,
+} from 'yummies/utils/types';
 
 import { routeConfig } from '../config/config.js';
 
-import {
+import type {
   AnyRoute,
   BeforeOpenFeedback,
-  PreparedNavigationData,
   InputPathParams,
-  RouteConfiguration,
-  ParsedPathData,
-  RouteNavigateParams,
   IRoute,
+  ParsedPathData,
   ParsedPathParams,
+  PreparedNavigationData,
+  RouteConfiguration,
+  RouteNavigateParams,
 } from './route.types.js';
 
 /**
@@ -152,8 +162,8 @@ export class Route<
       return { params: {} as any, path: pathnameToCheck };
     }
 
-    const matcher = this._matcher ?? (this._matcher = match(this.tokenData));
-    const parsed = matcher(pathnameToCheck);
+    this._matcher ??= match(this.tokenData);
+    const parsed = this._matcher(pathnameToCheck);
 
     if (parsed === false) {
       return null;
@@ -239,7 +249,7 @@ export class Route<
   ) {
     type ExtendedRoutePath = `${TPath}${TExtendPath}`;
     type ParentRoute = this;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // biome-ignore lint/correctness/noUnusedVariables: this is need to extract unused fields
     const { index, params, ...configFromCurrentRoute } = this.config;
 
     const extendedChild = new Route<
@@ -296,9 +306,8 @@ export class Route<
     const pathParams = args[0];
     const queryParams = args[1];
 
-    const compiler =
-      this._compiler ?? (this._compiler = compile(this.tokenData));
-    const path = compiler(this.processParams(pathParams));
+    this._compiler ??= compile(this.tokenData);
+    const path = this._compiler(this.processParams(pathParams));
 
     return [
       this.baseUrl,
@@ -347,7 +356,7 @@ export class Route<
    * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#open-args)
    */
   async open(...args: any[]) {
-    let {
+    const {
       replace,
       state: rawState,
       query,
@@ -364,7 +373,7 @@ export class Route<
       url = this.createUrl(args[0], query);
     }
 
-    let state = rawState ?? null;
+    const state = rawState ?? null;
 
     const navigationData: PreparedNavigationData<TInputParams> = {
       url,

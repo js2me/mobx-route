@@ -9,13 +9,18 @@ import {
   reaction,
   runInAction,
 } from 'mobx';
-import { IQueryParams } from 'mobx-location-history';
+import type { IQueryParams } from 'mobx-location-history';
 import { callFunction } from 'yummies/common';
-import { IsPartial, AnyObject, EmptyObject, Maybe } from 'yummies/utils/types';
+import type {
+  AnyObject,
+  EmptyObject,
+  IsPartial,
+  Maybe,
+} from 'yummies/utils/types';
 
 import { routeConfig } from '../config/index.js';
 
-import {
+import type {
   AbstractVirtualRoute,
   VirtualOpenExtraParams,
   VirtualRouteConfiguration,

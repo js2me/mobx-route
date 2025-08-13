@@ -1,8 +1,8 @@
-import { IQueryParams } from 'mobx-location-history';
-import {
-  IsPartial,
+import type { IQueryParams } from 'mobx-location-history';
+import type {
   AnyObject,
   EmptyObject,
+  IsPartial,
   Maybe,
   MaybeFn,
   MaybePromise,

@@ -1,9 +1,9 @@
-import { History, IQueryParams } from 'mobx-location-history';
-import { AnyObject } from 'yummies/utils/types';
+import type { History, IQueryParams } from 'mobx-location-history';
+import type { AnyObject } from 'yummies/utils/types';
 
-import { RoutesCollection } from '../route-group/index.js';
+import type { RoutesCollection } from '../route-group/index.js';
 
-import { Router } from './router.js';
+import type { Router } from './router.js';
 
 export interface RouterConfiguration<TRoutesStruct extends RoutesCollection> {
   routes: TRoutesStruct;

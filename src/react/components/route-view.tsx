@@ -1,18 +1,18 @@
 import { observer } from 'mobx-react-lite';
-import { ComponentType, ReactNode, useRef } from 'react';
-import { loadable, LoadableConfig } from 'react-simple-loadable';
+import { useRef } from 'react';
+import { type LoadableConfig, loadable } from 'react-simple-loadable';
 
-import {
+import type {
   AnyAbstractRouteEntity,
-  type AnyRoute,
-  type AnyVirtualRoute,
+  AnyRoute,
+  AnyVirtualRoute,
 } from '../../core/index.js';
 
 export type RouteViewComponent<TRoute extends AnyAbstractRouteEntity> =
-  ComponentType<RouteViewProps<TRoute>>;
+  React.ComponentType<RouteViewProps<TRoute>>;
 
 interface RouteViewConfigWithoutRoute {
-  children?: ReactNode | (() => ReactNode);
+  children?: React.ReactNode | (() => React.ReactNode);
 }
 
 export interface RouteViewConfigWithRoute<TRoute extends AnyAbstractRouteEntity>
@@ -23,10 +23,13 @@ export interface RouteViewConfigWithRoute<TRoute extends AnyAbstractRouteEntity>
   /**
    * Case when route is not opened
    */
-  fallback?: ReactNode;
+  fallback?: React.ReactNode;
   children?:
-    | ReactNode
-    | ((params: RouteViewProps<TRoute>['params'], route: TRoute) => ReactNode);
+    | React.ReactNode
+    | ((
+        params: RouteViewProps<TRoute>['params'],
+        route: TRoute,
+      ) => React.ReactNode);
 }
 
 export type RouteViewConfig<TRoute extends AnyAbstractRouteEntity> =
@@ -34,7 +37,7 @@ export type RouteViewConfig<TRoute extends AnyAbstractRouteEntity> =
   | RouteViewConfigWithoutRoute;
 
 export type RouteViewProps<TRoute extends AnyAbstractRouteEntity> = {
-  children?: ReactNode;
+  children?: React.ReactNode;
   params: TRoute extends AnyRoute
     ? Exclude<TRoute['params'], null | undefined>
     : TRoute extends AnyVirtualRoute
@@ -42,13 +45,17 @@ export type RouteViewProps<TRoute extends AnyAbstractRouteEntity> = {
       : never;
 };
 
+type RouteViewBaseComponent = <TRoute extends AnyAbstractRouteEntity>(
+  props: RouteViewConfig<TRoute>,
+) => React.ReactNode;
+
 function RouteViewBase<TRoute extends AnyAbstractRouteEntity>(
   props: Readonly<RouteViewConfig<TRoute>>,
-): ReactNode {
+): React.ReactNode {
   // @ts-expect-error redundand pass first argument
-  const lazyViewComponentRef = useRef<ComponentType<any>>();
+  const lazyViewComponentRef = useRef<React.ComponentType<any>>();
 
-  let Component: ComponentType<any> | undefined;
+  let Component: React.ComponentType<any> | undefined;
 
   if (!('route' in props)) {
     return typeof props.children === 'function'
@@ -87,4 +94,4 @@ function RouteViewBase<TRoute extends AnyAbstractRouteEntity>(
   return props.children;
 }
 
-export const RouteView = observer(RouteViewBase);
+export const RouteView = observer(RouteViewBase) as RouteViewBaseComponent;

@@ -1,18 +1,18 @@
 import { computed } from 'mobx';
-import { IQueryParams } from 'mobx-location-history';
+import type { IQueryParams } from 'mobx-location-history';
 import {
   applyObservable,
   ViewModelBase,
-  ViewModelParams,
+  type ViewModelParams,
 } from 'mobx-view-model';
-import { EmptyObject } from 'yummies/utils/types';
+import type { EmptyObject } from 'yummies/utils/types';
 
 import {
-  routeConfig,
+  type AnyAbstractRouteEntity,
   Route,
+  type RouteParams,
+  routeConfig,
   VirtualRoute,
-  AnyAbstractRouteEntity,
-  RouteParams,
 } from '../core/index.js';
 
 export abstract class RouteViewModel<

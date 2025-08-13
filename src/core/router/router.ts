@@ -1,14 +1,17 @@
 import { computed, makeObservable } from 'mobx';
 import {
-  History,
   buildSearchString,
-  IQueryParams,
+  type History,
+  type IQueryParams,
 } from 'mobx-location-history';
 
 import { routeConfig } from '../config/config.js';
-import { RoutesCollection } from '../route-group/index.js';
+import type { RoutesCollection } from '../route-group/index.js';
 
-import { RouterConfiguration, RouterNavigateOptions } from './router.types.js';
+import type {
+  RouterConfiguration,
+  RouterNavigateOptions,
+} from './router.types.js';
 
 /**
  * Class for centralized routing management.

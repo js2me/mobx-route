@@ -1,11 +1,16 @@
-import { ParseOptions } from 'path-to-regexp';
-import { IsPartial, AnyObject, Maybe, MaybePromise } from 'yummies/utils/types';
+import type { ParseOptions } from 'path-to-regexp';
+import type {
+  AnyObject,
+  IsPartial,
+  Maybe,
+  MaybePromise,
+} from 'yummies/utils/types';
 
-import { RouteGlobalConfig } from '../config/config.types.js';
-import { AnyAbstractRouteEntity } from '../route-group/route-group.types.js';
-import { VirtualRoute } from '../virtual-route/virtual-route.js';
+import type { RouteGlobalConfig } from '../config/config.types.js';
+import type { AnyAbstractRouteEntity } from '../route-group/route-group.types.js';
+import type { VirtualRoute } from '../virtual-route/virtual-route.js';
 
-import { Route } from './route.js';
+import type { Route } from './route.js';
 
 export type PreparedNavigationData<TParams extends AnyObject = AnyObject> = {
   state?: any;
@@ -155,7 +160,7 @@ export interface IRoute<
 }
 
 export type InputPathParam = string | number | boolean | null;
-// eslint-disable-next-line sonarjs/redundant-type-aliases
+
 export type ParsedPathParam = string;
 
 type Simplify<T> = T extends infer U ? { [K in keyof U]: U[K] } : never;
@@ -182,8 +187,7 @@ export type PathToObject<
           ? { [K in Param]: PropertyValue }
           : Path extends `*${infer Wildcard}`
             ? { [K in Wildcard]: PropertyValue[] }
-            : // eslint-disable-next-line @typescript-eslint/ban-types
-              {}
+            : {}
 >;
 
 export type ParsedPathParams<Path extends string> = PathToObject<
@@ -207,19 +211,26 @@ export interface ParsedPathData<TPath extends string> {
   params: ParsedPathParams<TPath>;
 }
 
-export type InferPath<T extends AnyRoute> =
-  T extends IRoute<infer TPath, any, any> ? TPath : never;
+export type InferPath<T extends AnyRoute> = T extends IRoute<
+  infer TPath,
+  any,
+  any
+>
+  ? TPath
+  : never;
 
-export type InferInputParams<T extends AnyRoute> =
-  T extends VirtualRoute<infer TParams>
-    ? TParams
-    : T extends IRoute<any, infer TInputParams, any>
-      ? TInputParams
-      : never;
+export type InferInputParams<T extends AnyRoute> = T extends VirtualRoute<
+  infer TParams
+>
+  ? TParams
+  : T extends IRoute<any, infer TInputParams, any>
+    ? TInputParams
+    : never;
 
-export type InferParams<T extends AnyRoute> =
-  T extends VirtualRoute<infer TParams>
+export type InferParams<T extends AnyRoute> = T extends VirtualRoute<
+  infer TParams
+>
+  ? TParams
+  : T extends IRoute<any, any, infer TParams>
     ? TParams
-    : T extends IRoute<any, any, infer TParams>
-      ? TParams
-      : never;
+    : never;
