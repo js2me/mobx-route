@@ -1,5 +1,11 @@
 # mobx-view-model
 
+## 0.8.1
+
+### Patch Changes
+
+- [`417f9ab`](https://github.com/js2me/mobx-route/commit/417f9ab6925f71069e6cef01d1dd80ba0c8ae7d8) Thanks [@js2me](https://github.com/js2me)! - fixed `Link` component (external navigation with target)
+
 ## 0.8.0
 
 ### Minor Changes
