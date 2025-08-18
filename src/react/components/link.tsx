@@ -62,6 +62,10 @@ export const Link = observer(
       },
       ref,
     ) => {
+      const isExternalNavigation =
+        outerAnchorProps.target === '_blank' ||
+        outerAnchorProps.target === 'blank';
+
       const href =
         outerHref ??
         (typeof to === 'string'
@@ -70,6 +74,7 @@ export const Link = observer(
 
       const handleClick = (event: MouseEvent<HTMLElement>) => {
         if (
+          isExternalNavigation ||
           event.ctrlKey ||
           event.metaKey ||
           event.altKey ||
@@ -96,9 +101,8 @@ export const Link = observer(
         href,
         onClick: handleClick,
         rel:
-          outerAnchorProps.target === '_blank' && !outerAnchorProps.rel
-            ? 'noopener noreferrer'
-            : outerAnchorProps.rel,
+          outerAnchorProps.rel ??
+          (isExternalNavigation ? 'noopener noreferrer' : undefined),
       };
 
       return asChild && isValidElement(children) ? (
