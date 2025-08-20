@@ -1,5 +1,11 @@
 # mobx-view-model
 
+## 0.9.0
+
+### Minor Changes
+
+- [`9e8dc8e`](https://github.com/js2me/mobx-route/commit/9e8dc8ed88a79bad25f0f06a40abb37bc5ab4a85) Thanks [@js2me](https://github.com/js2me)! - added `mergeQuery` feature to merge existed query with new one
+
 ## 0.8.1
 
 ### Patch Changes
