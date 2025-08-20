@@ -4,4 +4,5 @@ export interface RouteGlobalConfig {
   history: History;
   queryParams: IQueryParams;
   baseUrl?: string;
+  mergeQuery?: boolean;
 }

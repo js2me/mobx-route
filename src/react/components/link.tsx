@@ -79,9 +79,10 @@ export const Link = observer(
       if (outerHref) {
         href = outerHref;
       } else {
-        const query = mergeQuery
-          ? { ...routeConfig.get().queryParams.data, ...navigateParams.query }
-          : (navigateParams.query ?? {});
+        const query =
+          (mergeQuery ?? routeConfig.get().mergeQuery)
+            ? { ...routeConfig.get().queryParams.data, ...navigateParams.query }
+            : (navigateParams.query ?? {});
 
         if (typeof to === 'string') {
           href = `${to}${buildSearchString(query)}`;

@@ -104,6 +104,7 @@ export class Route<
     computed.struct(this, 'params');
     computed.struct(this, 'currentPath');
     computed.struct(this, 'hasOpenedChildren');
+    computed.struct(this, 'isAbleToMergeQuery');
     computed(this, 'baseUrl');
 
     observable(this, 'children');
@@ -300,11 +301,16 @@ export class Route<
 
   createUrl(
     ...args: IsPartial<TInputParams> extends true
-      ? [params?: Maybe<TInputParams>, query?: AnyObject]
-      : [params: TInputParams, query?: AnyObject]
+      ? [params?: Maybe<TInputParams>, query?: AnyObject, mergeQuery?: boolean]
+      : [params: TInputParams, query?: AnyObject, mergeQuery?: boolean]
   ) {
     const pathParams = args[0];
-    const queryParams = args[1];
+    const rawQuery = args[1];
+    const mergeQuery = args[2] ?? this.isAbleToMergeQuery;
+
+    const query = mergeQuery
+      ? { ...this.query.data, ...rawQuery }
+      : (rawQuery ?? {});
 
     this._compiler ??= compile(this.tokenData);
     const path = this._compiler(this.processParams(pathParams));
@@ -313,7 +319,7 @@ export class Route<
       this.baseUrl,
       this.isHash ? '#' : '',
       path,
-      buildSearchString(queryParams || {}),
+      buildSearchString(query),
     ].join('');
   }
 
@@ -360,13 +366,14 @@ export class Route<
       replace,
       state: rawState,
       query: rawQuery,
-      mergeQuery,
+      mergeQuery: rawMergeQuery,
     } = typeof args[1] === 'boolean' || args.length > 2
       ? ({ replace: args[1], query: args[2] } as RouteNavigateParams)
       : ((args[1] ?? {}) as RouteNavigateParams);
     let url: string;
     let params: Maybe<InputPathParams<TPath>>;
 
+    const mergeQuery = rawMergeQuery ?? this.isAbleToMergeQuery;
     const query = mergeQuery ? { ...this.query.data, ...rawQuery } : rawQuery;
 
     if (typeof args[0] === 'string') {
@@ -448,6 +455,10 @@ export class Route<
       this.config.afterClose?.();
     }
   };
+
+  private get isAbleToMergeQuery() {
+    return this.config.mergeQuery ?? routeConfig.get().mergeQuery;
+  }
 
   destroy() {
     this.abortController.abort();

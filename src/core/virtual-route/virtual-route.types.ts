@@ -13,7 +13,7 @@ import type { VirtualRoute } from './virtual-route.js';
 export type AnyVirtualRoute = VirtualRoute<any>;
 
 export interface VirtualOpenExtraParams
-  extends Omit<RouteNavigateParams, 'state'> {}
+  extends Omit<RouteNavigateParams, 'state' | 'mergeQuery'> {}
 
 export interface AbstractVirtualRoute<
   TParams extends AnyObject | EmptyObject = EmptyObject,
