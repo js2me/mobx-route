@@ -7,15 +7,13 @@ import type {
   MaybeFn,
   MaybePromise,
 } from 'yummies/utils/types';
-
+import type { RouteNavigateParams } from '../route/route.types.js';
 import type { VirtualRoute } from './virtual-route.js';
 
 export type AnyVirtualRoute = VirtualRoute<any>;
 
-export interface VirtualOpenExtraParams {
-  query?: AnyObject;
-  replace?: boolean;
-}
+export interface VirtualOpenExtraParams
+  extends Omit<RouteNavigateParams, 'state'> {}
 
 export interface AbstractVirtualRoute<
   TParams extends AnyObject | EmptyObject = EmptyObject,

@@ -204,6 +204,7 @@ export interface RouteNavigateParams {
   replace?: boolean;
   state?: any;
   query?: AnyObject;
+  mergeQuery?: boolean;
 }
 
 export interface ParsedPathData<TPath extends string> {

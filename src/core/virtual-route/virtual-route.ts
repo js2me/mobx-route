@@ -131,8 +131,11 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
       return;
     }
 
-    if (extraParams?.query) {
-      this.query.update(extraParams.query, extraParams.replace);
+    if (extraParams?.query || extraParams?.mergeQuery) {
+      const query = extraParams.mergeQuery
+        ? { ...this.query.data, ...params }
+        : params;
+      this.query.update(query, extraParams.replace);
     }
 
     runInAction(() => {

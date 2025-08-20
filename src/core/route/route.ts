@@ -359,12 +359,15 @@ export class Route<
     const {
       replace,
       state: rawState,
-      query,
+      query: rawQuery,
+      mergeQuery,
     } = typeof args[1] === 'boolean' || args.length > 2
-      ? { replace: args[1], query: args[2] }
-      : (args[1] ?? {});
+      ? ({ replace: args[1], query: args[2] } as RouteNavigateParams)
+      : ((args[1] ?? {}) as RouteNavigateParams);
     let url: string;
     let params: Maybe<InputPathParams<TPath>>;
+
+    const query = mergeQuery ? { ...this.query.data, ...rawQuery } : rawQuery;
 
     if (typeof args[0] === 'string') {
       url = args[0];

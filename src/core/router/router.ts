@@ -38,9 +38,12 @@ export class Router<TRoutesCollection extends RoutesCollection> {
   }
 
   navigate(url: string, options?: RouterNavigateOptions) {
-    const navigationUrl = [url, buildSearchString(options?.query || {})].join(
-      '',
-    );
+    const query = options?.mergeQuery
+      ? { ...this.query.data, ...options?.query }
+      : { ...options?.query };
+
+    const searchString = buildSearchString(query);
+    const navigationUrl = `${url}${searchString}`;
 
     if (options?.replace) {
       this.history.replace(navigationUrl, options?.state);

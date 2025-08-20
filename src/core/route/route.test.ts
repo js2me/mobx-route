@@ -283,4 +283,60 @@ describe('route', () => {
 
     expect(foo).toBeDefined();
   });
+
+  it('test mergeQuery', async () => {
+    const route = new Route('/foo/bar/baz');
+    const route2 = new Route('/asdfdsafdsa');
+    const route3 = new Route('/route3');
+
+    await route.open(null, { query: { a: 1, b: 2, c: 3 } });
+
+    expect(history.spies.push).toHaveBeenNthCalledWith(
+      1,
+      '/foo/bar/baz?a=1&b=2&c=3',
+      null,
+    );
+    expect(history.location.search).toBe('?a=1&b=2&c=3');
+
+    await route2.open(null, {
+      query: { c: 4, d: 4, e: 5, f: 6 },
+      mergeQuery: true,
+    });
+
+    expect(history.spies.push).toHaveBeenNthCalledWith(
+      2,
+      '/asdfdsafdsa?a=1&b=2&c=4&d=4&e=5&f=6',
+      null,
+    );
+    expect(history.location.search).toBe('?a=1&b=2&c=4&d=4&e=5&f=6');
+    expect(route2.query.data).toStrictEqual({
+      a: '1',
+      b: '2',
+      c: '4',
+      d: '4',
+      e: '5',
+      f: '6',
+    });
+
+    await route3.open(null, {
+      mergeQuery: true,
+    });
+
+    expect(history.spies.push).toHaveBeenNthCalledWith(
+      3,
+      '/route3?a=1&b=2&c=4&d=4&e=5&f=6',
+      null,
+    );
+    expect(history.location.search).toBe('?a=1&b=2&c=4&d=4&e=5&f=6');
+    expect(route3.query.data).toStrictEqual({
+      a: '1',
+      b: '2',
+      c: '4',
+      d: '4',
+      e: '5',
+      f: '6',
+    });
+
+    history.clearMocks();
+  });
 });

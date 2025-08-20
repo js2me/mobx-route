@@ -1,8 +1,6 @@
 import type { History, IQueryParams } from 'mobx-location-history';
-import type { AnyObject } from 'yummies/utils/types';
-
+import type { RouteNavigateParams } from '../route/route.types.js';
 import type { RoutesCollection } from '../route-group/index.js';
-
 import type { Router } from './router.js';
 
 export interface RouterConfiguration<TRoutesStruct extends RoutesCollection> {
@@ -11,10 +9,6 @@ export interface RouterConfiguration<TRoutesStruct extends RoutesCollection> {
   queryParams?: IQueryParams;
 }
 
-export interface RouterNavigateOptions {
-  replace?: boolean;
-  state?: any;
-  query?: AnyObject;
-}
+export interface RouterNavigateOptions extends RouteNavigateParams {}
 
 export type AnyRouter = Router<RoutesCollection>;
