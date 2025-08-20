@@ -1,4 +1,3 @@
-import { buildSearchString } from 'mobx-location-history';
 import { observer } from 'mobx-react-lite';
 import {
   type AnchorHTMLAttributes,
@@ -15,6 +14,7 @@ import {
   type RouteNavigateParams,
   routeConfig,
 } from '../../core/index.js';
+import { buildUrl } from '../../core/utils/build-url.js';
 
 interface LinkAnchorProps
   extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
@@ -79,15 +79,14 @@ export const Link = observer(
       if (outerHref) {
         href = outerHref;
       } else {
-        const query =
-          (mergeQuery ?? routeConfig.get().mergeQuery)
-            ? { ...routeConfig.get().queryParams.data, ...navigateParams.query }
-            : (navigateParams.query ?? {});
-
         if (typeof to === 'string') {
-          href = `${to}${buildSearchString(query)}`;
+          href = buildUrl(to, navigateParams);
         } else {
-          href = (to as AnyRoute).createUrl(params, query);
+          href = (to as AnyRoute).createUrl(
+            params,
+            navigateParams.query,
+            navigateParams.mergeQuery,
+          );
         }
       }
 

@@ -150,8 +150,8 @@ export interface IRoute<
 
   createUrl(
     ...args: IsPartial<TInputParams> extends true
-      ? [params?: Maybe<TInputParams>, query?: AnyObject]
-      : [params: TInputParams, query?: AnyObject]
+      ? [params?: Maybe<TInputParams>, query?: AnyObject, mergeQuery?: boolean]
+      : [params: TInputParams, query?: AnyObject, mergeQuery?: boolean]
   ): string;
 
   destroy(): void;
