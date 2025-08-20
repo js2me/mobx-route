@@ -51,6 +51,7 @@ export const Link = observer(
       {
         to,
         href: outerHref,
+        mergeQuery,
         asChild,
         children,
         params,
@@ -66,11 +67,28 @@ export const Link = observer(
         outerAnchorProps.target === '_blank' ||
         outerAnchorProps.target === 'blank';
 
-      const href =
-        outerHref ??
-        (typeof to === 'string'
-          ? `${to}${buildSearchString(query || {})}`
-          : (to as AnyRoute).createUrl(params, query));
+      const navigateParams: RouteNavigateParams = {
+        mergeQuery,
+        query,
+        replace,
+        state,
+      };
+
+      let href: string;
+
+      if (outerHref) {
+        href = outerHref;
+      } else {
+        const query = mergeQuery
+          ? { ...routeConfig.get().queryParams.data, ...navigateParams.query }
+          : (navigateParams.query ?? {});
+
+        if (typeof to === 'string') {
+          href = `${to}${buildSearchString(query)}`;
+        } else {
+          href = (to as AnyRoute).createUrl(params, query);
+        }
+      }
 
       const handleClick = (event: MouseEvent<HTMLElement>) => {
         if (
@@ -89,9 +107,13 @@ export const Link = observer(
           event.preventDefault();
 
           if (typeof to === 'string') {
-            routeConfig.get().history.push(href, state);
+            if (navigateParams.replace) {
+              routeConfig.get().history.replace(href, state);
+            } else {
+              routeConfig.get().history.push(href, state);
+            }
           } else {
-            (to as AnyRoute).open(href, { replace, query, state });
+            (to as AnyRoute).open(href, navigateParams);
           }
         }
       };
