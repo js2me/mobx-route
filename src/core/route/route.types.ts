@@ -51,7 +51,7 @@ export interface RouteConfiguration<
   TInputParams extends InputPathParams<TPath> = InputPathParams<TPath>,
   TOutputParams extends AnyObject = ParsedPathParams<TPath>,
   TParentRoute extends Route<string, any, any, any> | null = null,
-> extends Partial<RouteGlobalConfig> {
+> extends Omit<Partial<RouteGlobalConfig>, 'createUrl'> {
   /**
    * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#abortsignal)
    */

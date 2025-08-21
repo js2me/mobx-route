@@ -320,7 +320,9 @@ export class Route<
       query,
     };
     const urlCreateParams: UrlCreateParams<TInputParams> =
-      this.config.createUrl?.(defaultUrlCreateParams) ?? defaultUrlCreateParams;
+      this.config.createUrl?.(defaultUrlCreateParams) ??
+      routeConfig.get().createUrl?.(defaultUrlCreateParams) ??
+      defaultUrlCreateParams;
 
     const path = this._compiler(this.processParams(urlCreateParams.params));
 
