@@ -39,6 +39,7 @@ import type {
   PreparedNavigationData,
   RouteConfiguration,
   RouteNavigateParams,
+  UrlCreateParams,
 } from './route.types.js';
 
 /**
@@ -304,7 +305,7 @@ export class Route<
       ? [params?: Maybe<TInputParams>, query?: AnyObject, mergeQuery?: boolean]
       : [params: TInputParams, query?: AnyObject, mergeQuery?: boolean]
   ) {
-    const pathParams = args[0];
+    const params = args[0];
     const rawQuery = args[1];
     const mergeQuery = args[2] ?? this.isAbleToMergeQuery;
 
@@ -313,13 +314,21 @@ export class Route<
       : (rawQuery ?? {});
 
     this._compiler ??= compile(this.tokenData);
-    const path = this._compiler(this.processParams(pathParams));
+
+    const defaultUrlCreateParams: UrlCreateParams<TInputParams> = {
+      params: params as TInputParams,
+      query,
+    };
+    const urlCreateParams: UrlCreateParams<TInputParams> =
+      this.config.createUrl?.(defaultUrlCreateParams) ?? defaultUrlCreateParams;
+
+    const path = this._compiler(this.processParams(urlCreateParams.params));
 
     return [
       this.baseUrl,
       this.isHash ? '#' : '',
       path,
-      buildSearchString(query),
+      buildSearchString(urlCreateParams.query),
     ].join('');
   }
 

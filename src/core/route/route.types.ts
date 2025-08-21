@@ -41,9 +41,9 @@ export type BeforeOpenFeedback =
       replace?: boolean;
     };
 
-export interface AbstractPathRoute<TPath extends string = string> {
-  isOpened: boolean;
-  path: TPath;
+export interface UrlCreateParams<TInputParams> {
+  params: TInputParams;
+  query: AnyObject;
 }
 
 export interface RouteConfiguration<
@@ -98,6 +98,12 @@ export interface RouteConfiguration<
       NoInfer<TParentRoute>
     >,
   ) => void;
+  /**
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#createurl)
+   */
+  createUrl?: (
+    params: UrlCreateParams<NoInfer<TInputParams>>,
+  ) => Maybe<UrlCreateParams<NoInfer<TInputParams>>>;
 }
 
 export type AnyRoute = IRoute;

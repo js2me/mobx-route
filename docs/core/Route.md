@@ -302,4 +302,23 @@ Calls after close route.
 ### `afterOpen()`  
 Calls after open route.   
 
+### `createUrl()`   
+Ability to customize path or query params before create route url.   
 
+Example:   
+```ts
+const route = new Route('/foo/bar/baz',{
+  createUrl: ({ params, query }) => {
+    return {
+      params,
+      query: {
+        ...query,
+        openModal: true,
+      }
+    }
+  }
+});
+
+route.createUrl(); // /foo/bar/baz?openModal=true
+route.open(); // /foo/bar/baz?openModal=true
+```
