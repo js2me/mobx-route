@@ -1,5 +1,11 @@
 # mobx-view-model
 
+## 0.10.1
+
+### Patch Changes
+
+- [`79df550`](https://github.com/js2me/mobx-route/commit/79df55031aaebd38e30ee00df6674421ab349bdd) Thanks [@js2me](https://github.com/js2me)! - fixed `extend()` method with transfer input param typings
+
 ## 0.10.0
 
 ### Minor Changes
