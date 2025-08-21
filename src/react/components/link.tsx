@@ -108,12 +108,12 @@ export const Link = observer(
 
           if (typeof to === 'string') {
             if (navigateParams.replace) {
-              routeConfig.get().history.replace(href, state);
+              routeConfig.get().history.replace(to, navigateParams.state);
             } else {
-              routeConfig.get().history.push(href, state);
+              routeConfig.get().history.push(to, navigateParams.state);
             }
           } else {
-            (to as AnyRoute).open(href, navigateParams);
+            (to as AnyRoute).open(params, navigateParams);
           }
         }
       };
