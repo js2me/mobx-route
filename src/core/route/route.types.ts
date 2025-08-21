@@ -50,6 +50,11 @@ export type UrlCreateParamsFn<TInputParams = any> = (
   currentQueryData: RawQueryParamsData,
 ) => Maybe<UrlCreateParams<TInputParams>>;
 
+export interface CreatedUrlOutputParams {
+  mergeQuery?: boolean;
+  omitQuery?: boolean;
+}
+
 export interface RouteConfiguration<
   TPath extends string,
   TInputParams extends InputPathParams<TPath> = InputPathParams<TPath>,

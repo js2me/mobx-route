@@ -32,6 +32,7 @@ import { routeConfig } from '../config/config.js';
 import type {
   AnyRoute,
   BeforeOpenFeedback,
+  CreatedUrlOutputParams,
   InputPathParams,
   IRoute,
   ParsedPathData,
@@ -302,14 +303,26 @@ export class Route<
 
   createUrl(
     ...args: IsPartial<TInputParams> extends true
-      ? [params?: Maybe<TInputParams>, query?: AnyObject, mergeQuery?: boolean]
-      : [params: TInputParams, query?: AnyObject, mergeQuery?: boolean]
+      ? [
+          params?: Maybe<TInputParams>,
+          query?: Maybe<AnyObject>,
+          mergeQueryOrParams?: boolean | CreatedUrlOutputParams,
+        ]
+      : [
+          params: TInputParams,
+          query?: Maybe<AnyObject>,
+          mergeQueryOrParams?: boolean | CreatedUrlOutputParams,
+        ]
   ) {
     const params = args[0];
     const rawQuery = args[1];
-    const mergeQuery = args[2] ?? this.isAbleToMergeQuery;
+    const mergeQueryOrOutputParams = args[2] ?? this.isAbleToMergeQuery;
+    const outputParams: Maybe<CreatedUrlOutputParams> =
+      typeof mergeQueryOrOutputParams === 'boolean'
+        ? { mergeQuery: mergeQueryOrOutputParams }
+        : mergeQueryOrOutputParams;
 
-    const query = mergeQuery
+    const query = outputParams?.mergeQuery
       ? { ...this.query.data, ...rawQuery }
       : (rawQuery ?? {});
 
@@ -326,12 +339,13 @@ export class Route<
 
     const path = this._compiler(this.processParams(urlCreateParams.params));
 
-    return [
-      this.baseUrl,
-      this.isHash ? '#' : '',
-      path,
-      buildSearchString(urlCreateParams.query),
-    ].join('');
+    const url = [this.baseUrl, this.isHash ? '#' : '', path].join('');
+
+    if (outputParams?.omitQuery) {
+      return url;
+    }
+
+    return `${url}${buildSearchString(urlCreateParams.query)}`;
   }
 
   /**

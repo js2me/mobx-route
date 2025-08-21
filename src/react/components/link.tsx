@@ -1,3 +1,4 @@
+import { buildSearchString, parseSearchString } from 'mobx-location-history';
 import { observer } from 'mobx-react-lite';
 import {
   type AnchorHTMLAttributes,
@@ -5,16 +6,17 @@ import {
   forwardRef,
   isValidElement,
   type MouseEvent,
+  useMemo,
+  useRef,
 } from 'react';
-import type { AnyObject, IsPartial } from 'yummies/utils/types';
-
+import { isShallowEqual } from 'yummies/data';
+import type { IsPartial } from 'yummies/utils/types';
 import {
   type AnyRoute,
   type InputPathParams,
   type RouteNavigateParams,
   routeConfig,
 } from '../../core/index.js';
-import { buildUrl } from '../../core/utils/build-url.js';
 
 interface LinkAnchorProps
   extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
@@ -46,7 +48,15 @@ type LinkComponentType = <TRoute extends AnyRoute>(
 ) => React.ReactNode;
 
 export const Link = observer(
-  forwardRef<HTMLAnchorElement, AnyObject>(
+  forwardRef<
+    HTMLAnchorElement,
+    LinkAnchorProps &
+      RouteNavigateParams & {
+        params?: any;
+        to: string | AnyRoute;
+        href: string;
+      }
+  >(
     (
       {
         to,
@@ -66,31 +76,56 @@ export const Link = observer(
       const isExternalNavigation =
         outerAnchorProps.target === '_blank' ||
         outerAnchorProps.target === 'blank';
+      const queryDataRef = useRef<RouteNavigateParams['query']>(query);
 
-      const navigateParams: RouteNavigateParams = {
-        mergeQuery,
-        query,
-        replace,
-        state,
-      };
-
-      let href: string;
-
-      if (outerHref) {
-        href = outerHref;
-      } else {
-        if (typeof to === 'string') {
-          href = buildUrl(to, navigateParams);
-        } else {
-          href = (to as AnyRoute).createUrl(
-            params,
-            navigateParams.query,
-            navigateParams.mergeQuery,
-          );
-        }
+      if (!isShallowEqual(queryDataRef.current, query)) {
+        queryDataRef.current = query;
       }
 
-      const handleClick = (event: MouseEvent<HTMLElement>) => {
+      const { href, navigateParams } = useMemo(() => {
+        const navigateParams: RouteNavigateParams = {
+          mergeQuery,
+          query,
+          replace,
+          state,
+        };
+
+        let href: string;
+
+        if (outerHref) {
+          href = outerHref;
+        } else {
+          if (typeof to === 'string') {
+            const isNeedToMergeQuery =
+              navigateParams.mergeQuery ?? routeConfig.get().mergeQuery;
+
+            const [path, ...querySegments] = to.split('?');
+
+            const existedQuery = parseSearchString(querySegments.join('?'));
+
+            const query = {
+              ...(isNeedToMergeQuery ? routeConfig.get().queryParams.data : {}),
+              ...existedQuery,
+              ...navigateParams.query,
+            };
+
+            href = `${path}${buildSearchString(query)}`;
+          } else {
+            href = to.createUrl(
+              params,
+              navigateParams.query,
+              navigateParams.mergeQuery,
+            );
+          }
+        }
+
+        return {
+          href,
+          navigateParams,
+        };
+      }, [mergeQuery, replace, state, to, queryDataRef.current]);
+
+      const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
         if (
           isExternalNavigation ||
           event.ctrlKey ||
@@ -103,17 +138,13 @@ export const Link = observer(
 
         outerAnchorProps.onClick?.(event);
 
-        if (!event.defaultPrevented && to) {
+        if (!event.defaultPrevented) {
           event.preventDefault();
 
-          if (typeof to === 'string') {
-            if (navigateParams.replace) {
-              routeConfig.get().history.replace(to, navigateParams.state);
-            } else {
-              routeConfig.get().history.push(to, navigateParams.state);
-            }
+          if (navigateParams.replace) {
+            routeConfig.get().history.replace(href, navigateParams.state);
           } else {
-            (to as AnyRoute).open(params, navigateParams);
+            routeConfig.get().history.push(href, navigateParams.state);
           }
         }
       };
