@@ -1,5 +1,11 @@
 # mobx-view-model
 
+## 0.12.1
+
+### Patch Changes
+
+- [`46eab98`](https://github.com/js2me/mobx-route/commit/46eab98fa76cf7a05f2a4152b2f518ff97551c41) Thanks [@js2me](https://github.com/js2me)! - fixed `<Link/>` component (navigation)
+
 ## 0.12.0
 
 ### Minor Changes
