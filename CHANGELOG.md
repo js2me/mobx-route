@@ -1,5 +1,15 @@
 # mobx-view-model
 
+## 0.10.0
+
+### Minor Changes
+
+- [`3405fc8`](https://github.com/js2me/mobx-route/commit/3405fc8aae294338b0efe2d25ccb5f432fda6896) Thanks [@js2me](https://github.com/js2me)! - added docs for `mergeQuery` feature
+
+### Patch Changes
+
+- [`e065e8e`](https://github.com/js2me/mobx-route/commit/e065e8e5eaaa2306aedd5f2504ad271d4e35ce3b) Thanks [@js2me](https://github.com/js2me)! - fixed building url for link component with mergeQuery option
+
 ## 0.9.1
 
 ### Patch Changes
