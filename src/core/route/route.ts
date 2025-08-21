@@ -234,8 +234,8 @@ export class Route<
     TExtendedPath extends string,
     TExtendedInputParams extends
       InputPathParams<`${TPath}${TExtendedPath}`> = InputPathParams<`${TPath}${TExtendedPath}`>,
-    TExtendedOutputParams extends
-      AnyObject = ParsedPathParams<`${TPath}${TExtendedPath}`>,
+    TExtendedOutputParams extends AnyObject = TInputParams &
+      ParsedPathParams<`${TPath}${TExtendedPath}`>,
   >(
     path: TExtendedPath,
     config?: Omit<
