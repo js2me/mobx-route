@@ -52,9 +52,11 @@ First argument can be required based on path declaration (first argument)
 
 **API Signature**  
 ```ts
-open(params?, { query?, replace?, state? }): Promise<void>
+open(params?, { query?, replace?, state?, mergeQuery? }): Promise<void>
 open(params?, replace?, query?): Promise<void>
 ```
+
+More about `mergeQuery` you can read [here](/core/routeConfig#mergequery)   
 
 Examples:  
 ```ts
@@ -65,11 +67,16 @@ location.pathname; // /stars
 
 ```ts
 const starDetails = new Route('/stars/:starId');
-await starDetails.open({ starId: 1 });
+await starDetails.open({ starId: 1 }, {
+  query: { bar: 'baz' }
+});
 
 const starsWithMeta = new Route('/stars{/:meta}');
-starsWithMeta();
-starsWithMeta({ meta: 1 });
+await starsWithMeta.open();
+await starsWithMeta.open({ meta: 1 }, {
+  query: { foo: 'bar' },
+});
+
 ```
 
 ### `extend(path, config): Route`  
@@ -158,14 +165,18 @@ routeC.hasOpenedChildren; // false
 ### `children: AnyRoute[]` <Badge type="info" text="observable" />   
 Array of child routes. Automatically updated when using `extend()`.  
 
-### `createUrl(params?, query?): string`  
+### `createUrl(params?, query?, mergeQuery?): string`  
 Generates full URL for route. Respects base URL and parent routes.  
 
 Example:   
 ```ts
 const starDetails = new Route('/stars/:starId');
 starDetails.createUrl({ starId: 1 }, { bar: 1 }); // /stars/1?bar=1
+
+starDetails.createUrl({ starId: 1 }, { baz: 2 }, true); // /stars/1?bar=1&baz=2
 ```
+
+More about `mergeQuery` you can read [here](/core/routeConfig#mergequery)   
 
 ### `path: string`  
 Original path pattern used for route matching.  
