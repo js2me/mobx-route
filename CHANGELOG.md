@@ -1,5 +1,13 @@
 # mobx-view-model
 
+## 0.9.1
+
+### Patch Changes
+
+- [`fc47412`](https://github.com/js2me/mobx-route/commit/fc4741200e0a1376e70db59173bfdf853adacdff) Thanks [@js2me](https://github.com/js2me)! - fixed `mergeQuery` option use in Link react component
+
+- [`76e6b1e`](https://github.com/js2me/mobx-route/commit/76e6b1e10a6e1d89cab2362ebaee08f12308b695) Thanks [@js2me](https://github.com/js2me)! - fixed mergeQuery option behaviour
+
 ## 0.9.0
 
 ### Minor Changes
