@@ -1,3 +1,4 @@
+import type { RawQueryParamsData } from 'mobx-location-history';
 import type { ParseOptions } from 'path-to-regexp';
 import type {
   AnyObject,
@@ -5,11 +6,9 @@ import type {
   Maybe,
   MaybePromise,
 } from 'yummies/utils/types';
-
 import type { RouteGlobalConfig } from '../config/config.types.js';
 import type { AnyAbstractRouteEntity } from '../route-group/route-group.types.js';
 import type { VirtualRoute } from '../virtual-route/virtual-route.js';
-
 import type { Route } from './route.js';
 
 export type PreparedNavigationData<TParams extends AnyObject = AnyObject> = {
@@ -45,6 +44,11 @@ export interface UrlCreateParams<TInputParams> {
   params: TInputParams;
   query: AnyObject;
 }
+
+export type UrlCreateParamsFn<TInputParams = any> = (
+  params: UrlCreateParams<TInputParams>,
+  currentQueryData: RawQueryParamsData,
+) => Maybe<UrlCreateParams<TInputParams>>;
 
 export interface RouteConfiguration<
   TPath extends string,
@@ -101,9 +105,7 @@ export interface RouteConfiguration<
   /**
    * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#createurl)
    */
-  createUrl?: (
-    params: UrlCreateParams<NoInfer<TInputParams>>,
-  ) => Maybe<UrlCreateParams<NoInfer<TInputParams>>>;
+  createUrl?: UrlCreateParamsFn<TInputParams>;
 }
 
 export type AnyRoute = IRoute;
