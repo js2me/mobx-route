@@ -1,5 +1,11 @@
 # mobx-view-model
 
+## 0.12.0
+
+### Minor Changes
+
+- [`6e7c12c`](https://github.com/js2me/mobx-route/commit/6e7c12c234169eb9b1735652ad32e0212ca2034f) Thanks [@js2me](https://github.com/js2me)! - `createUrl` option for `routeConfig`
+
 ## 0.11.0
 
 ### Minor Changes
