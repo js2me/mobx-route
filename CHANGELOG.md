@@ -1,5 +1,11 @@
 # mobx-view-model
 
+## 0.11.0
+
+### Minor Changes
+
+- [`a35efa0`](https://github.com/js2me/mobx-route/commit/a35efa0384bb17528cc163dc88ee22fee484359f) Thanks [@js2me](https://github.com/js2me)! - ability to customize url before route open/ creating url (`createUrl` param)
+
 ## 0.10.2
 
 ### Patch Changes
