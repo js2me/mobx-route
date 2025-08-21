@@ -231,32 +231,32 @@ export class Route<
    * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#extend-path-config-route)
    */
   extend<
-    TExtendPath extends string,
-    TInputParams extends
-      InputPathParams<`${TPath}${TExtendPath}`> = InputPathParams<`${TPath}${TExtendPath}`>,
-    TOutputParams extends
-      AnyObject = ParsedPathParams<`${TPath}${TExtendPath}`>,
+    TExtendedPath extends string,
+    TExtendedInputParams extends
+      InputPathParams<`${TPath}${TExtendedPath}`> = InputPathParams<`${TPath}${TExtendedPath}`>,
+    TExtendedOutputParams extends
+      AnyObject = ParsedPathParams<`${TPath}${TExtendedPath}`>,
   >(
-    path: TExtendPath,
+    path: TExtendedPath,
     config?: Omit<
       RouteConfiguration<
-        `${TPath}${TExtendPath}`,
-        TInputParams,
-        TOutputParams,
+        `${TPath}${TExtendedPath}`,
+        TInputParams & TExtendedInputParams,
+        TExtendedOutputParams,
         any
       >,
       'parent'
     >,
   ) {
-    type ExtendedRoutePath = `${TPath}${TExtendPath}`;
+    type ExtendedRoutePath = `${TPath}${TExtendedPath}`;
     type ParentRoute = this;
     // biome-ignore lint/correctness/noUnusedVariables: this is need to extract unused fields
     const { index, params, ...configFromCurrentRoute } = this.config;
 
     const extendedChild = new Route<
       ExtendedRoutePath,
-      TInputParams,
-      TOutputParams,
+      TInputParams & TExtendedInputParams,
+      TExtendedOutputParams,
       ParentRoute
     >(`${this.path}${path}`, {
       ...configFromCurrentRoute,
