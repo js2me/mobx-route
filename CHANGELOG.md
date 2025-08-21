@@ -1,5 +1,11 @@
 # mobx-view-model
 
+## 0.10.2
+
+### Patch Changes
+
+- [`e07c69d`](https://github.com/js2me/mobx-route/commit/e07c69de568fd0145504c1f52670163b1079d317) Thanks [@js2me](https://github.com/js2me)! - fixed output params typings in extended route (receive typings from parent)
+
 ## 0.10.1
 
 ### Patch Changes
