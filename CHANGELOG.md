@@ -1,5 +1,11 @@
 # mobx-view-model
 
+## 0.12.2
+
+### Patch Changes
+
+- [`0933b95`](https://github.com/js2me/mobx-route/commit/0933b9543d76a2f87f9c5ee316963920a1ada9b7) Thanks [@js2me](https://github.com/js2me)! - fixed navigation with passed query params in link when `to` is string
+
 ## 0.12.1
 
 ### Patch Changes
