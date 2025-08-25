@@ -1,5 +1,11 @@
 # mobx-view-model
 
+## 0.13.0
+
+### Minor Changes
+
+- [`09be673`](https://github.com/js2me/mobx-route/commit/09be6735ab62a8406debde37bdfefd9ac5b085c1) Thanks [@js2me](https://github.com/js2me)! - update `mobx-location-history` to `8.x.x`
+
 ## 0.12.2
 
 ### Patch Changes
