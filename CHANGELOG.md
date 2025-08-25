@@ -1,5 +1,13 @@
 # mobx-view-model
 
+## 0.14.0
+
+### Minor Changes
+
+- [`39a4a40`](https://github.com/js2me/mobx-route/commit/39a4a40be52464d7adf158d1ffe582ba9ddca2ba) Thanks [@js2me](https://github.com/js2me)! - added `formatLinkHref` global route config option
+
+- [`c4a8336`](https://github.com/js2me/mobx-route/commit/c4a8336ed044723b52a8fa50aec72b0d2fea87d2) Thanks [@js2me](https://github.com/js2me)! - added baseUrl override ability for `createUrl`
+
 ## 0.13.0
 
 ### Minor Changes
