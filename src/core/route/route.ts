@@ -329,6 +329,7 @@ export class Route<
     this._compiler ??= compile(this.tokenData);
 
     const defaultUrlCreateParams: UrlCreateParams<TInputParams> = {
+      baseUrl: this.baseUrl,
       params: params as TInputParams,
       query,
     };
@@ -339,7 +340,9 @@ export class Route<
 
     const path = this._compiler(this.processParams(urlCreateParams.params));
 
-    const url = [this.baseUrl, this.isHash ? '#' : '', path].join('');
+    const url = [urlCreateParams.baseUrl, this.isHash ? '#' : '', path].join(
+      '',
+    );
 
     if (outputParams?.omitQuery) {
       return url;

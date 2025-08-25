@@ -41,6 +41,7 @@ export type BeforeOpenFeedback =
     };
 
 export interface UrlCreateParams<TInputParams> {
+  baseUrl?: string | undefined;
   params: TInputParams;
   query: AnyObject;
 }
