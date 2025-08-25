@@ -7,4 +7,5 @@ export interface RouteGlobalConfig {
   baseUrl?: string;
   mergeQuery?: boolean;
   createUrl?: UrlCreateParamsFn;
+  formatLinkHref?: (href: string) => string;
 }

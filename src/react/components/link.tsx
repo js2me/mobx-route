@@ -90,6 +90,8 @@ export const Link = observer(
           state,
         };
 
+        const cfg = routeConfig.get();
+
         let href: string;
 
         if (outerHref) {
@@ -97,14 +99,14 @@ export const Link = observer(
         } else {
           if (typeof to === 'string') {
             const isNeedToMergeQuery =
-              navigateParams.mergeQuery ?? routeConfig.get().mergeQuery;
+              navigateParams.mergeQuery ?? cfg.mergeQuery;
 
             const [path, ...querySegments] = to.split('?');
 
             const existedQuery = parseSearchString(querySegments.join('?'));
 
             const query = {
-              ...(isNeedToMergeQuery ? routeConfig.get().queryParams.data : {}),
+              ...(isNeedToMergeQuery ? cfg.queryParams.data : {}),
               ...existedQuery,
               ...navigateParams.query,
             };
@@ -120,7 +122,7 @@ export const Link = observer(
         }
 
         return {
-          href,
+          href: cfg.formatLinkHref?.(href) ?? href,
           navigateParams,
         };
       }, [mergeQuery, replace, state, to, queryDataRef.current]);
