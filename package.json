@@ -1,6 +1,6 @@
 {
   "name": "mobx-route",
-  "version": "0.14.0",
+  "version": "0.14.1",
   "scripts": {
     "prepare": "pnpm dev:install-hooks",
     "clean": "rimraf dist",
@@ -80,7 +80,7 @@
     "@vitejs/plugin-react-swc": "^3.9.0",
     "@vitest/coverage-istanbul": "^3.1.2",
     "commitfmt": "^1.0.4",
-		"js2me-biome-config": "^1.0.3",
+    "js2me-biome-config": "^1.0.3",
     "js2me-exports-post-build-script": "^5.0.1",
     "jsdom": "^26.1.0",
     "lefthook": "^1.11.13",
