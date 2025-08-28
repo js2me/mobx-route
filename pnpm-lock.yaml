@@ -66,6 +66,9 @@ importers:
       commitfmt:
         specifier: ^1.0.4
         version: 1.0.4
+      js2me-biome-config:
+        specifier: ^1.0.3
+        version: 1.0.3
       js2me-exports-post-build-script:
         specifier: ^5.0.1
         version: 5.0.1(@types/node@20.19.10)
@@ -1637,6 +1640,9 @@ packages:
   js-yaml@3.14.1:
     resolution: {integrity: sha512-okMH7OXXJ7YrN9Ok3/SXrnu4iX9yOk+25nqX4imS2npuvTYDmo/QEZoqwZkYaIDk3jVvBOTOIEgEhaLOynBS9g==}
     hasBin: true
+
+  js2me-biome-config@1.0.3:
+    resolution: {integrity: sha512-DDFZxXXynbz6alYaHMCZ3oyeZQPpqaRqeyLg2uJl8z9uaKSJv4eiBQV1yScMhnMqwuE/3UivlW2mYZ7NOsr4ig==}
 
   js2me-exports-post-build-script@5.0.1:
     resolution: {integrity: sha512-rMsfnLkhlbtdwHLycWqVtwy7bCPIrqTQMrKFtwDKf/ZwI2660catZdlVJepBW5+HjGnjzt8F34XPjAeLi0PiZQ==}
@@ -4270,6 +4276,8 @@ snapshots:
     dependencies:
       argparse: 1.0.10
       esprima: 4.0.1
+
+  js2me-biome-config@1.0.3: {}
 
   js2me-exports-post-build-script@5.0.1(@types/node@20.19.10):
     dependencies:

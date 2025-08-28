@@ -1,4 +1,4 @@
-# mobx-view-model
+# mobx-route
 
 ## 0.14.0
 
