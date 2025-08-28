@@ -47,7 +47,7 @@
   },
   "dependencies": {
     "linked-abort-controller": "^1.1.0",
-    "mobx-location-history": "^8.0.2",
+    "mobx-location-history": "^8.1.0",
     "path-to-regexp": "^8.2.0",
     "react-simple-loadable": "^2.3.8",
     "yummies": "^4.12.2"
