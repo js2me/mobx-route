@@ -1,5 +1,11 @@
 # mobx-route
 
+## 0.14.2
+
+### Patch Changes
+
+- [`cd93a9e`](https://github.com/js2me/mobx-route/commit/cd93a9e7620bb0cbe7c865c4f33f178d796fe193) Thanks [@js2me](https://github.com/js2me)! - update mobx-location-history to 8.1.1
+
 ## 0.14.1
 
 ### Patch Changes
