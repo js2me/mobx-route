@@ -1,5 +1,13 @@
 # mobx-route
 
+## 0.14.1
+
+### Patch Changes
+
+- [`570d002`](https://github.com/js2me/mobx-route/commit/570d002d654f4b0e8d2a7fa0e1de6dc947890dd5) Thanks [@js2me](https://github.com/js2me)! - [internal] use unified biome config
+
+- [`30ca924`](https://github.com/js2me/mobx-route/commit/30ca924e5e74d3555fee0bb4527b8e4988b3bc39) Thanks [@js2me](https://github.com/js2me)! - update `mobx-location-history` to latest
+
 ## 0.14.0
 
 ### Minor Changes
