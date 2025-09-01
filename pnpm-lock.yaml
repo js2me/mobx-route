@@ -21,7 +21,7 @@ importers:
         specifier: ^4.0.7
         version: 4.1.0(mobx@6.13.7)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       mobx-view-model:
-        specifier: ^6.10.0 || ^7.0.0
+        specifier: ^6.10.0 || ^7.0.0 || ^8.0.0
         version: 7.0.0(mobx-react-lite@4.1.0(mobx@6.13.7)(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(mobx@6.13.7)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       path-to-regexp:
         specifier: ^8.2.0
