@@ -1,5 +1,11 @@
 # mobx-route
 
+## 0.15.0
+
+### Minor Changes
+
+- [`eb9ebb2`](https://github.com/js2me/mobx-route/commit/eb9ebb246546733f8ac3de4692430a16e7fc195a) Thanks [@js2me](https://github.com/js2me)! - support 8.0.0 version of `mobx-view-model`
+
 ## 0.14.2
 
 ### Patch Changes
