@@ -10,7 +10,7 @@
     "prebuild": "npm run clean && npm run check",
     "build:watch": "pnpm build && nodemon --watch src --ext ts --exec \"pnpm build\"",
     "build": "zshy",
-    "pub": "pnpm build && node js2me-exports-post-build-script/scripts/publish.js",
+    "pub": "pnpm build && node node_modules/js2me-exports-post-build-script/scripts/publish",
     "pub:patch": "PUBLISH_VERSION=patch pnpm pub",
     "pub:minor": "PUBLISH_VERSION=minor pnpm pub",
     "pub:major": "PUBLISH_VERSION=major pnpm pub",
