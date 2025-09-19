@@ -161,7 +161,6 @@ export const Link = observer(
       };
 
       return asChild && isValidElement(children) ? (
-        // @ts-ignore
         cloneElement(children, anchorProps)
       ) : (
         <a {...anchorProps} ref={ref}>

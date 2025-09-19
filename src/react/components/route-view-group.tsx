@@ -47,7 +47,7 @@ export const RouteViewGroup = observer(
     children,
     layout: Layout,
     otherwise: otherwiseNavigation,
-    // @ts-ignore
+    // @ts-expect-error
     params,
     ...navigateParams
   }: RouteViewGroupProps<TRoute>) => {
