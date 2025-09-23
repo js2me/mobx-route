@@ -26,7 +26,7 @@ import { Route } from "mobx-route";
 
 const userDetails = new Route("/users/:id");
 
-userDetails.open({ id: 1 }); // path params are required
+await userDetails.open({ id: 1 }); // path params are required
 
 userDetails.isOpened; // true;
 ```
