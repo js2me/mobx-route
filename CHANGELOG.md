@@ -1,5 +1,11 @@
 # mobx-route
 
+## 0.16.2
+
+### Patch Changes
+
+- [`988ca41`](https://github.com/js2me/mobx-route/commit/988ca41bd2aa2a4ae6efc9b7250ead77af9ac949) Thanks [@js2me](https://github.com/js2me)! - try to fix bad typings for view-model section (after using zshy)
+
 ## 0.16.1
 
 ### Patch Changes
