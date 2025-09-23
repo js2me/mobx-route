@@ -6,7 +6,7 @@ import type {
   AnyAbstractRouteEntity,
   AnyRoute,
   AnyVirtualRoute,
-} from '../../core/index.js';
+} from '../../index.js';
 
 export type RouteViewComponent<TRoute extends AnyAbstractRouteEntity> =
   React.ComponentType<RouteViewProps<TRoute>>;

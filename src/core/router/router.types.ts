@@ -1,5 +1,5 @@
 import type { History, IQueryParams } from 'mobx-location-history';
-import type { RouteNavigateParams } from '../route/route.types.js';
+import type { RouteNavigateParams } from '../route/index.js';
 import type { RoutesCollection } from '../route-group/index.js';
 import type { Router } from './router.js';
 

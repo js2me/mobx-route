@@ -13,7 +13,7 @@ import {
   type RouteParams,
   routeConfig,
   VirtualRoute,
-} from '../core/index.js';
+} from '../index.js';
 
 export abstract class RouteViewModel<
   TRoute extends AnyAbstractRouteEntity = AnyAbstractRouteEntity,

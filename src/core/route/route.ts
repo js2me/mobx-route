@@ -27,7 +27,7 @@ import type {
   MaybePromise,
 } from 'yummies/utils/types';
 
-import { routeConfig } from '../config/config.js';
+import { routeConfig } from '../config/index.js';
 
 import type {
   AnyRoute,

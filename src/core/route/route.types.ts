@@ -6,9 +6,9 @@ import type {
   Maybe,
   MaybePromise,
 } from 'yummies/utils/types';
-import type { RouteGlobalConfig } from '../config/config.types.js';
-import type { AnyAbstractRouteEntity } from '../route-group/route-group.types.js';
-import type { VirtualRoute } from '../virtual-route/virtual-route.js';
+import type { RouteGlobalConfig } from '../config/index.js';
+import type { AnyAbstractRouteEntity } from '../route-group/index.js';
+import type { VirtualRoute } from '../virtual-route/index.js';
 import type { Route } from './route.js';
 
 export type PreparedNavigationData<TParams extends AnyObject = AnyObject> = {

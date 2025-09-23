@@ -21,7 +21,7 @@ importers:
         specifier: ^4.0.7
         version: 4.1.0(mobx@6.13.7)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       mobx-view-model:
-        specifier: ^6.10.0 || ^7.0.0 || ^8.0.0
+        specifier: ^6.10.0 || ^7.0.0 || ^8.3.2
         version: 7.0.0(mobx-react-lite@4.1.0(mobx@6.13.7)(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(mobx@6.13.7)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       path-to-regexp:
         specifier: ^8.2.0
@@ -33,8 +33,8 @@ importers:
         specifier: ^2.3.8
         version: 2.3.9(react@19.1.1)
       yummies:
-        specifier: ^5.4.8
-        version: 5.4.8(mobx@6.13.7)(react@19.1.1)
+        specifier: ^5.4.9
+        version: 5.4.9(mobx@6.13.7)(react@19.1.1)
     devDependencies:
       '@biomejs/biome':
         specifier: 2.2.4
@@ -2734,8 +2734,8 @@ packages:
       mobx:
         optional: true
 
-  yummies@5.4.8:
-    resolution: {integrity: sha512-3rpVP1ECoB+vFJ5erXBBQV5Qy350/JC35HwywImxIv8gTwqz5/PfOc0r2Q5JlNlFXDfAso4eaugjUx1qJsPg4g==}
+  yummies@5.4.9:
+    resolution: {integrity: sha512-0S0HhOO1PxPiQSE22qwMkBzhBlojs07Phhshq3JsD1fWH8O5NgFsbzybnHhEdHVBLSt1PP1gZlEvuLzZbQtsMw==}
     peerDependencies:
       mobx: ^6.12.4
       react: ^18 || ^19
@@ -5412,7 +5412,7 @@ snapshots:
     optionalDependencies:
       mobx: 6.13.7
 
-  yummies@5.4.8(mobx@6.13.7)(react@19.1.1):
+  yummies@5.4.9(mobx@6.13.7)(react@19.1.1):
     dependencies:
       class-variance-authority: 0.7.1
       clsx: 2.1.1

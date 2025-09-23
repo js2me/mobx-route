@@ -5,7 +5,7 @@ import {
   type IQueryParams,
 } from 'mobx-location-history';
 
-import { routeConfig } from '../config/config.js';
+import { routeConfig } from '../config/index.js';
 import type { RoutesCollection } from '../route-group/index.js';
 
 import type {

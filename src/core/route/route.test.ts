@@ -1,7 +1,7 @@
 import { createBrowserHistory, type History } from 'mobx-location-history';
 import { beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 
-import { routeConfig } from '../config/config.js';
+import { routeConfig } from '../config/index.js';
 import { RouteGroup } from '../route-group/route-group.js';
 
 import { Route } from './route.js';

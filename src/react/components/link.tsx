@@ -16,7 +16,7 @@ import {
   type InputPathParams,
   type RouteNavigateParams,
   routeConfig,
-} from '../../core/index.js';
+} from '../../index.js';
 
 interface LinkAnchorProps
   extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {

@@ -1,5 +1,5 @@
 import type { History, IQueryParams } from 'mobx-location-history';
-import type { UrlCreateParamsFn } from '../route/route.types.js';
+import type { UrlCreateParamsFn } from '../route/index.js';
 
 export interface RouteGlobalConfig {
   history: History;

@@ -7,10 +7,10 @@ import type {
   MaybeFn,
   MaybePromise,
 } from 'yummies/utils/types';
-import type { RouteNavigateParams } from '../route/route.types.js';
+import type { RouteNavigateParams } from '../route/index.js';
 import type { VirtualRoute } from './virtual-route.js';
 
-export type AnyVirtualRoute = VirtualRoute<any>;
+export type AnyVirtualRoute = VirtualRoute<any> | AbstractVirtualRoute<any>;
 
 export interface VirtualOpenExtraParams
   extends Omit<RouteNavigateParams, 'state' | 'mergeQuery'> {}
@@ -20,6 +20,15 @@ export interface AbstractVirtualRoute<
 > {
   isOpened: boolean;
   params: TParams | null;
+
+  /**
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#open-params-extraparams-query-replace-promise-void)
+   */
+  open(
+    ...args: IsPartial<TParams> extends true
+      ? [params?: Maybe<TParams>, extraParams?: VirtualOpenExtraParams]
+      : [params: TParams, extraParams?: VirtualOpenExtraParams]
+  ): Promise<void>;
 }
 
 export interface VirtualRouteConfiguration<
