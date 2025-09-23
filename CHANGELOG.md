@@ -1,5 +1,11 @@
 # mobx-route
 
+## 0.16.1
+
+### Patch Changes
+
+- [`24ca151`](https://github.com/js2me/mobx-route/commit/24ca15126dbeeaf2a8176ed83cbe99b1cdc86628) Thanks [@js2me](https://github.com/js2me)! - fix zshy incorrect bundle
+
 ## 0.16.0
 
 ### Minor Changes
