@@ -1,5 +1,15 @@
 # mobx-route
 
+## 0.16.0
+
+### Minor Changes
+
+- [`0545391`](https://github.com/js2me/mobx-route/commit/0545391fcc780cb14ca27205ed4b17556fd33f27) Thanks [@js2me](https://github.com/js2me)! - refactor bundle using zshy
+
+### Patch Changes
+
+- [`63e341d`](https://github.com/js2me/mobx-route/commit/63e341d84ab7d9fe4f3a90349d7c13534ce190ca) Thanks [@js2me](https://github.com/js2me)! - update docs layout
+
 ## 0.15.0
 
 ### Minor Changes
