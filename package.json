@@ -9,8 +9,8 @@
     "check": "npm run lint:check && npm run ts:check",
     "prebuild": "npm run clean && npm run check",
     "build:watch": "pnpm build && nodemon --watch src --ext ts --exec \"pnpm build\"",
-    "build": "zshy",
-    "pub": "pnpm build && sborshik publish",
+    "build": "zshy && sborshik fill-dist",
+    "pub": "pnpm build && sborshik publish --openDistDir",
     "pub:patch": "PUBLISH_VERSION=patch pnpm pub",
     "pub:minor": "PUBLISH_VERSION=minor pnpm pub",
     "pub:major": "PUBLISH_VERSION=major pnpm pub",
@@ -88,7 +88,7 @@
     "@vitest/coverage-istanbul": "^3.1.2",
     "commitfmt": "^1.0.4",
     "js2me-biome-config": "^1.0.5",
-    "sborshik": "^1.0.6",
+    "sborshik": "^1.0.7",
     "jsdom": "^26.1.0",
     "lefthook": "^1.11.13",
     "nodemon": "^3.1.10",
@@ -97,29 +97,5 @@
     "vitest": "^3.1.2",
     "zshy": "^0.4.2"
   },
-  "packageManager": "pnpm@9.5.0+sha512.140036830124618d624a2187b50d04289d5a087f326c9edfc0ccd733d76c4f52c3a313d4fc148794a2a9d81553016004e6742e8cf850670268a7387fc220c903",
-  "files": [
-    "dist"
-  ],
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.cts",
-  "exports": {
-    "./package.json": "./package.json",
-    ".": {
-      "types": "./dist/index.d.cts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    },
-    "./react": {
-      "types": "./dist/react/index.d.cts",
-      "import": "./dist/react/index.js",
-      "require": "./dist/react/index.cjs"
-    },
-    "./view-model": {
-      "types": "./dist/view-model/index.d.cts",
-      "import": "./dist/view-model/index.js",
-      "require": "./dist/view-model/index.cjs"
-    }
-  }
+  "packageManager": "pnpm@9.5.0+sha512.140036830124618d624a2187b50d04289d5a087f326c9edfc0ccd733d76c4f52c3a313d4fc148794a2a9d81553016004e6742e8cf850670268a7387fc220c903"
 }

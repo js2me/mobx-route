@@ -82,8 +82,8 @@ importers:
         specifier: ^6.0.1
         version: 6.0.1
       sborshik:
-        specifier: ^1.0.6
-        version: 1.0.6(@types/node@20.19.10)
+        specifier: ^1.0.7
+        version: 1.0.7(@types/node@20.19.10)
       typescript:
         specifier: ^5.8.3
         version: 5.9.2
@@ -2251,8 +2251,8 @@ packages:
     resolution: {integrity: sha512-xAg7SOnEhrm5zI3puOOKyy1OMcMlIJZYNJY7xLBwSze0UjhPLnWfj2GF2EpT0jmzaJKIWKHLsaSSajf35bcYnA==}
     engines: {node: '>=v12.22.7'}
 
-  sborshik@1.0.6:
-    resolution: {integrity: sha512-ffXXf4GcgvaluV/qZ9d/vfCcfWnu7qmB7/MRZ5g/ew9CY9zF812I7xpJXHvmWvGBsBqvF42PQvS/ENP+DmiE5w==}
+  sborshik@1.0.7:
+    resolution: {integrity: sha512-NUr1tntInlJCwDtwM75s6jJM0TxAaQVeyTl1kwQ2lLU2LLdy4mchA7GwlyFum8u03Z+23CCAl+qsa1nbmh413Q==}
     hasBin: true
 
   scheduler@0.26.0:
@@ -4949,7 +4949,7 @@ snapshots:
     dependencies:
       xmlchars: 2.2.0
 
-  sborshik@1.0.6(@types/node@20.19.10):
+  sborshik@1.0.7(@types/node@20.19.10):
     dependencies:
       gh-release: 7.0.2(@types/node@20.19.10)
       simple-git: 3.27.0
