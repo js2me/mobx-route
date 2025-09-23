@@ -10,7 +10,7 @@
     "prebuild": "npm run clean && npm run check",
     "build:watch": "pnpm build && nodemon --watch src --ext ts --exec \"pnpm build\"",
     "build": "zshy",
-    "pub": "pnpm build && node node_modules/js2me-exports-post-build-script/scripts/publish",
+    "pub": "pnpm build && sborshik publish",
     "pub:patch": "PUBLISH_VERSION=patch pnpm pub",
     "pub:minor": "PUBLISH_VERSION=minor pnpm pub",
     "pub:major": "PUBLISH_VERSION=major pnpm pub",
@@ -34,7 +34,7 @@
   ],
   "author": "js2me",
   "license": "MIT",
-  "description": "simple and lightweight typed router",
+  "description": "Simple and lightweight typed router",
   "type": "module",
   "zshy": {
     "exports": {
@@ -57,7 +57,7 @@
     "mobx-location-history": "^8.1.1",
     "path-to-regexp": "^8.2.0",
     "react-simple-loadable": "^2.3.8",
-    "yummies": "^4.12.2"
+    "yummies": "^5.4.8"
   },
   "peerDependencies": {
     "mobx": "^6.12.4",
@@ -88,7 +88,7 @@
     "@vitest/coverage-istanbul": "^3.1.2",
     "commitfmt": "^1.0.4",
     "js2me-biome-config": "^1.0.5",
-    "js2me-exports-post-build-script": "^5.5.0",
+    "sborshik": "^1.0.6",
     "jsdom": "^26.1.0",
     "lefthook": "^1.11.13",
     "nodemon": "^3.1.10",
