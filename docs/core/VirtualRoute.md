@@ -109,7 +109,7 @@ console.log(route.meta?.memes); // true
 Custom implementation of open behaviour for this route.  
 It can be helpful if you need custom open/close behaviour  
 
-::: tip if not provided then will be used default implementation:
+::: tip Will be used default implementation if is not specified:
 :::
 
 ```ts
@@ -132,7 +132,7 @@ const route = new VirtualRoute({
 Custom implementation of close behaviour for this route  
 It can be helpful if you need custom open/close behaviour  
 
-::: tip if not provided then will be used default implementation:
+::: tip Will be used default implementation if is not specified:
 :::
 
 ```ts
