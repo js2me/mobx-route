@@ -11,12 +11,7 @@ import {
 } from 'mobx';
 import type { IQueryParams } from 'mobx-location-history';
 import { callFunction } from 'yummies/common';
-import type {
-  AnyObject,
-  EmptyObject,
-  IsPartial,
-  Maybe,
-} from 'yummies/utils/types';
+import type { AnyObject, EmptyObject, IsPartial, Maybe } from 'yummies/types';
 
 import { routeConfig } from '../config/index.js';
 

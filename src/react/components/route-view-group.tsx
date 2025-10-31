@@ -1,7 +1,7 @@
 import { buildSearchString } from 'mobx-location-history';
 import { observer } from 'mobx-react-lite';
 import { isValidElement, useEffect } from 'react';
-import type { IsPartial, Maybe } from 'yummies/utils/types';
+import type { IsPartial, Maybe } from 'yummies/types';
 import { isRouteEntity } from '../../core/utils/is-route-entity.js';
 import {
   type AnyRouteEntity,

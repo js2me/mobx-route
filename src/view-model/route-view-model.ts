@@ -5,7 +5,7 @@ import {
   ViewModelBase,
   type ViewModelParams,
 } from 'mobx-view-model';
-import type { EmptyObject } from 'yummies/utils/types';
+import type { EmptyObject } from 'yummies/types';
 
 import {
   type AnyAbstractRouteEntity,

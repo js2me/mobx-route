@@ -20,12 +20,7 @@ import {
   parse,
   type TokenData,
 } from 'path-to-regexp';
-import type {
-  AnyObject,
-  IsPartial,
-  Maybe,
-  MaybePromise,
-} from 'yummies/utils/types';
+import type { AnyObject, IsPartial, Maybe, MaybePromise } from 'yummies/types';
 
 import { routeConfig } from '../config/index.js';
 

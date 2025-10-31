@@ -10,7 +10,7 @@ import {
   useRef,
 } from 'react';
 import { isShallowEqual } from 'yummies/data';
-import type { IsPartial } from 'yummies/utils/types';
+import type { IsPartial } from 'yummies/types';
 import {
   type AnyRoute,
   type InputPathParams,

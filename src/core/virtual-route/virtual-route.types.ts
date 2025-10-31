@@ -6,7 +6,7 @@ import type {
   Maybe,
   MaybeFn,
   MaybePromise,
-} from 'yummies/utils/types';
+} from 'yummies/types';
 import type { RouteNavigateParams } from '../route/index.js';
 import type { VirtualRoute } from './virtual-route.js';
 

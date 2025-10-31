@@ -1,11 +1,6 @@
 import type { RawQueryParamsData } from 'mobx-location-history';
 import type { ParseOptions } from 'path-to-regexp';
-import type {
-  AnyObject,
-  IsPartial,
-  Maybe,
-  MaybePromise,
-} from 'yummies/utils/types';
+import type { AnyObject, IsPartial, Maybe, MaybePromise } from 'yummies/types';
 import type { RouteGlobalConfig } from '../config/index.js';
 import type { AnyAbstractRouteEntity } from '../route-group/index.js';
 import type { VirtualRoute } from '../virtual-route/index.js';

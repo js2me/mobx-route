@@ -57,7 +57,7 @@
     "mobx-location-history": "^8.1.1",
     "path-to-regexp": "^8.2.0",
     "react-simple-loadable": "^2.3.8",
-    "yummies": "^5.4.9"
+    "yummies": "^6.0.0"
   },
   "peerDependencies": {
     "mobx": "^6.12.4",
