@@ -10,7 +10,6 @@ import { createGlobalDynamicConfig } from 'yummies/complex';
 import type { RouteGlobalConfig } from './config.types.js';
 
 let localHistory: History | undefined;
-let localQueryParams: IQueryParams | undefined;
 
 export const routeConfig = createGlobalDynamicConfig<RouteGlobalConfig>(
   (update) => {
@@ -29,18 +28,12 @@ export const routeConfig = createGlobalDynamicConfig<RouteGlobalConfig>(
     let queryParams: IQueryParams;
 
     if (update?.history && !update.queryParams) {
-      if (localQueryParams) {
-        localQueryParams.destroy();
-      }
-      queryParams = localQueryParams = new QueryParams({ history });
+      queryParams = new QueryParams({ history });
     } else {
-      if (localQueryParams && update?.queryParams) {
-        localQueryParams.destroy();
-      }
       if (update?.queryParams) {
         queryParams = update.queryParams;
       } else {
-        queryParams = localQueryParams = new QueryParams({ history });
+        queryParams = new QueryParams({ history });
       }
     }
 

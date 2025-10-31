@@ -15,8 +15,8 @@ importers:
         specifier: ^6.12.4
         version: 6.13.7
       mobx-location-history:
-        specifier: ^9.1.0
-        version: 9.1.0(mobx@6.13.7)(react@19.1.1)
+        specifier: ^9.1.1
+        version: 9.1.1(mobx@6.13.7)(react@19.1.1)
       mobx-react-lite:
         specifier: ^4.0.7
         version: 4.1.0(mobx@6.13.7)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
@@ -1936,8 +1936,8 @@ packages:
     resolution: {integrity: sha512-qOOzS1cBTWYF4BH8fVePDBOO9iptMnGUEZwNc/cMWnTV2nVLZ7VoNWEPHkYczZA0pdoA7dl6e7FL659nX9S2aw==}
     engines: {node: '>=16 || 14 >=14.17'}
 
-  mobx-location-history@9.1.0:
-    resolution: {integrity: sha512-Yvof/QpAYtQw4c/VZiS09KS54oQjOiWvPM84LR8fVex/2YzoJOLZUF8Vx2CwH3OVTqa1Yupj3T5mzPOt0CupWA==}
+  mobx-location-history@9.1.1:
+    resolution: {integrity: sha512-7VGt6SeYy+Rn0WoqkNKV92HEQ8fq0BDHNKoefg1HGS1rcqJWyhfMiQqf6G89bqJKA88KAMQRgHUE69xbm74aBg==}
     peerDependencies:
       mobx: ^6.13.3
 
@@ -4709,7 +4709,7 @@ snapshots:
 
   minipass@7.1.2: {}
 
-  mobx-location-history@9.1.0(mobx@6.13.7)(react@19.1.1):
+  mobx-location-history@9.1.1(mobx@6.13.7)(react@19.1.1):
     dependencies:
       '@types/qs': 6.14.0
       history: 5.3.0
