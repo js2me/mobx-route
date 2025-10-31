@@ -1,5 +1,11 @@
 # mobx-route
 
+## 0.17.0
+
+### Minor Changes
+
+- [`0d99dfb`](https://github.com/js2me/mobx-route/commit/0d99dfb2edff76f61ea04b1e7e4bf8c7a18e77b9) Thanks [@js2me](https://github.com/js2me)! - [internal] migration to yummies 6.x
+
 ## 0.16.2
 
 ### Patch Changes
