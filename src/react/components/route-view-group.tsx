@@ -1,14 +1,14 @@
-import { buildSearchString } from 'mobx-location-history';
 import { observer } from 'mobx-react-lite';
-import { isValidElement, useEffect } from 'react';
-import type { IsPartial, Maybe } from 'yummies/types';
-import { isRouteEntity } from '../../core/utils/is-route-entity.js';
 import {
   type AnyRouteEntity,
+  buildSearchString,
+  isRouteEntity,
   type RouteNavigateParams,
   type RouteParams,
   routeConfig,
-} from '../../index.js';
+} from 'mobx-route';
+import { isValidElement, useEffect } from 'react';
+import type { IsPartial, Maybe } from 'yummies/types';
 
 type LayoutComponent =
   | React.ComponentType<{ children?: React.ReactNode }>

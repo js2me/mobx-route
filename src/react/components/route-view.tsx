@@ -1,12 +1,11 @@
 import { observer } from 'mobx-react-lite';
-import { useRef } from 'react';
-import { type LoadableConfig, loadable } from 'react-simple-loadable';
-
 import type {
   AnyAbstractRouteEntity,
   AnyRoute,
   AnyVirtualRoute,
-} from '../../index.js';
+} from 'mobx-route';
+import { useRef } from 'react';
+import { type LoadableConfig, loadable } from 'react-simple-loadable';
 
 export type RouteViewComponent<TRoute extends AnyAbstractRouteEntity> =
   React.ComponentType<RouteViewProps<TRoute>>;

@@ -1,5 +1,12 @@
-import { buildSearchString, parseSearchString } from 'mobx-location-history';
 import { observer } from 'mobx-react-lite';
+import {
+  type AnyRoute,
+  buildSearchString,
+  type InputPathParams,
+  parseSearchString,
+  type RouteNavigateParams,
+  routeConfig,
+} from 'mobx-route';
 import {
   type AnchorHTMLAttributes,
   cloneElement,
@@ -11,12 +18,6 @@ import {
 } from 'react';
 import { isShallowEqual } from 'yummies/data';
 import type { IsPartial } from 'yummies/types';
-import {
-  type AnyRoute,
-  type InputPathParams,
-  type RouteNavigateParams,
-  routeConfig,
-} from '../../index.js';
 
 interface LinkAnchorProps
   extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {

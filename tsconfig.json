@@ -21,7 +21,12 @@
       "./node_modules/@types/", "./types", "./node_modules"
     ],
     "noEmit": false,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+		"paths": {
+      "mobx-route": ["./src/index.ts"],
+			"mobx-route/react": ["./src/react/index.ts"],
+			"mobx-route/view-model": ["./src/view-model/index.ts"]
+    }
   },
   "include": [
     "src"
