@@ -1,5 +1,15 @@
 # mobx-route
 
+## 0.19.0
+
+### Minor Changes
+
+- [`a233d78`](https://github.com/js2me/mobx-route/commit/a233d78e80ca4679229bd6710c6b1730bf281b25) Thanks [@js2me](https://github.com/js2me)! - added `unmount()` method call for `RouteViewModel` when route will be closed
+
+### Patch Changes
+
+- [`2ff886d`](https://github.com/js2me/mobx-route/commit/2ff886d93d4cb745be5f03d41ff0f0d32909e065) Thanks [@js2me](https://github.com/js2me)! - [internal] build modification
+
 ## 0.18.0
 
 ### Minor Changes
