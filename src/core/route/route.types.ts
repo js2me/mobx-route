@@ -1,5 +1,5 @@
 import type { RawQueryParamsData } from 'mobx-location-history';
-import type { ParseOptions } from 'path-to-regexp';
+import type { MatchOptions, ParseOptions } from 'path-to-regexp';
 import type { AnyObject, IsPartial, Maybe, MaybePromise } from 'yummies/types';
 import type { RouteGlobalConfig } from '../config/index.js';
 import type { AnyAbstractRouteEntity } from '../route-group/index.js';
@@ -68,6 +68,7 @@ export interface RouteConfiguration<
    */
   meta?: AnyObject;
   parseOptions?: ParseOptions;
+  matchOptions?: MatchOptions & ParseOptions;
   parent?: TParentRoute;
   children?: AnyRoute[];
   /**

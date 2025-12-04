@@ -160,7 +160,10 @@ export class Route<
       return { params: {} as any, path: pathnameToCheck };
     }
 
-    this._matcher ??= match(this.tokenData);
+    this._matcher ??= match(this.tokenData, {
+      end: false,
+      ...this.config.matchOptions,
+    });
     const parsed = this._matcher(pathnameToCheck);
 
     if (parsed === false) {

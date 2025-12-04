@@ -226,8 +226,8 @@ describe('route', () => {
     expect(routeB.hasOpenedChildren).toBe(true);
     expect(routeC.hasOpenedChildren).toBe(false);
 
-    expect(routeA.isOpened).toBe(false);
-    expect(routeB.isOpened).toBe(false);
+    expect(routeA.isOpened).toBe(true);
+    expect(routeB.isOpened).toBe(true);
     expect(routeC.isOpened).toBe(true);
   });
 
@@ -338,5 +338,15 @@ describe('route', () => {
     });
 
     history.clearMocks();
+  });
+
+  it('nested path routes', async () => {
+    const route = new Route('/foo');
+    const route2 = route.extend('/bar');
+
+    await route2.open();
+
+    expect(route2.isOpened).toBe(true);
+    expect(route.isOpened).toBe(true);
   });
 });

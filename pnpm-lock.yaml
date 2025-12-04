@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       linked-abort-controller:
-        specifier: ^1.1.0
+        specifier: ^1.1.1
         version: 1.1.1
       mobx:
         specifier: ^6.12.4
@@ -24,17 +24,17 @@ importers:
         specifier: ^6.10.0 || ^7.0.0 || ^8.3.2
         version: 7.0.0(mobx-react-lite@4.1.0(mobx@6.13.7)(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(mobx@6.13.7)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       path-to-regexp:
-        specifier: ^8.2.0
-        version: 8.2.0
+        specifier: ^8.3.0
+        version: 8.3.0
       react:
         specifier: ^18.0.0 || ^19.0.0
         version: 19.1.1
       react-simple-loadable:
-        specifier: ^2.3.8
-        version: 2.3.9(react@19.1.1)
+        specifier: ^3.0.0
+        version: 3.0.0(react@19.1.1)
       yummies:
-        specifier: ^6.0.0
-        version: 6.0.0(mobx@6.13.7)(react@19.1.1)
+        specifier: ^6.6.0
+        version: 6.6.0(mobx@6.13.7)(react@19.1.1)
     devDependencies:
       '@biomejs/biome':
         specifier: 2.2.4
@@ -67,8 +67,8 @@ importers:
         specifier: ^1.0.4
         version: 1.0.4
       js2me-biome-config:
-        specifier: ^1.0.7
-        version: 1.0.7
+        specifier: ^1.0.8
+        version: 1.0.8
       jsdom:
         specifier: ^26.1.0
         version: 26.1.0
@@ -82,8 +82,8 @@ importers:
         specifier: ^6.0.1
         version: 6.0.1
       sborshik:
-        specifier: ^1.9.7
-        version: 1.9.7(@algolia/client-search@5.42.0)(@types/debug@4.1.12)(@types/react@19.1.10)(jiti@2.6.1)(postcss@8.5.6)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(search-insights@2.17.3)(typescript@5.9.2)
+        specifier: ^1.9.12
+        version: 1.9.12(@algolia/client-search@5.42.0)(@types/debug@4.1.12)(@types/react@19.1.10)(jiti@2.6.1)(postcss@8.5.6)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(search-insights@2.17.3)(typescript@5.9.2)
       typescript:
         specifier: ^5.8.3
         version: 5.9.2
@@ -2749,8 +2749,8 @@ packages:
     resolution: {integrity: sha512-okMH7OXXJ7YrN9Ok3/SXrnu4iX9yOk+25nqX4imS2npuvTYDmo/QEZoqwZkYaIDk3jVvBOTOIEgEhaLOynBS9g==}
     hasBin: true
 
-  js2me-biome-config@1.0.7:
-    resolution: {integrity: sha512-XAfyJa6+a/7C/vsSy+02fxMbOMmFmZUem8jt9MVC4na6YS/zSLt7aU9O3qxhQ12sgPd82TMc0wNwHMPtKvNlNg==}
+  js2me-biome-config@1.0.8:
+    resolution: {integrity: sha512-6tMh5dqVhDvAHblURsDqyejDaDS/N0zFn3OrLDYudF3xKpX3QMkaIGy1RCOLDFxjRCYU0tLb6LI5CbXS0Oh9Ow==}
 
   jsdom@26.1.0:
     resolution: {integrity: sha512-Cvc9WUhxSMEo4McES3P7oK3QaXldCfNWp7pl2NNeiIFlCoLr3kfq9kb1fxftiwk1FLV7CvpvDfonxtzUDeSOPg==}
@@ -3307,10 +3307,6 @@ packages:
     resolution: {integrity: sha512-ypGJsmGtdXUOeM5u93TyeIEfEhM6s+ljAhrk5vAvSx8uyY/02OvrZnA0YNGUrPXfpJMgI1ODd3nwz8Npx4O4cg==}
     engines: {node: 20 || >=22}
 
-  path-to-regexp@8.2.0:
-    resolution: {integrity: sha512-TdrF7fW9Rphjq4RjrW0Kp2AW0Ahwu9sRGTkS6bvDi0SCwZlEZYmcfDbEsTz8RVk0EHIS/Vd1bv3JhG+1xZuAyQ==}
-    engines: {node: '>=16'}
-
   path-to-regexp@8.3.0:
     resolution: {integrity: sha512-7jdwVIRtsP8MYpdXSwOS0YdD0Du+qOoF/AEPIt88PcCFrZCzx41oxku1jD88hZBwbNUIEfpqvuhjFaMAqMTWnA==}
 
@@ -3430,6 +3426,11 @@ packages:
 
   react-simple-loadable@2.3.9:
     resolution: {integrity: sha512-XEVV0N64wNct7XZgUIoXHWpkp8en36APdlJatAA+I3i9JeFHDxf0w/Y0zVeE8hoWBvYez/Y8Hulem16SkmRalg==}
+    peerDependencies:
+      react: ^18.0.0 || ^19.0.0
+
+  react-simple-loadable@3.0.0:
+    resolution: {integrity: sha512-NbEsqBx48KoVrCpl97PLvlVE1cST9ZPdMPqLiGoV1qvteoYzgsdEq6NTLpoWHi/HW4oBsrKIj/uUZEE4Mfr9fg==}
     peerDependencies:
       react: ^18.0.0 || ^19.0.0
 
@@ -3571,8 +3572,8 @@ packages:
     resolution: {integrity: sha512-xAg7SOnEhrm5zI3puOOKyy1OMcMlIJZYNJY7xLBwSze0UjhPLnWfj2GF2EpT0jmzaJKIWKHLsaSSajf35bcYnA==}
     engines: {node: '>=v12.22.7'}
 
-  sborshik@1.9.7:
-    resolution: {integrity: sha512-EJHos26jEzmK3LT4qwk9w6VM9xpN9whVU1qQd25KDB12psDsYLztVaeuZRtRGLCnB0Timaah5o9+g/U11upG1A==}
+  sborshik@1.9.12:
+    resolution: {integrity: sha512-Ek8+G9DK3BMDuTQ44ZnVRfeZB9Xd9/nNppfxOJ2zhJAMVy+gyh5RF8XFLR6WtirlnAPDZqPdOC0NEeRODvqm/A==}
     hasBin: true
 
   scheduler@0.26.0:
@@ -4300,8 +4301,8 @@ packages:
       mobx:
         optional: true
 
-  yummies@6.0.0:
-    resolution: {integrity: sha512-Cz3eui7Inq2CvQPWaHRHYIyT0yc9R6ZeYaZrjsAkUJYSD5YTIEoWI9o1DjBXOHytpLb0EYzp3rK6RFqF1A9EBQ==}
+  yummies@6.6.0:
+    resolution: {integrity: sha512-+x7cftRVC6m72VYWGvjbB/hmo668tnY4rTGus7KAUTQIHcAoPXIqH4OvKJNQJtqFo05x6cn85pDteEqTly7jig==}
     peerDependencies:
       mobx: ^6.12.4
       react: ^18 || ^19
@@ -7104,7 +7105,7 @@ snapshots:
       argparse: 1.0.10
       esprima: 4.0.1
 
-  js2me-biome-config@1.0.7: {}
+  js2me-biome-config@1.0.8: {}
 
   jsdom@26.1.0:
     dependencies:
@@ -7594,7 +7595,7 @@ snapshots:
       linked-abort-controller: 1.1.1
       mobx: 6.13.7
       qs: 6.14.0
-      yummies: 6.0.0(mobx@6.13.7)(react@19.1.1)
+      yummies: 6.6.0(mobx@6.13.7)(react@19.1.1)
     transitivePeerDependencies:
       - react
 
@@ -7775,8 +7776,6 @@ snapshots:
       lru-cache: 11.1.0
       minipass: 7.1.2
 
-  path-to-regexp@8.2.0: {}
-
   path-to-regexp@8.3.0: {}
 
   path-type@4.0.0: {}
@@ -7882,6 +7881,10 @@ snapshots:
   react-is@17.0.2: {}
 
   react-simple-loadable@2.3.9(react@19.1.1):
+    dependencies:
+      react: 19.1.1
+
+  react-simple-loadable@3.0.0(react@19.1.1):
     dependencies:
       react: 19.1.1
 
@@ -8089,7 +8092,7 @@ snapshots:
     dependencies:
       xmlchars: 2.2.0
 
-  sborshik@1.9.7(@algolia/client-search@5.42.0)(@types/debug@4.1.12)(@types/react@19.1.10)(jiti@2.6.1)(postcss@8.5.6)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(search-insights@2.17.3)(typescript@5.9.2):
+  sborshik@1.9.12(@algolia/client-search@5.42.0)(@types/debug@4.1.12)(@types/react@19.1.10)(jiti@2.6.1)(postcss@8.5.6)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(search-insights@2.17.3)(typescript@5.9.2):
     dependencies:
       '@iconify-json/logos': 1.2.10
       '@types/jsdom': 27.0.0
@@ -9017,7 +9020,7 @@ snapshots:
     optionalDependencies:
       mobx: 6.13.7
 
-  yummies@6.0.0(mobx@6.13.7)(react@19.1.1):
+  yummies@6.6.0(mobx@6.13.7)(react@19.1.1):
     dependencies:
       class-variance-authority: 0.7.1
       clsx: 2.1.1

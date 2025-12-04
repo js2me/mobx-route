@@ -45,11 +45,11 @@
     "url": "git://github.com/js2me/mobx-route"
   },
   "dependencies": {
-    "linked-abort-controller": "^1.1.0",
+    "linked-abort-controller": "^1.1.1",
     "mobx-location-history": "^9.1.1",
-    "path-to-regexp": "^8.2.0",
-    "react-simple-loadable": "^2.3.8",
-    "yummies": "^6.0.0"
+    "path-to-regexp": "^8.3.0",
+    "react-simple-loadable": "^3.0.0",
+    "yummies": "^6.6.0"
   },
   "peerDependencies": {
     "mobx": "^6.12.4",
@@ -79,12 +79,12 @@
     "@vitejs/plugin-react-swc": "^3.9.0",
     "@vitest/coverage-istanbul": "^3.1.2",
     "commitfmt": "^1.0.4",
-    "js2me-biome-config": "^1.0.7",
+    "js2me-biome-config": "^1.0.8",
     "jsdom": "^26.1.0",
     "lefthook": "^1.11.13",
     "nodemon": "^3.1.10",
     "rimraf": "^6.0.1",
-    "sborshik": "^1.9.7",
+    "sborshik": "^1.9.12",
     "typescript": "^5.8.3",
     "vite": "^7.1.12",
     "vitest": "^3.1.2"
