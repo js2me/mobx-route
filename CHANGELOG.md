@@ -1,5 +1,13 @@
 # mobx-route
 
+## 0.20.0
+
+### Minor Changes
+
+- [`413223f`](https://github.com/js2me/mobx-route/commit/413223f4160530a8b9ecb80cd06f019701fdaf9c) Thanks [@js2me](https://github.com/js2me)! - added `exact` option for path routes
+
+- [`397e1f8`](https://github.com/js2me/mobx-route/commit/397e1f8f4ae459c0dff4412e850a9b83265f0241) Thanks [@js2me](https://github.com/js2me)! - rewrite logic for `beforeOpen` hook for Route
+
 ## 0.19.0
 
 ### Minor Changes
