@@ -19,16 +19,15 @@ new Route( // class form
 
 ### Basic example
 
-```ts
+```ts{7-9}
 const users = createRoute('/users');
-users.open();
-
 const userDetails = users.extend('/:userId');
-userDetails.open({ userId: 1 });
-
 const userPhotos = userDetails.extend('/photos');
-userPhotos.open({ userId: 1 });
 
+await userPhotos.open({ userId: 1 });
+
+users.isOpened; // true
+userDetails.isOpened; // true
 userPhotos.isOpened; // true;
 location.pathname; // /users/1/photos
 ```
@@ -102,7 +101,7 @@ Useful with groupping routes using [`RouteGroup`](/core/RouteGroup)
 Indicates if this route is an hash based route.  
 Hash based routes work with only `#hashstrings` in browser address URL. This is useful when you want to create routes that only affect the hash part of the URL, such as for client-side routing or for creating routes that don't affect the server-side routing.  
 
-### `isOpened: boolean` <Badge type="tip" text="computed.struct" />   
+### `isOpened: boolean` <Badge type="tip" text="computed" />   
 
 Defines the "open" state for this route.   
 Returns true when current URL matches this route's path pattern.
@@ -136,7 +135,7 @@ const routeB = routeA.extend('/b');
 routeB.parent === routeA; // true
 ```
 
-### `currentPath: ParsedPathName | null` <Badge type="tip" text="computed.struct" />   
+### `currentPath: ParsedPathName | null` <Badge type="tip" text="computed" />   
 Matched path segment for current URL. `null` if route isn't open.  
 
 Example:  
@@ -146,7 +145,7 @@ location.href = '/foo/bar/1234';
 routeA.currentPath; // '/foo/bar/1234'
 ```
 
-### `hasOpenedChildren: boolean` <Badge type="tip" text="computed.struct" />   
+### `hasOpenedChildren: boolean` <Badge type="tip" text="computed" />   
 `true` when any child route is currently opened.  
 
 Example:   
@@ -219,6 +218,38 @@ const route = createRoute('/fruits/apples', {
 
 console.log(route.meta?.memes); // true
 ```
+
+### `exact`   
+This property changes the route matching behavior to match only exact pathname provided as the first parameter.   
+This can be useful when building nested routes and you need to display sub routes within a certain parent route.
+
+Default: `false`  
+
+Examples:   
+
+_`exact` is `false`_
+```ts
+const projectsRoute = createRoute('/projects', { exact: false });
+history.push('/projects/123');
+projectsRoute.isOpened; // true
+```
+
+_`exact` is `true`_
+```ts
+const projectsRoute = createRoute('/projects', { exact: true });
+history.push('/projects/123');
+projectsRoute.isOpened; // false
+```
+
+```ts
+const projectsRoute = createRoute('/projects');
+const projectRoute = createRoute('/projects/:projectId');
+
+history.push('/projects/123');
+projectsRoute.isOpened; // true
+projectRoute.isOpened; // true
+```
+
 
 ### `params()`   
 A function that can be needed when it is necessary to cast parsed path parameters from route to a certain type.   

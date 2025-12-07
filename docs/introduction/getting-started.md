@@ -33,7 +33,7 @@ const route = createRoute('/foo/bar/:baz');
 ...
 <RouteView route={route} view={() => <div>Hello!</div>} />
 ...
-<Link route={route} params={{ baz: 1 }} />
+<Link to={route} params={{ baz: 1 }} />
 ```
 
 ## Writing first routes
@@ -66,7 +66,7 @@ import { RouteView, Link } from "mobx-route/react";
 const AllUsersPage = () => {
   return (
     <div>
-      <Link route={routes.userDetails} params={{ userId: 1 }}>
+      <Link to={routes.userDetails} params={{ userId: 1 }}>
         Open user with id 1
       </Link>
     </div>
