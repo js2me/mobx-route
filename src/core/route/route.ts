@@ -4,9 +4,8 @@ import {
   computed,
   makeObservable,
   observable,
-  onBecomeObserved,
-  onBecomeUnobserved,
   reaction,
+  runInAction,
 } from 'mobx';
 import {
   buildSearchString,
@@ -20,19 +19,16 @@ import {
   parse,
   type TokenData,
 } from 'path-to-regexp';
-import type { AnyObject, IsPartial, Maybe, MaybePromise } from 'yummies/types';
-
+import type { AnyObject, IsPartial, Maybe } from 'yummies/types';
 import { routeConfig } from '../config/index.js';
-
 import type {
   AnyRoute,
-  BeforeOpenFeedback,
   CreatedUrlOutputParams,
   InputPathParams,
   IRoute,
+  NavigationTrx,
   ParsedPathData,
   ParsedPathParams,
-  PreparedNavigationData,
   RouteConfiguration,
   RouteNavigateParams,
   UrlCreateParams,
@@ -59,7 +55,13 @@ export class Route<
   private _tokenData: TokenData | undefined;
   private _matcher?: ReturnType<typeof match>;
   private _compiler?: ReturnType<typeof compile>;
-  private reactionDisposer: Maybe<VoidFunction>;
+
+  protected status:
+    | 'opening'
+    | 'closed'
+    | 'open-rejected'
+    | 'open-confirmed'
+    | 'unknown';
 
   meta?: AnyObject;
 
@@ -94,40 +96,31 @@ export class Route<
     this.isIndex = !!this.config.index;
     this.isHash = !!this.config.hash;
     this.meta = this.config.meta;
+    this.status = 'unknown';
     this.parent = config.parent ?? (null as unknown as TParentRoute);
 
-    computed.struct(this, 'isOpened');
+    computed(this, 'isPathMatched');
+    computed(this, 'isOpened');
     computed.struct(this, 'data');
     computed.struct(this, 'params');
-    computed.struct(this, 'currentPath');
-    computed.struct(this, 'hasOpenedChildren');
-    computed.struct(this, 'isAbleToMergeQuery');
+    computed(this, 'currentPath');
+    computed(this, 'hasOpenedChildren');
+    computed(this, 'isAbleToMergeQuery');
     computed(this, 'baseUrl');
 
     observable(this, 'children');
     observable.ref(this, 'parent');
+    observable.ref(this, 'status');
     action(this, 'addChildren');
+    action(this, 'confirmOpening');
+    action(this, 'confirmClosing');
     action(this, 'removeChildren');
 
     makeObservable(this);
 
-    onBecomeObserved(this, 'isOpened', () => {
-      if (!config.afterOpen && !config.afterClose) {
-        return;
-      }
-
-      this.reactionDisposer = reaction(
-        () => this.isOpened,
-        this.processOpenedState,
-        {
-          signal: this.abortController.signal,
-          fireImmediately: true,
-        },
-      );
-    });
-    onBecomeUnobserved(this, 'isOpened', () => {
-      this.reactionDisposer?.();
-      this.reactionDisposer = undefined;
+    reaction(() => this.isPathMatched, this.processPathMatched, {
+      signal: this.abortController.signal,
+      fireImmediately: true,
     });
   }
 
@@ -210,18 +203,26 @@ export class Route<
     return params;
   }
 
+  protected get isPathMatched() {
+    return this.parsedPathData !== null;
+  }
+
   /**
    * Defines the "open" state for this route.
    *
    * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#isopened-boolean)
    */
   get isOpened() {
-    if (this.params === null || this.parsedPathData === null) {
+    if (
+      !this.isPathMatched ||
+      this.params === null ||
+      this.status !== 'open-confirmed'
+    ) {
       return false;
     }
 
     return (
-      !this.config.checkOpened || this.config.checkOpened(this.parsedPathData)
+      !this.config.checkOpened || this.config.checkOpened(this.parsedPathData!)
     );
   }
 
@@ -338,9 +339,7 @@ export class Route<
 
     const path = this._compiler(this.processParams(urlCreateParams.params));
 
-    const url = [urlCreateParams.baseUrl, this.isHash ? '#' : '', path].join(
-      '',
-    );
+    const url = `${urlCreateParams.baseUrl || ''}${this.isHash ? '#' : ''}${path}`;
 
     if (outputParams?.omitQuery) {
       return url;
@@ -411,7 +410,7 @@ export class Route<
 
     const state = rawState ?? null;
 
-    const navigationData: PreparedNavigationData<TInputParams> = {
+    const trx: NavigationTrx<TInputParams> = {
       url,
       params: params as TInputParams,
       replace,
@@ -419,43 +418,17 @@ export class Route<
       query,
     };
 
-    const feedback = await this.beforeOpen(navigationData);
+    const isConfirmed = await this.confirmOpening(trx);
 
-    if (feedback === false) {
+    if (!isConfirmed) {
       return;
     }
 
-    if (typeof feedback === 'object') {
-      Object.assign(navigationData, feedback);
-    }
-
-    if (replace) {
-      this.history.replace(url, state);
+    if (trx.replace) {
+      this.history.replace(trx.url, trx.state);
     } else {
-      this.history.push(url, state);
+      this.history.push(trx.url, trx.state);
     }
-
-    if (!this.reactionDisposer && this.isOpened) {
-      this.config.afterOpen?.(this.parsedPathData!, this);
-    }
-  }
-
-  protected beforeOpen(
-    openData: PreparedNavigationData<TInputParams>,
-  ): MaybePromise<BeforeOpenFeedback> {
-    if (this.config.beforeOpen) {
-      return this.config.beforeOpen(openData);
-    }
-
-    return true;
-  }
-
-  protected afterClose() {
-    if (this.config.afterClose) {
-      return this.config.afterClose();
-    }
-
-    return true;
   }
 
   protected get tokenData() {
@@ -465,20 +438,69 @@ export class Route<
     return this._tokenData;
   }
 
-  private firstOpenedStateCheck = true;
-  private processOpenedState = (isOpened: boolean) => {
-    if (this.firstOpenedStateCheck) {
-      this.firstOpenedStateCheck = false;
+  protected async confirmOpening(trx: NavigationTrx<TInputParams>) {
+    this.status = 'opening';
+
+    if (this.config.beforeOpen) {
+      const feedback = await this.config.beforeOpen(trx);
+
+      if (feedback === false) {
+        runInAction(() => {
+          this.status = 'open-rejected';
+        });
+        return false;
+      }
+
+      if (typeof feedback === 'object') {
+        Object.assign(trx, feedback);
+      }
+    }
+
+    runInAction(() => {
+      this.status = 'open-confirmed';
+    });
+
+    return true;
+  }
+
+  protected confirmClosing() {
+    this.status = 'closed';
+    return true;
+  }
+
+  private firstPathMatchingRun = true;
+
+  private processPathMatched = async (isPathMathched: boolean) => {
+    if (this.firstPathMatchingRun) {
+      this.firstPathMatchingRun = false;
       // ignore first 'afterClose' callback call
-      if (!isOpened) {
+      if (!isPathMathched) {
         return;
       }
     }
 
-    if (isOpened) {
+    if (isPathMathched) {
+      const navigationData: NavigationTrx<TInputParams> = {
+        url: this.parsedPathData!.path,
+        params: this.parsedPathData!.params as TInputParams,
+        state: this.history.location.state,
+        query: this.query.data,
+      };
+
+      const isConfirmed = await this.confirmOpening(navigationData);
+
+      if (!isConfirmed) {
+        return;
+      }
+
       this.config.afterOpen?.(this.parsedPathData!, this);
+      return;
     } else {
-      this.config.afterClose?.();
+      const isConfirmed = this.confirmClosing();
+
+      if (isConfirmed) {
+        this.config.afterClose?.();
+      }
     }
   };
 

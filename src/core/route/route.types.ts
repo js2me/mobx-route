@@ -6,7 +6,7 @@ import type { AnyAbstractRouteEntity } from '../route-group/index.js';
 import type { VirtualRoute } from '../virtual-route/index.js';
 import type { Route } from './route.js';
 
-export type PreparedNavigationData<TParams extends AnyObject = AnyObject> = {
+export type NavigationTrx<TParams extends AnyObject = AnyObject> = {
   state?: any;
 
   /**
@@ -29,11 +29,7 @@ export type PreparedNavigationData<TParams extends AnyObject = AnyObject> = {
 export type BeforeOpenFeedback =
   | void
   | boolean
-  | {
-      url: string;
-      state?: any;
-      replace?: boolean;
-    };
+  | Pick<NavigationTrx, 'url' | 'state' | 'replace'>;
 
 export interface UrlCreateParams<TInputParams> {
   baseUrl?: string | undefined;
@@ -86,7 +82,7 @@ export interface RouteConfiguration<
    * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#beforeopen)
    */
   beforeOpen?: (
-    preparedNavigationData: PreparedNavigationData<NoInfer<TInputParams>>,
+    navigationTransaction: NavigationTrx<NoInfer<TInputParams>>,
   ) => MaybePromise<BeforeOpenFeedback>;
   /**
    * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#afterclose)

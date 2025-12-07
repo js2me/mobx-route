@@ -1,9 +1,8 @@
 import { createBrowserHistory, type History } from 'mobx-location-history';
 import { beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
-
+import { sleep } from 'yummies/async';
 import { routeConfig } from '../config/index.js';
 import { RouteGroup } from '../route-group/route-group.js';
-
 import { Route } from './route.js';
 import type { InputPathParam } from './route.types.js';
 
@@ -13,7 +12,7 @@ export const mockHistory = (history: History) => {
     replace: vi.spyOn(history, 'replace'),
   };
 
-  const clearMocks = () => {
+  const resetMock = () => {
     spies.push.mockClear();
     spies.replace.mockClear();
   };
@@ -21,19 +20,22 @@ export const mockHistory = (history: History) => {
   return {
     ...history,
     spies,
-    clearMocks,
+    resetMock,
   };
 };
 
 describe('route', () => {
   const history = mockHistory(createBrowserHistory());
-
   routeConfig.update({
     history,
   });
 
   beforeEach(() => {
-    history.clearMocks();
+    history.replace('/', null);
+    globalThis.history.replaceState(null, '', '/');
+    window.history.replaceState(null, '', '/');
+
+    history.resetMock();
   });
 
   it('empty string', async () => {
@@ -80,12 +82,12 @@ describe('route', () => {
     });
     expect(history.spies.push).toBeCalledWith('/users/1/delete', null);
 
-    history.clearMocks();
+    history.resetMock();
 
     await route.open();
     expect(history.spies.push).toBeCalledWith('/users/delete', null);
 
-    history.clearMocks();
+    history.resetMock();
 
     const childRoute = route.extend('/push/:id1{/:bar}');
     await childRoute.open({
@@ -175,11 +177,12 @@ describe('route', () => {
       login: new Route('/login'),
     };
 
-    expect(routes.private.isOpened).toBe(false);
+    expect(history.location.pathname).toBe('/');
+    expect(routes.private.isOpened).toBe(true); // because location.pathname === '/' and private has index '/' route
     expect(routes.private.routes.matrices.isOpened).toBe(false);
 
     history.push('/matrices', null);
-    history.clearMocks();
+    history.resetMock();
 
     expect(routes.private.isOpened).toBe(true);
     expect(routes.private.routes.matrices.isOpened).toBe(true);
@@ -194,7 +197,7 @@ describe('route', () => {
 
     expect(history.spies.push).toBeCalledWith('/', null);
     expect(location.href).toBe('http://localhost:3000/');
-    history.clearMocks();
+    history.resetMock();
   });
 
   it('test with root paths (/, "")', async () => {
@@ -337,7 +340,7 @@ describe('route', () => {
       f: '6',
     });
 
-    history.clearMocks();
+    history.resetMock();
   });
 
   it('nested path routes', async () => {
@@ -346,7 +349,38 @@ describe('route', () => {
 
     await route2.open();
 
-    expect(route2.isOpened).toBe(true);
     expect(route.isOpened).toBe(true);
+    expect(route2.isOpened).toBe(true);
+    expect(history.location.pathname).toBe('/foo/bar');
+  });
+
+  it('beforeOpen should work', async () => {
+    vi.useFakeTimers();
+
+    const beforeOpenFn = vi.fn();
+
+    const route = new Route('/foo', {
+      beforeOpen: async (...args) => {
+        await sleep(500);
+        beforeOpenFn(...args);
+      },
+    });
+
+    expect(history.location.pathname).toBe('/');
+
+    history.push('/foo');
+
+    expect(route.isOpened).toBe(false);
+
+    await vi.runAllTimersAsync();
+
+    expect(route.isOpened).toBe(true);
+    expect(beforeOpenFn).toBeCalledTimes(1);
+    expect(beforeOpenFn).toBeCalledWith({
+      params: {},
+      query: {},
+      state: null,
+      url: '/foo',
+    });
   });
 });
