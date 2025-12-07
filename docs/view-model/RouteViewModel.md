@@ -6,19 +6,14 @@ Abstract class for integration with [`mobx-view-model` library](https://js2me.gi
 
 ```tsx
 import { RouteViewModel } from 'mobx-route/view-model';
-import { routes } from '@/shared/config/routing';
+import { userRoute } from '@/shared/config/routing';
 import { withViewModel } from "mobx-view-model";
 
-class UserDetailsRouteVM extends RouteViewModel<
-  typeof routes.userDetails
-> {
-  route = routes.userDetails;
+class UserPageVM extends RouteViewModel<typeof userRoute> {
+  route = userRoute;
 }
 
-const UserDetailsPageView = () => {
-  return <div>Details page</div>
-}
-
-export const UserDetailsPage =
-  withViewModel(UserDetailsRouteVM)(UserDetailsPageView);
+export const UserPage = withViewModel(UserPageVM, () => {
+  return <div>User page</div>
+});
 ```
