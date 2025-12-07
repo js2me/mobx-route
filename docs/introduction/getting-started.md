@@ -25,10 +25,10 @@ pnpm add {packageJson.name}
 ## Integration with React
 
 ```tsx
-import { Route } from "mobx-route";
+import { createRoute } from "mobx-route";
 import { RouteView, Link } from "mobx-route/react";
 
-const route = new Route('/foo/bar/:baz');
+const route = createRoute('/foo/bar/:baz');
 
 ...
 <RouteView route={route} view={() => <div>Hello!</div>} />
@@ -39,19 +39,19 @@ const route = new Route('/foo/bar/:baz');
 ## Writing first routes
 
 ```ts
-import { Route, RouteGroup } from "mobx-route";
+import { createRoute, createRouteGroup } from "mobx-route";
 
-const feed = new Route("/");
-const users = new Route("/users");
+const feed = createRoute("/");
+const users = createRoute("/users");
 const userDetails = users.extend("/:userId");
 
 export const routes = {
   feed,
   users,
   userDetails,
-  memes: new RouteGroup({
-    list: new Route("/memes", { index: true }),
-    details: new Route("/memes/:memeId"),
+  memes: createRouteGroup({
+    list: createRoute("/memes", { index: true }),
+    details: createRoute("/memes/:memeId"),
   }),
 };
 ```

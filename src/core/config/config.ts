@@ -44,4 +44,5 @@ export const routeConfig = createGlobalDynamicConfig<RouteGlobalConfig>(
       queryParams,
     };
   },
+  Symbol.for('MOBX_ROUTE_CONFIG'),
 );

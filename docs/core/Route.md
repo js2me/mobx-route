@@ -7,7 +7,11 @@ You can track their open state using the `isOpened` property, and also "open" th
 
 ## Constructor   
 ```ts
-new Route(
+createRoute(
+  path: TPath,
+  config?: RouteConfiguration<TParentRoute>,
+)
+new Route( // class form
   path: TPath,
   config?: RouteConfiguration<TParentRoute>,
 )
@@ -16,7 +20,7 @@ new Route(
 ### Basic example
 
 ```ts
-const users = new Route('/users');
+const users = createRoute('/users');
 users.open();
 
 const userDetails = users.extend('/:userId');
@@ -36,7 +40,7 @@ The path itself is specified as the first parameter when creating an instance of
 
 So you can use all power of this library with TypeScript support out-of-box   
 ```ts
-const route = new Route('/*segment');
+const route = createRoute('/*segment');
 
 route.open({
   segment: [1,2,3]
@@ -60,18 +64,18 @@ More about `mergeQuery` you can read [here](/core/routeConfig#mergequery)
 
 Examples:  
 ```ts
-const stars = new Route('/stars');
+const stars = createRoute('/stars');
 await stars.open();
 location.pathname; // /stars
 ```
 
 ```ts
-const starDetails = new Route('/stars/:starId');
+const starDetails = createRoute('/stars/:starId');
 await starDetails.open({ starId: 1 }, {
   query: { bar: 'baz' }
 });
 
-const starsWithMeta = new Route('/stars{/:meta}');
+const starsWithMeta = createRoute('/stars{/:meta}');
 await starsWithMeta.open();
 await starsWithMeta.open({ meta: 1 }, {
   query: { foo: 'bar' },
@@ -83,7 +87,7 @@ await starsWithMeta.open({ meta: 1 }, {
 Allows to create child route based on this route with merging this route path and extending path.   
 Example:
 ```ts
-const stars = new Route('/stars');
+const stars = createRoute('/stars');
 const starDetails = stars.extends('/:starId');
 starDetails.path; // '/stars/:starId'
 await starDetails.open({ starId: 1 });
@@ -105,7 +109,7 @@ Returns true when current URL matches this route's path pattern.
 
 Example:  
 ```ts
-const stars = new Route('/stars');
+const stars = createRoute('/stars');
 stars.open();
 stars.isOpened; // true
 ```
@@ -116,7 +120,7 @@ Current parsed path parameters. `null` if route isn't open.
 
 Example:  
 ```ts
-const routeA = new Route('/foo/bar/:baz');
+const routeA = createRoute('/foo/bar/:baz');
 location.href = '/foo/bar/1234';
 routeA.params; // { baz: "1234" }
 ```
@@ -126,7 +130,7 @@ Parent route
 
 Example:  
 ```ts
-const routeA = new Route('/a');
+const routeA = createRoute('/a');
 const routeB = routeA.extend('/b');
 
 routeB.parent === routeA; // true
@@ -137,7 +141,7 @@ Matched path segment for current URL. `null` if route isn't open.
 
 Example:  
 ```ts
-const routeA = new Route('/foo/bar/:baz');
+const routeA = createRoute('/foo/bar/:baz');
 location.href = '/foo/bar/1234';
 routeA.currentPath; // '/foo/bar/1234'
 ```
@@ -147,7 +151,7 @@ routeA.currentPath; // '/foo/bar/1234'
 
 Example:   
 ```ts
-const routeA = new Route('/a');
+const routeA = createRoute('/a');
 const routeB = routeA.extend('/b');
 const routeC = routeB.extend('/c');
 
@@ -170,7 +174,7 @@ Generates full URL for route. Respects base URL and parent routes.
 
 Example:   
 ```ts
-const starDetails = new Route('/stars/:starId');
+const starDetails = createRoute('/stars/:starId');
 starDetails.createUrl({ starId: 1 }, { bar: 1 }); // /stars/1?bar=1
 
 starDetails.createUrl({ starId: 1 }, { baz: 2 }, true); // /stars/1?bar=1&baz=2
@@ -183,7 +187,7 @@ Original path pattern used for route matching.
 
 Example:   
 ```ts
-const starDetails = new Route('/stars/:starId');
+const starDetails = createRoute('/stars/:starId');
 starDetails.path; // /stars/:starId
 ```
 
@@ -287,7 +291,7 @@ or override the navigation to another one by returning
 
 Example:   
 ```ts
-const route = new Route('/foo/bar', {
+const route = createRoute('/foo/bar', {
   beforeOpen: () => {
     if (!auth.isAuth) {
       return false;
@@ -307,7 +311,7 @@ Ability to customize path or query params before create route url.
 
 Example:   
 ```ts
-const route = new Route('/foo/bar/baz',{
+const route = createRoute('/foo/bar/baz',{
   createUrl: ({ params, query }) => {
     return {
       params,

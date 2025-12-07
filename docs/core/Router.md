@@ -6,7 +6,8 @@ Provides a common interface for working with history, location, and route collec
 ## Constructor
 
 ```ts
-new Router(config: RouterConfiguration)
+createRouter(config: RouterConfiguration)
+new Router(config: RouterConfiguration) // class form
 ```
 Accepts configuration with route collection and routing settings.  
 
@@ -32,15 +33,15 @@ routeConfig.set({
 });
 
 export const routes = {
-  home: new Route('/'),
-  projects: new RouteGroup({
-    index: new Route('/projects', { index: true }),
-    new: new Route('/projects/new'),
-    details: new Route('/projects/:projectId'),
+  home: createRoute('/'),
+  projects: createRouteGroup({
+    index: createRoute('/projects', { index: true }),
+    new: createRoute('/projects/new'),
+    details: createRoute('/projects/:projectId'),
   }),
 };
 
-export const router = new Router({
+export const router = createRouter({
   routes,
   history,
   location,

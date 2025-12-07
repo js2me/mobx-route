@@ -5,7 +5,8 @@ Allows to organize routes into hierarchical structures.
 
 ## Constructor  
 ```ts
-new RouteGroup(routes: TRoutesCollection)
+createRouteGroup(routes: TRoutesCollection)
+new RouteGroup(routes: TRoutesCollection) // class form
 ```
 Accepts an object with a collection of routes/groups.
 Routes can be either regular `Route` objects or other entities, such as `RouteGroup` or `VirtualRoute`.  
@@ -13,15 +14,17 @@ Routes can be either regular `Route` objects or other entities, such as `RouteGr
 ### Basic example
 
 ```ts
-const routesGroup = new RouteGroup({
-  index: new Route('/', { index: true }),
-  fruits: new Route('/fruits'),
-  zombies: new Route('/zombies'),
-  memes: new RouteGroup({
-    index: new Route('/memes', { index: true }),
-    list: new Route('/memes/list'),
-    create: new Route('/memes/create'),
-    edit: new Route('/memes/edit/:id'),
+import { createRouteGroup } from 'mobx-route';
+
+const routesGroup = createRouteGroup({
+  index: createRoute('/', { index: true }),
+  fruits: createRoute('/fruits'),
+  zombies: createRoute('/zombies'),
+  memes: createRouteGroup({
+    index: createRoute('/memes', { index: true }),
+    list: createRoute('/memes/list'),
+    create: createRoute('/memes/create'),
+    edit: createRoute('/memes/edit/:id'),
   }),
 })
 ```
@@ -35,9 +38,9 @@ Returns `true` if at least one route in the group is open.
 
 Example:  
 ```ts
-const group = new RouteGroup({
-  home: new Route('/'),
-  about: new Route('/about')
+const group = createRouteGroup({
+  home: createRoute('/'),
+  about: createRoute('/about')
 });
 
 group.routes.home.open();
@@ -49,9 +52,9 @@ First found `index` route defined by [`isIndex` property](/core/Route.html#isind
 
 Example:  
 ```ts
-const fruits = new RouteGroup({
-  list: new Route('/fruits', { index: true }),
-  details: new Route('/fruits/:id'),
+const fruits = createRouteGroup({
+  list: createRoute('/fruits', { index: true }),
+  details: createRoute('/fruits/:id'),
 });
 
 fruits.routes.list === fruits.indexRoute; // true
@@ -67,15 +70,15 @@ Main navigation method for the group. Behavior:
 
 Example:  
 ```ts
-const group = new RouteGroup({
-  index: new Route('/', { index: true }),
-  other: new Route('/other')
+const group = createRouteGroup({
+  index: createRoute('/', { index: true }),
+  other: createRoute('/other')
 });
 group.open(); // Navigates to /
 
 // Sending arguments
-const paramGroup = new RouteGroup({
-  index: new Route('/user/:id', { index: true })
+const paramGroup = createRouteGroup({
+  index: createRoute('/user/:id', { index: true })
 });
 paramGroup.open({ id: 42 }); // /user/42
 ```

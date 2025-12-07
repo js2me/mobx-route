@@ -11,10 +11,10 @@ There are two ways to implement "not found" routing behaviour:
 In the behavior of this virtual route, it's crucial to implement a redirect to an existing route, for example, to the "home" page.   
 
 ```ts
-import { VirtualRoute } from "mobx-route";
+import { createVirtualRoute } from "mobx-route";
 import { homeRoute } from "@/pages/home"
 
-export const notFoundRoute = new VirtualRoute({
+export const notFoundRoute = createVirtualRoute({
   async open() {
     await homeRoute.open(null, { replace: true });
     return false;
@@ -88,9 +88,9 @@ You can also use [`mobx-view-model`](https://js2me.github.io/mobx-view-model) an
 
 
 ```ts
-import { VirtualRoute } from "mobx-route";
+import { createVirtualRoute } from "mobx-route";
 
-export const notFoundRoute = new VirtualRoute({})
+export const notFoundRoute = createVirtualRoute({})
 ```
 
 2. Connect this `notFoundRoute` to your `<RouteViewGroup />` component using [`otherwise` prop](/react/RouteViewGroup#otherwise) and create `RouteView` for this route    

@@ -82,8 +82,8 @@ routeConfig.update({
   mergeQuery: false,
 })
 
-const route1 = new Route('/foo/bar/baz');
-const route2 = new Route('/bebe');
+const route1 = createRoute('/foo/bar/baz');
+const route2 = createRoute('/bebe');
 
 await route1.open(null, { query: { a: 1, b: 2, c: 3 } });
 
@@ -101,8 +101,8 @@ routeConfig.update({
   mergeQuery: true,
 })
 
-const route1 = new Route('/foo/bar/baz');
-const route2 = new Route('/bebe');
+const route1 = createRoute('/foo/bar/baz');
+const route2 = createRoute('/bebe');
 
 await route1.open(null, { query: { a: 1, b: 2, c: 3 } });
 

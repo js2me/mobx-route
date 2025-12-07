@@ -1,4 +1,4 @@
-# VirtualRoute  
+# VirtualRoute
 
 Class for creating routes with custom activation logic. Useful for implementing:  
 - Modal windows routing  
@@ -10,7 +10,8 @@ Unlike standard `Route`, doesn't depend on URL path. Activation state is determi
 
 ## Constructor  
 ```ts
-new VirtualRoute(config?: VirtualRouteConfiguration<TParams>)
+createVirtualRoute(config?: VirtualRouteConfiguration<TParams>)
+new VirtualRoute(config?: VirtualRouteConfiguration<TParams>) // class form
 ```
 
 **Configuration options:**  
@@ -23,7 +24,7 @@ new VirtualRoute(config?: VirtualRouteConfiguration<TParams>)
 Example:   
 
 ```ts
-const ageModalRoute = new VirtualRoute<{ age: number }>({
+const ageModalRoute = createVirtualRoute<{ age: number }>({
   initialParams: { age: 0 },
   checkOpened: (route) => !!route.query.showAgeModal,
   open: (params, route) =>
@@ -47,7 +48,7 @@ Indicates whether route is active. Automatically updates when dependencies chang
 
 Example:   
 ```ts
-const route = new VirtualRoute({
+const route = createVirtualRoute({
   checkOpened: () => Math.random() > 0.5
 });
 
@@ -60,7 +61,7 @@ autorun(() => {
 Current virtual route parameters. Type is determined by generic type parameter.   
 Example:  
 ```ts
-const route = new VirtualRoute<{ userId: string }>();
+const route = createVirtualRoute<{ userId: string }>();
 route.open({ userId: '123' });
 route.params?.userId; // '123'
 ```
@@ -118,7 +119,7 @@ defaultOpenImplementation = () => true;
 
 Examples:   
 ```ts
-const route = new VirtualRoute({
+const route = createVirtualRoute({
   checkOpened: () => !!queryParams.data.yummiesDialog,
   open: () => {
     queryParams.update({ yummiesDialog: true });
@@ -141,7 +142,7 @@ defaultCloseImplementation = () => false;
 
 Examples:   
 ```ts
-const route = new VirtualRoute({
+const route = createVirtualRoute({
   checkOpened: () => !!queryParams.data.yummiesDialog,
   close: () => {
     queryParams.update({ yummiesDialog: false });
@@ -156,7 +157,7 @@ It can be helpful if you need custom open/close behaviour
 
 Examples:   
 ```ts
-const route = new VirtualRoute({
+const route = createVirtualRoute({
   checkOpened: () => !!queryParams.data.yummiesDialog,
 })
 ```
@@ -176,7 +177,7 @@ or override the navigation to another one by returning
 
 Example:   
 ```ts
-const route = new VirtualRoute('/foo/bar', {
+const route = createVirtualRoute('/foo/bar', {
   beforeOpen: () => {
     if (!auth.isAuth) {
       return false;

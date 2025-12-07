@@ -22,9 +22,9 @@ _Uses [`path-to-regexp` power](https://www.npmjs.com/package/path-to-regexp)_
 
 
 ```ts
-import { Route } from "mobx-route";
+import { createRoute } from "mobx-route";
 
-const userDetails = new Route("/users/:id");
+const userDetails = createRoute("/users/:id");
 
 await userDetails.open({ id: 1 }); // path params are required
 

@@ -4,7 +4,7 @@ Follow [documentation of the `path-to-regexp` npm package](https://www.npmjs.com
 
 Example:  
 ```ts
-import { Route } from "mobx-route";
+import { createRoute } from "mobx-route";
 
-export const serviceRoute = new Route('/services/:serviceId{/*rest}');
+export const serviceRoute = createRoute('/services/:serviceId{/*rest}');
 ```

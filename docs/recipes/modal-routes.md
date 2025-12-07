@@ -15,7 +15,7 @@ There are two primary approaches here:
 One possible implementation:   
 
 ```ts
-export const modalRoute = new VirtualRoute({
+export const modalRoute = createVirtualRoute({
   checkOpened: ({ query }) => !!query.data.yourModal,
   open: (_, { query }) => {
     query.update({ yourModal: true });
@@ -31,7 +31,7 @@ export const modalRoute = new VirtualRoute({
 Variant with specifying additional parameters via Query:     
 
 ```ts
-export const modalRoute = new VirtualRoute({
+export const modalRoute = createVirtualRoute({
   initialParams: ({ query }) => ({
     paramA: query.data.paramA || '',
     paramB: query.data.paramA || '',
@@ -54,12 +54,12 @@ Possible implementations:
 
 _local state_  
 ```ts
-export const modalRoute = new VirtualRoute();
+export const modalRoute = createVirtualRoute();
 ```
 
 _using `localStorage`_  
 ```ts
-export const modalRoute = new VirtualRoute({
+export const modalRoute = createVirtualRoute({
   checkOpened: () => !!localStorage.getItem('yourModal'),
   open: () => {
     localStorage.setItem('yourModal', true);
