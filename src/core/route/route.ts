@@ -55,6 +55,7 @@ export class Route<
   private _tokenData: TokenData | undefined;
   private _matcher?: ReturnType<typeof match>;
   private _compiler?: ReturnType<typeof compile>;
+  private skipPathMatchCheck = false;
 
   protected status:
     | 'opening'
@@ -118,7 +119,7 @@ export class Route<
 
     makeObservable(this);
 
-    reaction(() => this.isPathMatched, this.processPathMatched, {
+    reaction(() => this.isPathMatched, this.checkPathMatch, {
       signal: this.abortController.signal,
       fireImmediately: true,
     });
@@ -424,6 +425,8 @@ export class Route<
       return;
     }
 
+    this.skipPathMatchCheck = true;
+
     if (trx.replace) {
       this.history.replace(trx.url, trx.state);
     } else {
@@ -452,7 +455,7 @@ export class Route<
       }
 
       if (typeof feedback === 'object') {
-        Object.assign(trx, feedback);
+        return Object.assign(trx, feedback);
       }
     }
 
@@ -470,7 +473,7 @@ export class Route<
 
   private firstPathMatchingRun = true;
 
-  private processPathMatched = async (isPathMathched: boolean) => {
+  private checkPathMatch = async (isPathMathched: boolean) => {
     if (this.firstPathMatchingRun) {
       this.firstPathMatchingRun = false;
       // ignore first 'afterClose' callback call
@@ -479,21 +482,39 @@ export class Route<
       }
     }
 
+    if (this.skipPathMatchCheck) {
+      // after open
+      this.skipPathMatchCheck = false;
+      return;
+    }
+
     if (isPathMathched) {
-      const navigationData: NavigationTrx<TInputParams> = {
+      const trx: NavigationTrx<TInputParams> = {
         url: this.parsedPathData!.path,
         params: this.parsedPathData!.params as TInputParams,
         state: this.history.location.state,
         query: this.query.data,
       };
 
-      const isConfirmed = await this.confirmOpening(navigationData);
+      const nextTrxOrConfirmed = await this.confirmOpening(trx);
 
-      if (!isConfirmed) {
+      if (!nextTrxOrConfirmed) {
         return;
       }
 
       this.config.afterOpen?.(this.parsedPathData!, this);
+
+      if (typeof nextTrxOrConfirmed === 'object') {
+        if (nextTrxOrConfirmed.replace) {
+          this.history.replace(
+            nextTrxOrConfirmed.url,
+            nextTrxOrConfirmed.state,
+          );
+        } else {
+          this.history.push(nextTrxOrConfirmed.url, nextTrxOrConfirmed.state);
+        }
+      }
+
       return;
     } else {
       const isConfirmed = this.confirmClosing();

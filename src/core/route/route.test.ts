@@ -369,6 +369,7 @@ describe('route', () => {
     expect(history.location.pathname).toBe('/');
 
     history.push('/foo');
+    expect(history.location.pathname).toBe('/foo');
 
     expect(route.isOpened).toBe(false);
 
@@ -382,5 +383,59 @@ describe('route', () => {
       state: null,
       url: '/foo',
     });
+
+    expect(history.location.pathname).toBe('/foo');
+  });
+
+  it('beforeOpen should be able to reject opening route', async () => {
+    vi.useFakeTimers();
+
+    const route = new Route('/foo', {
+      beforeOpen: async () => {
+        await sleep(500);
+        return false;
+      },
+    });
+
+    expect(history.location.pathname).toBe('/');
+
+    history.push('/foo');
+
+    expect(history.location.pathname).toBe('/foo');
+
+    expect(route.isOpened).toBe(false);
+
+    await vi.runAllTimersAsync();
+
+    expect(route.isOpened).toBe(false);
+    expect(history.location.pathname).toBe('/foo');
+  });
+
+  it('beforeOpen should be able to redirect to another route', async () => {
+    vi.useFakeTimers();
+
+    const route = new Route('/foo', {
+      beforeOpen: async () => {
+        await sleep(500);
+        return {
+          url: '/baz',
+          replace: true,
+        };
+      },
+    });
+
+    expect(history.location.pathname).toBe('/');
+
+    history.push('/foo');
+
+    expect(history.location.pathname).toBe('/foo');
+
+    expect(route.isOpened).toBe(false);
+
+    await vi.runAllTimersAsync();
+
+    expect(route.isOpened).toBe(false);
+
+    expect(history.location.pathname).toBe('/baz');
   });
 });
