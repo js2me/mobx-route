@@ -155,7 +155,7 @@ export class Route<
     }
 
     this._matcher ??= match(this.tokenData, {
-      end: false,
+      end: this.config.exact ?? false,
       ...this.config.matchOptions,
     });
     const parsed = this._matcher(pathnameToCheck);

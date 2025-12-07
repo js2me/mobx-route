@@ -60,6 +60,11 @@ export interface RouteConfiguration<
   index?: boolean;
   hash?: boolean;
   /**
+   * Exact match for the path
+   * @default false
+   */
+  exact?: boolean;
+  /**
    * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#meta)
    */
   meta?: AnyObject;
