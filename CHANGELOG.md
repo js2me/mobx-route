@@ -1,5 +1,11 @@
 # mobx-route
 
+## 0.20.1
+
+### Patch Changes
+
+- [`3d31db2`](https://github.com/js2me/mobx-route/commit/3d31db2e777d26ca34a9a903380b1cad25fe1eaa) Thanks [@js2me](https://github.com/js2me)! - fixed <RouteViewGroup /> navigation with opening routes statements
+
 ## 0.20.0
 
 ### Minor Changes
