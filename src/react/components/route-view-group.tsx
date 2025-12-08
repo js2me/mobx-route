@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import {
+  type AnyRoute,
   type AnyRouteEntity,
   buildSearchString,
   isRouteEntity,
@@ -50,32 +51,41 @@ export const RouteViewGroup = observer(
     params,
     ...navigateParams
   }: RouteViewGroupProps<TRoute>) => {
-    let activeChildNode: React.ReactNode = null;
+    let activeChildRouteNode: React.ReactNode = null;
     let lastInactiveChildNode: React.ReactNode = null;
+    let hasRoutesInOpening = false;
 
     const childNodes: React.ReactNode[] = Array.isArray(children)
       ? children
       : [children];
 
     for (const childNode of childNodes) {
-      if (
+      const isRouteChild =
         isValidElement(childNode) &&
         // @ts-expect-error redundand checks better to wrap in this directive
-        isRouteEntity(childNode.props?.route) &&
-        // @ts-expect-error redundand checks better to wrap in this directive
-        childNode.props.route.isOpened
-      ) {
-        activeChildNode = childNode;
-        break;
+        isRouteEntity(childNode.props?.route);
+
+      if (isRouteChild) {
+        const route = (childNode.props as any).route as AnyRoute;
+
+        if (route.isOpened) {
+          activeChildRouteNode = childNode;
+          break;
+        } else {
+          if (route.isOpening) {
+            hasRoutesInOpening = true;
+          }
+          lastInactiveChildNode = childNode;
+        }
       } else {
         lastInactiveChildNode = childNode;
       }
     }
 
-    const hasActiveChildNode = !!activeChildNode;
+    const hasActiveChildNode = !!activeChildRouteNode;
 
     useEffect(() => {
-      if (!hasActiveChildNode && otherwiseNavigation) {
+      if (!hasActiveChildNode && !hasRoutesInOpening && otherwiseNavigation) {
         if (typeof otherwiseNavigation === 'string') {
           const history = routeConfig.get().history;
           const url = `${otherwiseNavigation}${buildSearchString(navigateParams.query || {})}`;
@@ -89,13 +99,14 @@ export const RouteViewGroup = observer(
           otherwiseNavigation.open(params, navigateParams);
         }
       }
-    }, [hasActiveChildNode, otherwiseNavigation]);
+    }, [hasActiveChildNode, hasRoutesInOpening, otherwiseNavigation]);
 
-    if (otherwiseNavigation && !activeChildNode) {
+    if (otherwiseNavigation && !activeChildRouteNode) {
       return null;
     }
 
-    const resultNodeToRender = activeChildNode ?? lastInactiveChildNode ?? null;
+    const resultNodeToRender =
+      activeChildRouteNode ?? lastInactiveChildNode ?? null;
 
     if (Layout) {
       return <Layout>{resultNodeToRender}</Layout>;

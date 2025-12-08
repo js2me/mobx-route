@@ -112,6 +112,7 @@ export class Route<
     observable(this, 'children');
     observable.ref(this, 'parent');
     observable.ref(this, 'status');
+    computed(this, 'isOpening');
     action(this, 'addChildren');
     action(this, 'confirmOpening');
     action(this, 'confirmClosing');
@@ -165,6 +166,10 @@ export class Route<
     }
 
     return parsed as ParsedPathData<TPath>;
+  }
+
+  get isOpening() {
+    return this.status === 'opening';
   }
 
   /**
@@ -455,6 +460,10 @@ export class Route<
       }
 
       if (typeof feedback === 'object') {
+        runInAction(() => {
+          this.status = 'open-confirmed';
+        });
+
         return Object.assign(trx, feedback);
       }
     }

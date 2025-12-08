@@ -119,6 +119,7 @@ export interface IRoute<
   TOutputParams extends AnyObject = ParsedPathParams<TPath>,
 > {
   isOpened: boolean;
+  isOpening: boolean;
   path: TPath;
 
   /**
