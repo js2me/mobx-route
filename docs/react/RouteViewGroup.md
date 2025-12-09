@@ -8,8 +8,8 @@ React components which **renders only the first matching route**.
 import { RouteView, RouteViewGroup } from 'mobx-route/react';
 
 const routes = {
-  allOrders: new Route('/orders'),
-  order: new Route('/orders/:orderId'),
+  allOrders: createRoute('/orders'),
+  order: createRoute('/orders/:orderId'),
 }
 
 function Routing() {

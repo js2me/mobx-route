@@ -15,7 +15,7 @@ _Home page_
 export const HomePageView = () => <div>Home Page</div>;
 
 // src/pages/home/route.ts
-export const homeRoute = new Route('/');
+export const homeRoute = createRoute('/');
 
 // src/pages/home/index.ts
 export * from "./route";
@@ -28,7 +28,7 @@ _Death-star page_
 export const DeathStarPageView = () => <div>Death Star Page</div>;
 
 // src/pages/death-star/route.ts
-export const deathStarRoute = new Route('/death-star');
+export const deathStarRoute = createRoute('/death-star');
 
 // src/pages/death-star/index.ts
 export * from "./route";
@@ -81,8 +81,8 @@ _routes configuration_
 // src/shared/config/routing/routes.ts
 
 export const routes = {
-  home: new Route('/'),
-  deathStar: new Route('/death-star'),
+  home: createRoute('/'),
+  deathStar: createRoute('/death-star'),
 }
 ```
 

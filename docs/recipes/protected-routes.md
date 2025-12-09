@@ -12,7 +12,7 @@ Example:
 ```ts
 import { currentUser } from "@/entities/user"
 
-const route = new Route('/foo/bar', {
+const route = createRoute('/foo/bar', {
   checkOpened: () => {
     return currentUser.isAuthorized;
   },
