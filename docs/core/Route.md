@@ -84,6 +84,11 @@ await starsWithMeta.open({ meta: 1 }, {
 
 ### `extend(path, config): Route`  
 Allows to create child route based on this route with merging this route path and extending path.   
+
+::: info Extending route from parent will ignore parameters:
+ `index`, `params` `exact`
+:::
+
 Example:
 ```ts
 const stars = createRoute('/stars');

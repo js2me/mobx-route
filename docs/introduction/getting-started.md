@@ -42,7 +42,7 @@ const route = createRoute('/foo/bar/:baz');
 import { createRoute, createRouteGroup } from "mobx-route";
 
 const feed = createRoute("/");
-const users = createRoute("/users");
+const users = createRoute("/users", { exact: true });
 const userDetails = users.extend("/:userId");
 
 export const routes = {
