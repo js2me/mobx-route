@@ -1,5 +1,11 @@
 # mobx-route
 
+## 0.20.2
+
+### Patch Changes
+
+- [`24dcc38`](https://github.com/js2me/mobx-route/commit/24dcc38985b1e874d1c5fac72b5ec2affd75be51) Thanks [@js2me](https://github.com/js2me)! - fix passing exact parameter for extending routes + update docs
+
 ## 0.20.1
 
 ### Patch Changes
