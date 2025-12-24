@@ -1,5 +1,13 @@
 # mobx-route
 
+## 0.21.0
+
+### Minor Changes
+
+- [`14d9ff0`](https://github.com/js2me/mobx-route/commit/14d9ff0b41aeaab893d34aa117c13a7ac20d0004) Thanks [@js2me](https://github.com/js2me)! - added `fallbackPath` parameter for cases when `path-to-regexp` thrown an error
+
+- [`14d9ff0`](https://github.com/js2me/mobx-route/commit/14d9ff0b41aeaab893d34aa117c13a7ac20d0004) Thanks [@js2me](https://github.com/js2me)! - safe building route urls using `path-to-regexp` lib
+
 ## 0.20.2
 
 ### Patch Changes
