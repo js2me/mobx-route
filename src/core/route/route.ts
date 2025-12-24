@@ -343,7 +343,14 @@ export class Route<
       routeConfig.get().createUrl?.(defaultUrlCreateParams, this.query.data) ??
       defaultUrlCreateParams;
 
-    const path = this._compiler(this.processParams(urlCreateParams.params));
+    let path: string;
+
+    try {
+      path = this._compiler(this.processParams(urlCreateParams.params));
+    } catch (e) {
+      console.error('Error while compiling route path', e);
+      path = this.config.fallbackPath ?? routeConfig.get().fallbackPath ?? '/';
+    }
 
     const url = `${urlCreateParams.baseUrl || ''}${this.isHash ? '#' : ''}${path}`;
 

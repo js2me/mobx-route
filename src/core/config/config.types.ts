@@ -8,4 +8,5 @@ export interface RouteGlobalConfig {
   mergeQuery?: boolean;
   createUrl?: UrlCreateParamsFn;
   formatLinkHref?: (href: string) => string;
+  fallbackPath?: string;
 }
