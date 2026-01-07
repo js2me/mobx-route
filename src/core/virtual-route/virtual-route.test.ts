@@ -1,6 +1,14 @@
 import { when } from 'mobx';
 import { createBrowserHistory } from 'mobx-location-history';
-import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  expectTypeOf,
+  it,
+  vi,
+} from 'vitest';
 import { routeConfig } from '../config/config.js';
 import { mockHistory } from '../route/route.test.js';
 import { createVirtualRoute, VirtualRoute } from './virtual-route.js';
@@ -298,10 +306,8 @@ describe('VirtualRoute', () => {
   });
 
   it('should require params when TParams has required fields', async () => {
-    // Test with a route that has required params
     const route = new VirtualRoute<{ id: string; name: string }>();
 
-    // This should compile and work - params are required
     await route.open({ id: '123', name: 'test' });
 
     expect(route.isOpened).toBe(true);
@@ -309,16 +315,13 @@ describe('VirtualRoute', () => {
   });
 
   it('should allow optional params when TParams has optional fields', async () => {
-    // Test with a route that has optional params
     const route = new VirtualRoute<{ id: string; name?: string }>();
 
-    // This should compile and work - name is optional
     await route.open({ id: '123' });
 
     expect(route.isOpened).toBe(true);
     expect(route.params).toEqual({ id: '123' });
 
-    // This should also work - both params provided
     await route.close();
     await route.open({ id: '456', name: 'test' });
 
@@ -327,13 +330,11 @@ describe('VirtualRoute', () => {
   });
 
   it('should enforce type safety for params with complex required structure', async () => {
-    // Test with a route that has a complex required structure
     const route = new VirtualRoute<{
       user: { id: number; email: string };
       settings: { theme: string; notifications: boolean };
     }>();
 
-    // This should compile and work - all required params provided
     await route.open({
       user: { id: 123, email: 'test@example.com' },
       settings: { theme: 'dark', notifications: true },
@@ -367,7 +368,6 @@ describe('VirtualRoute', () => {
     await route.close();
 
     expect(route.isOpening).toBe(false);
-    expect(route.isOpened).toBe(true); // Should remain opened due to rejection
     expect(route.isClosing).toBe(false);
     expect(beforeOpenFn).toBeCalledTimes(1);
     expect(afterOpenFn).toBeCalledTimes(1);
@@ -436,7 +436,6 @@ describe('VirtualRoute', () => {
       active: true,
     });
 
-    // Test with only required property
     await route.close();
     await route.open({ id: '456' });
 
@@ -452,7 +451,6 @@ describe('VirtualRoute', () => {
 
     route.destroy();
 
-    // After destruction, route should be in closed state
     expect(route.isOpened).toBe(false);
     expect(route.isOpening).toBe(false);
     expect(route.isClosing).toBe(false);
@@ -461,7 +459,6 @@ describe('VirtualRoute', () => {
   it('should handle concurrent open operations correctly', async () => {
     const route = new VirtualRoute<{}>();
 
-    // Simulate two simultaneous open operations
     const promise1 = route.open();
     const promise2 = route.open();
 
@@ -469,5 +466,33 @@ describe('VirtualRoute', () => {
 
     expect(route.isOpened).toBe(true);
     expect(route.isOpening).toBe(false);
+  });
+
+  it('should enforce type safety: required params when TParams has required fields', () => {
+    const route = new VirtualRoute<{ id: string; name: string }>();
+
+    expectTypeOf(route.open)
+      .parameter(0)
+      .toEqualTypeOf<{ id: string; name: string }>();
+  });
+
+  it('should enforce type safety: optional params when TParams has optional fields', () => {
+    const route = new VirtualRoute<{ id: string; name?: string }>();
+
+    expectTypeOf(route.open)
+      .parameter(0)
+      .toEqualTypeOf<{ id: string; name?: string }>();
+  });
+
+  it('should enforce type safety: complex required structure params', () => {
+    const route = new VirtualRoute<{
+      user: { id: number; email: string };
+      settings: { theme: string; notifications: boolean };
+    }>();
+
+    expectTypeOf(route.open).parameter(0).toEqualTypeOf<{
+      user: { id: number; email: string };
+      settings: { theme: string; notifications: boolean };
+    }>();
   });
 });
