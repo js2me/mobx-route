@@ -1,24 +1,23 @@
 import { LinkedAbortController } from 'linked-abort-controller';
 import {
   action,
+  comparer,
   computed,
   makeObservable,
   observable,
-  onBecomeObserved,
-  onBecomeUnobserved,
   reaction,
   runInAction,
+  untracked,
 } from 'mobx';
 import type { IQueryParams } from 'mobx-location-history';
 import { callFunction } from 'yummies/common';
 import type { AnyObject, EmptyObject, IsPartial, Maybe } from 'yummies/types';
-
 import { routeConfig } from '../config/index.js';
-
 import type {
   AbstractVirtualRoute,
   VirtualOpenExtraParams,
   VirtualRouteConfiguration,
+  VirtualRouteTrx,
 } from './virtual-route.types.js';
 
 /**
@@ -29,57 +28,106 @@ import type {
 export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
   implements AbstractVirtualRoute<TParams>
 {
-  protected abortController: AbortController;
   query: IQueryParams;
   params: TParams | null;
 
-  private isLocalOpened: boolean;
+  protected abortController: AbortController;
+
+  protected status:
+    | 'opening'
+    | 'open-rejected'
+    | 'opened'
+    | 'closing'
+    | 'close-rejected'
+    | 'closed'
+    | 'unknown';
 
   private openChecker: Maybe<VirtualRouteConfiguration<TParams>['checkOpened']>;
-  private reactionDisposer: Maybe<VoidFunction>;
+
+  private trx: Maybe<VirtualRouteTrx>;
+
+  private skipAutoOpenProcess: boolean;
 
   constructor(protected config: VirtualRouteConfiguration<TParams> = {}) {
     this.abortController = new LinkedAbortController(config.abortSignal);
     this.query = config.queryParams ?? routeConfig.get().queryParams;
-    this.params = callFunction(config.initialParams, this) ?? null;
+    this.params =
+      callFunction(config.initialParams, this) ??
+      callFunction(config.getParams, this) ??
+      null;
     this.openChecker = config.checkOpened;
-    this.isLocalOpened = this.openChecker?.(this) ?? false;
+    this.skipAutoOpenProcess = false;
+    this.status = 'unknown';
 
     observable(this, 'params');
     observable.ref(this, 'isLocalOpened');
-    observable.ref(this, '_isOpened');
-    computed.struct(this, 'isOpened');
+    observable.ref(this, 'status');
+    observable.ref(this, 'trx');
+    computed(this, 'isOpened');
+    computed(this, 'isOpening');
+    computed(this, 'isClosing');
     action(this, 'setOpenChecker');
     action(this, 'open');
     action(this, 'close');
     makeObservable(this);
 
-    onBecomeObserved(this, 'isOpened', () => {
-      if (!config.afterOpen && !config.afterClose) {
-        return;
-      }
-
-      this.reactionDisposer = reaction(
-        () => this.isOpened,
-        this.processOpenedState,
+    if (config.getParams) {
+      reaction(
+        () => config.getParams!(this),
+        action((params) => {
+          this.params = params ?? null;
+        }),
         {
+          equals: comparer.structural,
           signal: this.abortController.signal,
-          fireImmediately: true,
         },
       );
-    });
-    onBecomeUnobserved(this, 'isOpened', () => {
-      this.reactionDisposer?.();
-      this.reactionDisposer = undefined;
-    });
+    }
+
+    reaction(
+      (): Maybe<VirtualRouteTrx> => {
+        if (!this.skipAutoOpenProcess && this.openChecker?.(this)) {
+          return untracked(() => ({
+            extra: {
+              query: this.query.data,
+            },
+            params: this.params ?? {},
+          }));
+        }
+      },
+      (trx) => {
+        if (trx) {
+          // biome-ignore lint/nursery/noFloatingPromises: <explanation>
+          this.confirmOpening(trx);
+        }
+      },
+      {
+        fireImmediately: true,
+        signal: this.abortController.signal,
+        equals: comparer.structural,
+      },
+    );
   }
 
   /**
    * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#isopened-boolean)
    */
   get isOpened() {
-    const isOuterOpened = this.openChecker == null || this.openChecker(this);
-    return this.isLocalOpened && isOuterOpened;
+    return this.status === 'opened';
+  }
+
+  /**
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#isopening-boolean)
+   */
+  get isOpening() {
+    return this.status === 'opening';
+  }
+
+  /**
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#isclosing-boolean)
+   */
+  get isClosing() {
+    return this.status === 'closing';
   }
 
   /**
@@ -101,75 +149,83 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
   ): Promise<void>;
   async open(...args: any[]) {
     const params = (args[0] ?? {}) as unknown as TParams;
-    const extraParams: Maybe<VirtualOpenExtraParams> = args[1];
+    const extra: Maybe<VirtualOpenExtraParams> = args[1];
 
-    if (this.config.beforeOpen) {
-      const beforeOpenResult = await this.config.beforeOpen(params, this);
-      if (beforeOpenResult === false) {
-        return;
-      }
-    }
+    this.skipAutoOpenProcess = true;
 
-    if (this.config.open == null) {
-      runInAction(() => {
-        this.isLocalOpened = true;
-      });
-    } else {
-      const result = await this.config.open(params, this);
-      // because result can return void so this is truthy for opening state
-      runInAction(() => {
-        this.isLocalOpened = result !== false;
-      });
-    }
+    this.trx = {
+      params,
+      extra,
+      manual: true,
+    };
 
-    if (!this.isLocalOpened) {
-      return;
-    }
+    await this.confirmOpening(this.trx);
 
-    if (extraParams?.query) {
-      this.query.update(extraParams.query, extraParams.replace);
-    }
-
-    runInAction(() => {
-      this.params = params;
-    });
-
-    if (!this.reactionDisposer && this.isOpened) {
-      this.config.afterOpen?.(this.params!, this);
-    }
+    this.skipAutoOpenProcess = false;
   }
 
   /**
    * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#close-void)
    */
-  close() {
-    if (this.config.close == null) {
-      this.isLocalOpened = false;
-    } else {
-      const result = this.config.close(this);
-      // because result can return void so this is truthy for opening state
-      this.isLocalOpened = result !== false;
-    }
-
-    this.params = null;
+  async close() {
+    await this.confirmClosing();
   }
 
-  private firstOpenedStateCheck = true;
-  private processOpenedState = (isOpened: boolean) => {
-    if (this.firstOpenedStateCheck) {
-      this.firstOpenedStateCheck = false;
-      // ignore first 'afterClose' callback call
-      if (!isOpened) {
-        return;
-      }
+  private async confirmOpening(trx: VirtualRouteTrx) {
+    runInAction(() => {
+      this.trx = undefined;
+      this.status = 'opening';
+    });
+
+    if ((await this.config.beforeOpen?.(trx.params, this)) === false) {
+      runInAction(() => {
+        this.status = 'open-rejected';
+        this.trx = undefined;
+      });
+      return;
     }
 
-    if (isOpened) {
-      this.config.afterOpen?.(this.params!, this);
-    } else {
-      this.config.afterClose?.();
+    if ((await this.config.open?.(trx.params, this)) === false) {
+      runInAction(() => {
+        this.status = 'open-rejected';
+        this.trx = undefined;
+      });
+      return;
     }
-  };
+
+    runInAction(() => {
+      if (trx.extra?.query) {
+        this.query.update(trx.extra.query, trx.extra.replace);
+      }
+
+      this.trx = undefined;
+      this.params = trx.params;
+      this.status = 'opened';
+      this.config.afterOpen?.(this.params!, this);
+    });
+
+    return true;
+  }
+
+  private async confirmClosing() {
+    runInAction(() => {
+      this.status = 'closing';
+    });
+
+    if ((await this.config.beforeClose?.()) === false) {
+      runInAction(() => {
+        this.status = 'close-rejected';
+      });
+      return;
+    }
+
+    runInAction(() => {
+      this.status = 'closed';
+      this.params = null;
+    });
+
+    return true;
+  }
 
   destroy() {
     this.abortController.abort();

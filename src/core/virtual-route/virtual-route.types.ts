@@ -50,6 +50,11 @@ export interface VirtualRouteConfiguration<
   >;
 
   /**
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#getparams)
+   */
+  getParams?: (route: VirtualRoute<NoInfer<TParams>>) => Maybe<TParams>;
+
+  /**
    * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#meta)
    */
   meta?: AnyObject;
@@ -92,10 +97,21 @@ export interface VirtualRouteConfiguration<
   afterClose?: () => void;
 
   /**
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#beforeclose)
+   */
+  beforeClose?: () => MaybePromise<void | boolean>;
+
+  /**
    * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#afteropen)
    */
   afterOpen?: (
     params: NoInfer<TParams>,
     route: VirtualRoute<NoInfer<TParams>>,
   ) => void;
+}
+
+export interface VirtualRouteTrx {
+  params: any;
+  extra: Maybe<VirtualOpenExtraParams>;
+  manual?: boolean;
 }

@@ -228,6 +228,7 @@ export class Route<
     }
 
     return (
+      // this.parsedPathData is defined because this.params !== null
       !this.config.checkOpened || this.config.checkOpened(this.parsedPathData!)
     );
   }

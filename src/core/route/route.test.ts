@@ -1,15 +1,23 @@
 import { createBrowserHistory, type History } from 'mobx-location-history';
-import { beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
+import {
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  expectTypeOf,
+  it,
+  vi,
+} from 'vitest';
 import { sleep } from 'yummies/async';
 import { routeConfig } from '../config/index.js';
 import { RouteGroup } from '../route-group/route-group.js';
 import { Route } from './route.js';
 import type { InputPathParam } from './route.types.js';
 
-export const mockHistory = (history: History) => {
+export const mockHistory = <THistory extends History>(history: THistory) => {
   const spies = {
-    push: vi.spyOn(history, 'push'),
-    replace: vi.spyOn(history, 'replace'),
+    push: vi.spyOn(history, 'push' as any),
+    replace: vi.spyOn(history, 'replace' as any),
   };
 
   const resetMock = () => {
@@ -17,17 +25,24 @@ export const mockHistory = (history: History) => {
     spies.replace.mockClear();
   };
 
-  return {
-    ...history,
+  Object.assign(history, {
     spies,
     resetMock,
+  });
+
+  return history as THistory & {
+    spies: typeof spies;
+    resetMock: () => void;
   };
 };
 
 describe('route', () => {
   const history = mockHistory(createBrowserHistory());
-  routeConfig.update({
-    history,
+
+  beforeAll(() => {
+    routeConfig.update({
+      history,
+    });
   });
 
   beforeEach(() => {
