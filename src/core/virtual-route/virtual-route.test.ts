@@ -128,7 +128,7 @@ describe('VirtualRoute', () => {
 
     expect(route.isOpening).toBe(false);
     expect(route.isOpened).toBe(true);
-    expect(route.params).toEqual({});
+    expect(route.params).toEqual(null);
     expect(beforeOpenFn).toBeCalledTimes(1);
     expect(afterOpenFn).toBeCalledTimes(1);
     expect(beforeCloseFn).toBeCalledTimes(0);
@@ -183,7 +183,7 @@ describe('VirtualRoute', () => {
 
     expect(route.isOpened).toBe(true);
     expect(route.isOpening).toBe(false);
-    expect(route.params).toEqual({});
+    expect(route.params).toEqual(null);
     expect(beforeOpenFn).toBeCalledTimes(1);
     expect(afterOpenFn).toBeCalledTimes(1);
     expect(beforeCloseFn).toBeCalledTimes(0);
@@ -241,7 +241,7 @@ describe('VirtualRoute', () => {
 
     expect(route.isOpened).toBe(true);
     expect(route.isOpening).toBe(false);
-    expect(route.params).toEqual({});
+    expect(route.params).toEqual(null);
     expect(beforeOpenFn).toBeCalledTimes(1);
     expect(afterOpenFn).toBeCalledTimes(1);
     expect(beforeCloseFn).toBeCalledTimes(0);
@@ -494,5 +494,101 @@ describe('VirtualRoute', () => {
       user: { id: number; email: string };
       settings: { theme: string; notifications: boolean };
     }>();
+  });
+
+  it('should handle empty params object correctly', async () => {
+    const route = new VirtualRoute<{}>();
+
+    await route.open({});
+
+    expect(route.isOpened).toBe(true);
+    expect(route.params).toEqual({});
+
+    await route.close();
+    expect(route.isOpened).toBe(false);
+  });
+
+  it('should handle null params correctly', async () => {
+    const route = new VirtualRoute<{}>();
+
+    await route.open(null as any);
+
+    expect(route.isOpened).toBe(true);
+    expect(route.params).toBeNull();
+
+    await route.close();
+    expect(route.isOpened).toBe(false);
+  });
+
+  it('should handle undefined params correctly', async () => {
+    const route = new VirtualRoute<{}>();
+
+    await route.open(undefined as any);
+
+    expect(route.isOpened).toBe(true);
+    expect(route.params).toBeNull();
+
+    await route.close();
+    expect(route.isOpened).toBe(false);
+  });
+
+  it('should properly handle deeply nested object parameters', async () => {
+    const route = new VirtualRoute<{
+      data: {
+        user: {
+          profile: {
+            personal: {
+              firstName: string;
+              lastName: string;
+            };
+            contact: {
+              email: string;
+              phone: string;
+            };
+          };
+        };
+      };
+    }>();
+
+    const deepData = {
+      data: {
+        user: {
+          profile: {
+            personal: {
+              firstName: 'John',
+              lastName: 'Doe',
+            },
+            contact: {
+              email: 'john@example.com',
+              phone: '123-456-7890',
+            },
+          },
+        },
+      },
+    };
+
+    await route.open(deepData);
+
+    expect(route.isOpened).toBe(true);
+    expect(route.params).toEqual(deepData);
+  });
+
+  it('should properly handle array parameters with complex types', async () => {
+    const route = new VirtualRoute<{
+      items: Array<{ id: number; name: string; tags: string[] }>;
+      metadata: { count: number; total: number };
+    }>();
+
+    const complexItems = [
+      { id: 1, name: 'Item 1', tags: ['tag1', 'tag2'] },
+      { id: 2, name: 'Item 2', tags: ['tag3'] },
+    ];
+
+    const metadata = { count: 2, total: 10 };
+
+    await route.open({ items: complexItems, metadata });
+
+    expect(route.isOpened).toBe(true);
+    expect(route.params).toEqual({ items: complexItems, metadata });
   });
 });

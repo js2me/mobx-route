@@ -97,7 +97,7 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
             extra: {
               query: this.query.data,
             },
-            params: this.params ?? {},
+            params: this.params ?? null,
           }));
         }
       },
@@ -154,7 +154,7 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
       : [params: TParams, extraParams?: VirtualOpenExtraParams]
   ): Promise<void>;
   async open(...args: any[]) {
-    const params = (args[0] ?? {}) as unknown as TParams;
+    const params = (args[0] ?? null) as unknown as TParams;
     const extra: Maybe<VirtualOpenExtraParams> = args[1];
 
     this.skipAutoOpenProcess = true;
