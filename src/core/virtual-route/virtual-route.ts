@@ -174,7 +174,7 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
    * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#close-void)
    */
   async close() {
-    await this.confirmClosing();
+    return await this.confirmClosing();
   }
 
   private async confirmOpening(trx: VirtualRouteTrx) {
