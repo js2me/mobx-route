@@ -38,7 +38,6 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
     | 'open-rejected'
     | 'opened'
     | 'closing'
-    | 'close-rejected'
     | 'closed'
     | 'unknown';
 
@@ -70,6 +69,13 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
     action(this, 'open');
     action(this, 'close');
     makeObservable(this);
+
+    this.abortController.signal.addEventListener(
+      'abort',
+      action(() => {
+        this.status = 'unknown';
+      }),
+    );
 
     if (config.getParams) {
       reaction(
@@ -208,13 +214,15 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
   }
 
   private async confirmClosing() {
+    const lastStatus = this.status;
+
     runInAction(() => {
       this.status = 'closing';
     });
 
     if ((await this.config.beforeClose?.()) === false) {
       runInAction(() => {
-        this.status = 'close-rejected';
+        this.status = lastStatus;
       });
       return;
     }
