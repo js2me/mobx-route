@@ -47,6 +47,8 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
 
   private skipAutoOpenProcess: boolean;
 
+  private isOuterOpened: boolean | undefined;
+
   constructor(protected config: VirtualRouteConfiguration<TParams> = {}) {
     this.abortController = new LinkedAbortController(config.abortSignal);
     this.query = config.queryParams ?? routeConfig.get().queryParams;
@@ -56,12 +58,14 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
       null;
     this.openChecker = config.checkOpened;
     this.skipAutoOpenProcess = false;
-    this.status = 'unknown';
+    this.isOuterOpened = this.openChecker?.(this);
+    this.status = this.isOuterOpened ? 'opened' : 'unknown';
 
     observable(this, 'params');
-    observable.ref(this, 'isLocalOpened');
     observable.ref(this, 'status');
     observable.ref(this, 'trx');
+    observable.ref(this, 'openChecker');
+    observable.ref(this, 'isOuterOpened');
     computed(this, 'isOpened');
     computed(this, 'isOpening');
     computed(this, 'isClosing');
@@ -91,11 +95,25 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
     }
 
     reaction(
+      () => this.openChecker?.(this),
+      action((isOuterOpened) => {
+        this.isOuterOpened = isOuterOpened;
+      }),
+      { signal: this.abortController.signal },
+    );
+
+    reaction(
       (): Maybe<VirtualRouteTrx> => {
-        if (!this.skipAutoOpenProcess && this.openChecker?.(this)) {
+        if (
+          !this.skipAutoOpenProcess &&
+          this.status !== 'opened' &&
+          this.status !== 'opening' &&
+          this.isOuterOpened
+        ) {
           return untracked(() => ({
             extra: {
               query: this.query.data,
+              replace: true,
             },
             params: this.params ?? null,
           }));
@@ -119,7 +137,7 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
    * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#isopened-boolean)
    */
   get isOpened() {
-    return this.status === 'opened';
+    return this.status === 'opened' && this.isOuterOpened !== false;
   }
 
   /**

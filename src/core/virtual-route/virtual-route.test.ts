@@ -9,6 +9,7 @@ import {
   it,
   vi,
 } from 'vitest';
+import { sleep } from 'yummies/async';
 import { routeConfig } from '../config/config.js';
 import { mockHistory } from '../route/route.test.js';
 import { createVirtualRoute, VirtualRoute } from './virtual-route.js';
@@ -192,8 +193,7 @@ describe('VirtualRoute', () => {
 
     expect(lifecycleHistory).toEqual(['beforeOpen', 'open', 'afterOpen']);
 
-    expect(checkOpenedFn).toBeCalledTimes(1);
-    expect(checkOpenedFn).toHaveBeenNthCalledWith(1, route);
+    expect(checkOpenedFn).toBeCalledTimes(3);
   });
 
   it('route should complete full lyfecicle of open (with checkOpened + auto open)', async () => {
@@ -250,9 +250,8 @@ describe('VirtualRoute', () => {
 
     expect(lifecycleHistory).toEqual(['beforeOpen', 'open', 'afterOpen']);
 
-    expect(checkOpenedFn).toBeCalledTimes(2);
+    expect(checkOpenedFn).toBeCalledTimes(3);
     expect(checkOpenedFn).toHaveBeenNthCalledWith(1, route);
-    expect(checkOpenedFn).toHaveBeenNthCalledWith(2, route);
   });
 
   it('should handle route rejection in beforeOpen callback', async () => {
@@ -590,5 +589,66 @@ describe('VirtualRoute', () => {
 
     expect(route.isOpened).toBe(true);
     expect(route.params).toEqual({ items: complexItems, metadata });
+  });
+
+  it('route should be opened at start of creation', async () => {
+    history.push('/foo');
+
+    const checkOpened = vi.fn(() => {
+      return history.location.pathname === '/foo';
+    });
+
+    const route = new VirtualRoute({
+      checkOpened,
+    });
+    expect(route.isOpened).toBe(true);
+    await sleep(10);
+    expect(checkOpened).toBeCalledTimes(2);
+  });
+
+  it('route should not be opened at start of creation', async () => {
+    history.push('/foo');
+    const checkOpenedFn = vi.fn(() => history.location.pathname === '/bar');
+    const route = new VirtualRoute({
+      checkOpened: checkOpenedFn,
+    });
+    expect(route.isOpened).toBe(false);
+    await sleep(10);
+    expect(checkOpenedFn).toBeCalledTimes(2);
+  });
+
+  it('count of checkOpened function calls due to isOpened getter usage', async () => {
+    history.push('/foo');
+
+    const checkOpened = vi.fn(() => {
+      return history.location.pathname === '/foo';
+    });
+
+    const route = new VirtualRoute({
+      checkOpened,
+    });
+    expect(checkOpened).toBeCalledTimes(2);
+    expect(route.isOpened).toBe(true);
+    expect(route.isOpened).toBe(true);
+    expect(route.isOpened).toBe(true);
+    expect(checkOpened).toBeCalledTimes(2);
+    await sleep(10);
+    expect(checkOpened).toBeCalledTimes(2);
+
+    history.push('/bar');
+    expect(checkOpened).toBeCalledTimes(3);
+    expect(route.isOpened).toBe(false);
+    expect(route.isOpened).toBe(false);
+    expect(route.isOpened).toBe(false);
+    expect(checkOpened).toBeCalledTimes(3);
+    await sleep(10);
+
+    expect(checkOpened).toBeCalledTimes(3);
+    expect(route.isOpened).toBe(false);
+    expect(route.isOpened).toBe(false);
+    expect(route.isOpened).toBe(false);
+    expect(checkOpened).toBeCalledTimes(3);
+    await sleep(10);
+    expect(checkOpened).toBeCalledTimes(3);
   });
 });
