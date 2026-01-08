@@ -54,7 +54,7 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
     this.query = config.queryParams ?? routeConfig.get().queryParams;
     this.params =
       callFunction(config.initialParams, this) ??
-      callFunction(config.getParams, this) ??
+      callFunction(config.getBasicParams, this) ??
       null;
     this.openChecker = config.checkOpened;
     this.skipAutoOpenProcess = false;
@@ -81,19 +81,6 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
       }),
     );
 
-    if (config.getParams) {
-      reaction(
-        () => config.getParams!(this),
-        action((params) => {
-          this.params = params ?? null;
-        }),
-        {
-          equals: comparer.structural,
-          signal: this.abortController.signal,
-        },
-      );
-    }
-
     reaction(
       () => this.openChecker?.(this),
       action((isOuterOpened) => {
@@ -115,7 +102,9 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
               query: this.query.data,
               replace: true,
             },
-            params: this.params ?? null,
+            params: this.config.getBasicParams
+              ? this.config.getBasicParams(this)
+              : (this.params ?? null),
           }));
         }
       },
@@ -232,6 +221,10 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
   }
 
   private async confirmClosing() {
+    if (this.status === 'closed') {
+      return true;
+    }
+
     const lastStatus = this.status;
 
     runInAction(() => {

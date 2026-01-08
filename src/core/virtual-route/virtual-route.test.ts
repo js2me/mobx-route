@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/nursery/noFloatingPromises: <explanation> */
 import { when } from 'mobx';
 import { createBrowserHistory } from 'mobx-location-history';
 import {
@@ -592,6 +593,8 @@ describe('VirtualRoute', () => {
   });
 
   it('route should be opened at start of creation', async () => {
+    vi.useFakeTimers();
+
     history.push('/foo');
 
     const checkOpened = vi.fn(() => {
@@ -602,22 +605,29 @@ describe('VirtualRoute', () => {
       checkOpened,
     });
     expect(route.isOpened).toBe(true);
-    await sleep(10);
+
+    sleep(10);
+    await vi.runAllTimersAsync();
+
     expect(checkOpened).toBeCalledTimes(2);
   });
 
   it('route should not be opened at start of creation', async () => {
+    vi.useFakeTimers();
     history.push('/foo');
     const checkOpenedFn = vi.fn(() => history.location.pathname === '/bar');
     const route = new VirtualRoute({
       checkOpened: checkOpenedFn,
     });
     expect(route.isOpened).toBe(false);
-    await sleep(10);
+    sleep(10);
+    await vi.runAllTimersAsync();
     expect(checkOpenedFn).toBeCalledTimes(2);
   });
 
   it('count of checkOpened function calls due to isOpened getter usage', async () => {
+    vi.useFakeTimers();
+
     history.push('/foo');
 
     const checkOpened = vi.fn(() => {
@@ -632,7 +642,10 @@ describe('VirtualRoute', () => {
     expect(route.isOpened).toBe(true);
     expect(route.isOpened).toBe(true);
     expect(checkOpened).toBeCalledTimes(2);
-    await sleep(10);
+
+    sleep(10);
+    await vi.runAllTimersAsync();
+
     expect(checkOpened).toBeCalledTimes(2);
 
     history.push('/bar');
@@ -641,14 +654,19 @@ describe('VirtualRoute', () => {
     expect(route.isOpened).toBe(false);
     expect(route.isOpened).toBe(false);
     expect(checkOpened).toBeCalledTimes(3);
-    await sleep(10);
+
+    sleep(10);
+    await vi.runAllTimersAsync();
 
     expect(checkOpened).toBeCalledTimes(3);
     expect(route.isOpened).toBe(false);
     expect(route.isOpened).toBe(false);
     expect(route.isOpened).toBe(false);
     expect(checkOpened).toBeCalledTimes(3);
-    await sleep(10);
+
+    sleep(10);
+    await vi.runAllTimersAsync();
+
     expect(checkOpened).toBeCalledTimes(3);
   });
 });

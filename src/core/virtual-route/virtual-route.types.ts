@@ -50,9 +50,9 @@ export interface VirtualRouteConfiguration<
   >;
 
   /**
-   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#getparams)
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#getbasicparams)
    */
-  getParams?: (route: VirtualRoute<NoInfer<TParams>>) => Maybe<TParams>;
+  getBasicParams?: (route: VirtualRoute<NoInfer<TParams>>) => Maybe<TParams>;
 
   /**
    * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#meta)
