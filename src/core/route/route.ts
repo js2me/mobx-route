@@ -55,7 +55,7 @@ export class Route<
   private _tokenData: TokenData | undefined;
   private _matcher?: ReturnType<typeof match>;
   private _compiler?: ReturnType<typeof compile>;
-  private skipPathMatchCheck = false;
+  private ignoreOpenByPathMatch = false;
 
   protected status:
     | 'opening'
@@ -114,8 +114,6 @@ export class Route<
     observable.ref(this, 'status');
     computed(this, 'isOpening');
     action(this, 'addChildren');
-    action(this, 'confirmOpening');
-    action(this, 'confirmClosing');
     action(this, 'removeChildren');
 
     makeObservable(this);
@@ -432,13 +430,9 @@ export class Route<
       query,
     };
 
-    const isConfirmed = await this.confirmOpening(trx);
-
-    if (!isConfirmed) {
-      return;
+    if (await this.confirmOpening(trx)) {
+      this.ignoreOpenByPathMatch = true;
     }
-
-    this.skipPathMatchCheck = true;
   }
 
   protected get tokenData() {
@@ -449,7 +443,9 @@ export class Route<
   }
 
   protected async confirmOpening(trx: NavigationTrx<TInputParams>) {
-    this.status = 'opening';
+    runInAction(() => {
+      this.status = 'opening';
+    });
 
     let skipHistoryUpdate = !!trx.preferSkipHistoryUpdate;
 
@@ -492,7 +488,9 @@ export class Route<
   }
 
   protected confirmClosing() {
-    this.status = 'closed';
+    runInAction(() => {
+      this.status = 'closed';
+    });
     return true;
   }
 
@@ -507,13 +505,13 @@ export class Route<
       }
     }
 
-    if (this.skipPathMatchCheck) {
-      // after open
-      this.skipPathMatchCheck = false;
-      return;
-    }
-
     if (isPathMathched) {
+      // after manual open call
+      if (this.ignoreOpenByPathMatch) {
+        this.ignoreOpenByPathMatch = false;
+        return;
+      }
+
       const trx: NavigationTrx<TInputParams> = {
         url: this.parsedPathData!.path,
         params: this.parsedPathData!.params as TInputParams,

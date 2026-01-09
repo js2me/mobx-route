@@ -48,7 +48,7 @@ describe('route', () => {
     });
   });
 
-  beforeEach(async () => {
+  beforeEach(() => {
     history.replace('/', null);
     globalThis.history.replaceState(null, '', '/');
     window.history.replaceState(null, '', '/');
@@ -485,5 +485,189 @@ describe('route', () => {
     expect(route.isOpened).toBe(true);
     expect(route.isOpening).toBe(false);
     expect(afterOpenFn).toBeCalledTimes(1);
+  });
+
+  it('two routes opens should not affect each other', async () => {
+    const rout1 = createRoute('/foo');
+    const rout2 = createRoute('/bar');
+
+    await rout1.open();
+    await rout2.open();
+
+    expect(rout1.isOpened).toBe(false);
+    expect(rout2.isOpened).toBe(true);
+
+    await rout2.open();
+    await rout1.open();
+
+    expect(rout1.isOpened).toBe(true);
+    expect(rout2.isOpened).toBe(false);
+  });
+
+  // Test 1: Testing route with custom checkOpened function
+  it('should respect custom checkOpened function', async () => {
+    const route = new Route('/test/:id', {
+      checkOpened: (parsedData) => {
+        return parsedData.params.id === '123';
+      },
+    });
+
+    // Should not be opened with wrong ID
+    history.push('/test/456');
+    expect(route.isOpened).toBe(false);
+
+    // Should be opened with correct ID
+    history.push('/test/123');
+    expect(route.isOpened).toBe(true);
+  });
+
+  // Test 2: Testing route with fallbackPath
+  it('should use fallbackPath when compilation fails', async () => {
+    const route = new Route('/test/:id', {
+      fallbackPath: '/fallback',
+    });
+
+    // This should trigger the fallback path since we're passing invalid params
+    const spyPush = vi.spyOn(history, 'push');
+
+    await route.open({ id: null }); // null should cause compilation issue
+
+    expect(spyPush).toHaveBeenCalledWith('/fallback', null);
+  });
+
+  // Test 3: Testing route with hash routing
+  it('should handle hash routing correctly', async () => {
+    const route = new Route('/hash', { hash: true });
+
+    // Navigate to hash route
+    history.push('#/hash');
+
+    expect(route.isOpened).toBe(true);
+    expect(route.currentPath).toBe('/hash');
+  });
+
+  // Test 4: Testing route with exact matching
+  it('should respect exact matching flag', async () => {
+    const route = new Route('/test', { exact: true });
+
+    // Should not match /testing
+    history.push('/testing');
+    expect(route.isOpened).toBe(false);
+
+    // Should match /test exactly
+    history.push('/test');
+    expect(route.isOpened).toBe(true);
+  });
+
+  // Test 5: Testing route with custom createUrl function
+  it('should use custom createUrl function', async () => {
+    const customCreateUrl = vi.fn((params, query) => {
+      return {
+        ...params,
+        baseUrl: '/custom',
+        params: { ...params.params, customParam: 'value' },
+      };
+    });
+
+    const route = new Route('/test/:id', {
+      createUrl: customCreateUrl,
+    });
+
+    const url = route.createUrl({ id: '123' });
+
+    expect(customCreateUrl).toHaveBeenCalled();
+    expect(url).toContain('/custom/test/123');
+  });
+
+  // Test 6: Testing route with afterClose callback
+  it('should call afterClose when route closes', async () => {
+    const afterCloseFn = vi.fn();
+
+    const route = new Route('/test', {
+      afterClose: afterCloseFn,
+    });
+
+    // Open the route
+    await route.open();
+    expect(route.isOpened).toBe(true);
+
+    // Change to a different route to trigger close
+    history.push('/other');
+
+    // Wait a bit for the close to happen
+    await sleep(10);
+
+    expect(afterCloseFn).toHaveBeenCalled();
+  });
+
+  // Test 7: Testing route with abort controller
+  it('should properly handle abort signal', async () => {
+    const abortController = new AbortController();
+
+    const route = new Route('/test', {
+      abortSignal: abortController.signal,
+    });
+
+    // Abort the controller
+    abortController.abort();
+
+    // Try to open the route - should not succeed
+    await route.open();
+
+    // We can't directly access status, but we can verify it didn't open
+    expect(route.isOpened).toBe(false);
+  });
+
+  // Test 8: Testing route with complex nested children
+  it('should handle complex nested route hierarchy', async () => {
+    const parent = new Route('/admin');
+    const child1 = parent.extend('/users');
+    const child2 = parent.extend('/settings');
+    const grandchild = child1.extend('/profile/:id');
+
+    // Open parent
+    await parent.open();
+    expect(parent.isOpened).toBe(true);
+    expect(child1.isOpened).toBe(false);
+    expect(child2.isOpened).toBe(false);
+    expect(grandchild.isOpened).toBe(false);
+
+    // Open child1
+    await child1.open();
+    expect(parent.isOpened).toBe(true);
+    expect(child1.isOpened).toBe(true);
+    expect(child2.isOpened).toBe(false);
+    expect(grandchild.isOpened).toBe(false);
+
+    // Open grandchild
+    await grandchild.open({ id: '123' });
+    expect(parent.isOpened).toBe(true);
+    expect(child1.isOpened).toBe(true);
+    expect(child2.isOpened).toBe(false);
+    expect(grandchild.isOpened).toBe(true);
+  });
+
+  // Test 9: Testing route with query parameter merging behavior
+  it('should properly merge query parameters with different scenarios', async () => {
+    const route = new Route('/test');
+
+    // Open with initial query
+    await route.open(null, { query: { a: 1, b: 2 } });
+
+    expect(history.locationUrl).toBe('/test?a=1&b=2');
+
+    // Open with mergeQuery: true (should preserve previous query)
+    await route.open(null, {
+      query: { c: 3 },
+      mergeQuery: true,
+    });
+    expect(history.locationUrl).toBe('/test?a=1&b=2&c=3');
+
+    // Open with mergeQuery: false (should not merge)
+    await route.open(null, {
+      query: { d: 4 },
+      mergeQuery: false,
+    });
+    expect(history.locationUrl).toBe('/test?d=4');
   });
 });
