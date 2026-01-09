@@ -1,3 +1,6 @@
+/** biome-ignore-all lint/nursery/noFloatingPromises: <explanation> */
+
+import { when } from 'mobx';
 import { createBrowserHistory, type History } from 'mobx-location-history';
 import {
   beforeAll,
@@ -11,7 +14,7 @@ import {
 import { sleep } from 'yummies/async';
 import { routeConfig } from '../config/index.js';
 import { RouteGroup } from '../route-group/route-group.js';
-import { Route } from './route.js';
+import { createRoute, Route } from './route.js';
 import type { InputPathParam } from './route.types.js';
 
 export const mockHistory = <THistory extends History>(history: THistory) => {
@@ -45,7 +48,7 @@ describe('route', () => {
     });
   });
 
-  beforeEach(() => {
+  beforeEach(async () => {
     history.replace('/', null);
     globalThis.history.replaceState(null, '', '/');
     window.history.replaceState(null, '', '/');
@@ -53,19 +56,19 @@ describe('route', () => {
     history.resetMock();
   });
 
-  it('empty string', async () => {
-    const route = new Route('');
+  it('empty string', async ({ signal }) => {
+    const route = new Route('', { abortSignal: signal });
     expect(route.isOpened).toBe(true);
   });
 
-  it('/test', async () => {
-    const route = new Route('/test');
+  it('/test', async ({ signal }) => {
+    const route = new Route('/test', { abortSignal: signal });
     await route.open();
     expect(history.spies.push).toBeCalledWith('/test', null);
   });
 
-  it('/test/:id/:bar{/:bar3}', async () => {
-    const route = new Route('/test/:id/:bar{/:bar3}');
+  it('/test/:id/:bar{/:bar3}', async ({ signal }) => {
+    const route = new Route('/test/:id/:bar{/:bar3}', { abortSignal: signal });
     await route.open({
       id: 1,
       bar: 'barg',
@@ -82,8 +85,8 @@ describe('route', () => {
     >();
   });
 
-  it('/test/*splat', async () => {
-    const route = new Route('/test/*splat');
+  it('/test/*splat', async ({ signal }) => {
+    const route = new Route('/test/*splat', { abortSignal: signal });
     await route.open({
       splat: [1, 2, 3],
     });
@@ -370,8 +373,6 @@ describe('route', () => {
   });
 
   it('beforeOpen should work', async () => {
-    vi.useFakeTimers();
-
     const beforeOpenFn = vi.fn();
 
     const route = new Route('/foo', {
@@ -388,7 +389,7 @@ describe('route', () => {
 
     expect(route.isOpened).toBe(false);
 
-    await vi.runAllTimersAsync();
+    await when(() => route.isOpened);
 
     expect(route.isOpened).toBe(true);
     expect(beforeOpenFn).toBeCalledTimes(1);
@@ -397,14 +398,13 @@ describe('route', () => {
       query: {},
       state: null,
       url: '/foo',
+      preferSkipHistoryUpdate: true,
     });
 
     expect(history.location.pathname).toBe('/foo');
   });
 
   it('beforeOpen should be able to reject opening route', async () => {
-    vi.useFakeTimers();
-
     const route = new Route('/foo', {
       beforeOpen: async () => {
         await sleep(500);
@@ -420,13 +420,13 @@ describe('route', () => {
 
     expect(route.isOpened).toBe(false);
 
-    await vi.runAllTimersAsync();
-
     expect(route.isOpened).toBe(false);
     expect(history.location.pathname).toBe('/foo');
   });
 
-  it('beforeOpen should be able to redirect to another route', async () => {
+  it('beforeOpen should be able to redirect to another route', async ({
+    signal,
+  }) => {
     vi.useFakeTimers();
 
     const route = new Route('/foo', {
@@ -437,6 +437,7 @@ describe('route', () => {
           replace: true,
         };
       },
+      abortSignal: signal,
     });
 
     expect(history.location.pathname).toBe('/');
@@ -452,5 +453,37 @@ describe('route', () => {
     expect(route.isOpened).toBe(false);
 
     expect(history.location.pathname).toBe('/baz');
+
+    vi.useRealTimers();
+  });
+
+  it('should be called afterOpen if route is opened at start', async () => {
+    await sleep(1000);
+
+    history.push('/foo?modal=new-thing');
+    history.push('/foo?modal=new-thing');
+    history.push('/foo?modal=new-thing');
+    history.push('/foo?modal=new-thing');
+    history.push('/foo?modal=new-thing');
+    history.push('/foo?modal=new-thing');
+    history.push('/foo?modal=new-thing');
+    history.push('/foo?modal=new-thing');
+    history.push('/foo?modal=new-thing');
+
+    const afterOpenFn = vi.fn();
+
+    const route = createRoute('/foo', {
+      afterOpen: afterOpenFn,
+    });
+
+    history.push('/foo?modal=new-thing');
+    history.push('/foo?modal=new-thing');
+    history.push('/foo?modal=new-thing');
+
+    await sleep(10);
+
+    expect(route.isOpened).toBe(true);
+    expect(route.isOpening).toBe(false);
+    expect(afterOpenFn).toBeCalledTimes(1);
   });
 });

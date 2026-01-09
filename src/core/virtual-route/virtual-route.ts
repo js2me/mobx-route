@@ -120,6 +120,10 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
         equals: comparer.structural,
       },
     );
+
+    if (this.status === 'opened') {
+      this.config.afterOpen?.(this.params, this);
+    }
   }
 
   /**

@@ -669,4 +669,23 @@ describe('VirtualRoute', () => {
 
     expect(checkOpened).toBeCalledTimes(3);
   });
+
+  it('should be called afterOpen if route is opened at start', async () => {
+    vi.useFakeTimers();
+
+    history.push('/foo?modal=new-thing');
+
+    const afterOpenFn = vi.fn();
+
+    const route = createVirtualRoute({
+      checkOpened: (it) => it.query.data.modal === 'new-thing',
+      open: (_, it) => it.query.update({ modal: 'new-thing' }),
+      close: (it) => it.query.update({ modal: null }),
+      afterOpen: afterOpenFn,
+    });
+
+    expect(route.isOpened).toBe(true);
+    expect(route.isOpening).toBe(false);
+    expect(afterOpenFn).toBeCalledTimes(1);
+  });
 });

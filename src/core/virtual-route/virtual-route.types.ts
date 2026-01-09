@@ -105,7 +105,7 @@ export interface VirtualRouteConfiguration<
    * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#afteropen)
    */
   afterOpen?: (
-    params: NoInfer<TParams>,
+    params: NoInfer<TParams | null>,
     route: VirtualRoute<NoInfer<TParams>>,
   ) => void;
 }

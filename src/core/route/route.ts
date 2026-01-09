@@ -439,12 +439,6 @@ export class Route<
     }
 
     this.skipPathMatchCheck = true;
-
-    if (trx.replace) {
-      this.history.replace(trx.url, trx.state);
-    } else {
-      this.history.push(trx.url, trx.state);
-    }
   }
 
   protected get tokenData() {
@@ -457,6 +451,8 @@ export class Route<
   protected async confirmOpening(trx: NavigationTrx<TInputParams>) {
     this.status = 'opening';
 
+    let skipHistoryUpdate = !!trx.preferSkipHistoryUpdate;
+
     if (this.config.beforeOpen) {
       const feedback = await this.config.beforeOpen(trx);
 
@@ -464,21 +460,33 @@ export class Route<
         runInAction(() => {
           this.status = 'open-rejected';
         });
-        return false;
       }
 
       if (typeof feedback === 'object') {
-        runInAction(() => {
-          this.status = 'open-confirmed';
-        });
-
-        return Object.assign(trx, feedback);
+        skipHistoryUpdate = false;
+        Object.assign(trx, feedback);
       }
     }
 
-    runInAction(() => {
-      this.status = 'open-confirmed';
-    });
+    if (this.abortController.signal.aborted) {
+      return;
+    }
+
+    if (!skipHistoryUpdate) {
+      if (trx.replace) {
+        this.history.replace(trx.url, trx.state);
+      } else {
+        this.history.push(trx.url, trx.state);
+      }
+    }
+
+    if (this.isPathMatched) {
+      runInAction(() => {
+        this.status = 'open-confirmed';
+      });
+
+      this.config.afterOpen?.(this.parsedPathData!, this);
+    }
 
     return true;
   }
@@ -511,28 +519,10 @@ export class Route<
         params: this.parsedPathData!.params as TInputParams,
         state: this.history.location.state,
         query: this.query.data,
+        preferSkipHistoryUpdate: true,
       };
 
-      const nextTrxOrConfirmed = await this.confirmOpening(trx);
-
-      if (!nextTrxOrConfirmed) {
-        return;
-      }
-
-      this.config.afterOpen?.(this.parsedPathData!, this);
-
-      if (typeof nextTrxOrConfirmed === 'object') {
-        if (nextTrxOrConfirmed.replace) {
-          this.history.replace(
-            nextTrxOrConfirmed.url,
-            nextTrxOrConfirmed.state,
-          );
-        } else {
-          this.history.push(nextTrxOrConfirmed.url, nextTrxOrConfirmed.state);
-        }
-      }
-
-      return;
+      await this.confirmOpening(trx);
     } else {
       const isConfirmed = this.confirmClosing();
 

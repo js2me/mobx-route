@@ -21,6 +21,8 @@ export type NavigationTrx<TParams extends AnyObject = AnyObject> = {
   replace?: boolean;
 
   query?: AnyObject;
+
+  preferSkipHistoryUpdate?: boolean;
 };
 
 /**
