@@ -18,6 +18,7 @@ type LayoutComponent =
 interface BaseProps extends RouteNavigateParams {
   children: React.ReactNode;
   layout?: LayoutComponent;
+  useLastOpened?: boolean;
 }
 
 type PropsWithDefaultRoute<TRoute extends AnyRouteEntity> = BaseProps & {
@@ -47,6 +48,7 @@ export const RouteViewGroup = observer(
     children,
     layout: Layout,
     otherwise: otherwiseNavigation,
+    useLastOpened,
     // @ts-expect-error
     params,
     ...navigateParams
@@ -70,7 +72,9 @@ export const RouteViewGroup = observer(
 
         if (route.isOpened) {
           activeChildRouteNode = childNode;
-          break;
+          if (!useLastOpened) {
+            break;
+          }
         } else {
           if (route.isOpening) {
             hasRoutesInOpening = true;

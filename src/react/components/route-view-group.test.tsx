@@ -148,7 +148,7 @@ describe('<RouteViewGroup />', () => {
     expect(screen1.getByText('route3')).toBeDefined();
   });
 
-  it('Should render element of LAST OPENED route', async () => {
+  it('Should render element of FIRST OPENED route', async () => {
     const history = mockHistory(createBrowserHistory());
 
     routeConfig.update({
@@ -177,6 +177,38 @@ describe('<RouteViewGroup />', () => {
     expect(screen1.getByText('route1')).toBeDefined();
     expect(() => screen1.getByText('route2')).toThrowError();
     expect(() => screen1.getByText('route3')).toThrowError();
+    expect(() => screen1.getByText('not_found1')).toThrowError();
+  });
+
+  it('Should render element of LAST OPENED route (useLastOpened)', async () => {
+    const history = mockHistory(createBrowserHistory());
+
+    routeConfig.update({
+      history,
+    });
+
+    const route1 = new Route('/test');
+    const route2 = new Route('/test');
+    const route3 = new Route('/test');
+
+    const App1 = () => {
+      return (
+        <RouteViewGroup useLastOpened>
+          <RouteView route={route1} view={() => <div>route1</div>} />
+          <RouteView route={route2} view={() => <div>route2</div>} />
+          <RouteView route={route3} view={() => <div>route3</div>} />
+          <div>not_found1</div>
+        </RouteViewGroup>
+      );
+    };
+
+    await route3.open();
+
+    const screen1 = await act(async () => render(<App1 />));
+
+    expect(() => screen1.getByText('route1')).toThrowError();
+    expect(() => screen1.getByText('route2')).toThrowError();
+    expect(screen1.getByText('route3')).toBeDefined();
     expect(() => screen1.getByText('not_found1')).toThrowError();
   });
 });
