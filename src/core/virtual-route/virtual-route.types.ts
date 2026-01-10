@@ -50,9 +50,11 @@ export interface VirtualRouteConfiguration<
   >;
 
   /**
-   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#getbasicparams)
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#getautomatedopenparams)
    */
-  getBasicParams?: (route: VirtualRoute<NoInfer<TParams>>) => Maybe<TParams>;
+  getAutomatedOpenParams?: (
+    route: VirtualRoute<NoInfer<TParams>>,
+  ) => Maybe<Omit<VirtualRouteTrx, 'manual'>>;
 
   /**
    * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#meta)
@@ -112,6 +114,6 @@ export interface VirtualRouteConfiguration<
 
 export interface VirtualRouteTrx {
   params: any;
-  extra: Maybe<VirtualOpenExtraParams>;
+  extra?: Maybe<VirtualOpenExtraParams>;
   manual?: boolean;
 }

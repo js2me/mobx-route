@@ -694,12 +694,7 @@ describe('VirtualRoute', () => {
 
     history.push('/foo?modal=new-thing');
 
-    const afterOpenFn = vi.fn(() => {
-      setTimeout(() => {
-        route.close();
-      }, 400);
-    });
-
+    const afterOpenFn = vi.fn();
     const openFn = vi.fn();
     const closeFn = vi.fn();
 
@@ -719,21 +714,84 @@ describe('VirtualRoute', () => {
     expect(route.isOpened).toBe(true);
     expect(route.isOpening).toBe(false);
 
+    route.close();
+    expect(route.isClosing).toBe(true);
     await vi.runAllTimersAsync();
 
     expect(route.isOpened).toBe(false);
+    expect(route.isOpening).toBe(false);
 
     await vi.runAllTimersAsync();
+
+    expect(route.isOpened).toBe(false);
+    expect(route.isOpening).toBe(false);
 
     expect(afterOpenFn).toBeCalledTimes(1);
     expect(openFn).toBeCalledTimes(0);
     expect(closeFn).toBeCalledTimes(1);
+
+    expect(route.isOpened).toBe(false);
+    expect(route.isOpening).toBe(false);
 
     sleep(1000);
     await vi.runAllTimersAsync();
 
+    expect(route.isOpened).toBe(false);
+    expect(route.isOpening).toBe(false);
+
     expect(afterOpenFn).toBeCalledTimes(1);
     expect(openFn).toBeCalledTimes(0);
     expect(closeFn).toBeCalledTimes(1);
+
+    route.query.update({ modal: 'new-thing' });
+    expect(route.isOpening).toBe(true);
+    await vi.runAllTimersAsync();
+
+    expect(route.isOpened).toBe(true);
+    expect(route.isOpening).toBe(false);
+
+    expect(afterOpenFn).toBeCalledTimes(2);
+    expect(openFn).toBeCalledTimes(1);
+    expect(closeFn).toBeCalledTimes(1);
+
+    route.query.update({ modal: null });
+    expect(route.isClosing).toBe(true);
+    await vi.runAllTimersAsync();
+
+    expect(route.isOpened).toBe(false);
+    expect(route.isOpening).toBe(false);
+
+    expect(afterOpenFn).toBeCalledTimes(2);
+    expect(openFn).toBeCalledTimes(1);
+    expect(closeFn).toBeCalledTimes(2);
+
+    route.query.update({ modal: 'new-thing' });
+    expect(route.isOpening).toBe(true);
+    await vi.runAllTimersAsync();
+
+    expect(route.isOpened).toBe(true);
+    expect(route.isOpening).toBe(false);
+
+    expect(afterOpenFn).toBeCalledTimes(3);
+    expect(openFn).toBeCalledTimes(2);
+    expect(closeFn).toBeCalledTimes(2);
+
+    route.close();
+    expect(route.isClosing).toBe(true);
+    await vi.runAllTimersAsync();
+
+    expect(route.isOpened).toBe(false);
+    expect(route.isOpening).toBe(false);
+
+    expect(afterOpenFn).toBeCalledTimes(3);
+    expect(openFn).toBeCalledTimes(2);
+    expect(closeFn).toBeCalledTimes(3);
+
+    await vi.runAllTicks().runAllTimers().runAllTimersAsync();
+
+    vi.clearAllTimers();
+    vi.useRealTimers();
+
+    vi.clearAllTimers();
   });
 });
