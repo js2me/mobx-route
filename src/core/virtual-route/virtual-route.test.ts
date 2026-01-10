@@ -700,10 +700,19 @@ describe('VirtualRoute', () => {
       }, 400);
     });
 
+    const openFn = vi.fn();
+    const closeFn = vi.fn();
+
     const route = createVirtualRoute({
       checkOpened: (it) => it.query.data.modal === 'new-thing',
-      open: (_, it) => it.query.update({ modal: 'new-thing' }),
-      close: (it) => it.query.update({ modal: null }),
+      open: (_, it) => {
+        openFn();
+        it.query.update({ modal: 'new-thing' });
+      },
+      close: (it) => {
+        closeFn();
+        it.query.update({ modal: null });
+      },
       afterOpen: afterOpenFn,
     });
 
@@ -713,5 +722,18 @@ describe('VirtualRoute', () => {
     await vi.runAllTimersAsync();
 
     expect(route.isOpened).toBe(false);
+
+    await vi.runAllTimersAsync();
+
+    expect(afterOpenFn).toBeCalledTimes(1);
+    expect(openFn).toBeCalledTimes(0);
+    expect(closeFn).toBeCalledTimes(1);
+
+    sleep(1000);
+    await vi.runAllTimersAsync();
+
+    expect(afterOpenFn).toBeCalledTimes(1);
+    expect(openFn).toBeCalledTimes(0);
+    expect(closeFn).toBeCalledTimes(1);
   });
 });

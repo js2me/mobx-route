@@ -236,7 +236,10 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
       this.status = 'closing';
     });
 
-    if ((await this.config.beforeClose?.()) === false) {
+    if (
+      (await this.config.beforeClose?.()) === false ||
+      this.config.close?.(this) === false
+    ) {
       runInAction(() => {
         this.status = lastStatus;
       });
