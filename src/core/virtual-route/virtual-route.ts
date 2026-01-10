@@ -93,8 +93,9 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
       (): Maybe<VirtualRouteTrx> => {
         if (
           !this.skipAutoOpenProcess &&
-          this.status !== 'opened' &&
-          this.status !== 'opening' &&
+          untracked(
+            () => this.status !== 'opened' && this.status !== 'opening',
+          ) &&
           this.isOuterOpened
         ) {
           return untracked(() => ({
