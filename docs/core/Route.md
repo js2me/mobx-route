@@ -82,7 +82,7 @@ await starsWithMeta.open({ meta: 1 }, {
 
 ```
 
-### `extend(path, config): Route`  
+### `extend()`  
 Allows to create child route based on this route with merging this route path and extending path.   
 
 ::: info Extending route from parent will ignore parameters:
@@ -98,15 +98,15 @@ await starDetails.open({ starId: 1 });
 location.pathname; // /stars/1
 ```
 
-### `isIndex: boolean`  
+### `isIndex`  
 Indicates if this route is an index route. Index routes activate when parent route path matches exactly.  
 Useful with groupping routes using [`RouteGroup`](/core/RouteGroup)   
 
-### `isHash: boolean`  
+### `isHash`  
 Indicates if this route is an hash based route.  
 Hash based routes work with only `#hashstrings` in browser address URL. This is useful when you want to create routes that only affect the hash part of the URL, such as for client-side routing or for creating routes that don't affect the server-side routing.  
 
-### `isOpened: boolean` <Badge type="tip" text="computed" />   
+### `isOpened` <Badge type="tip" text="computed" />   
 
 Defines the "open" state for this route.   
 Returns true when current URL matches this route's path pattern.
@@ -118,11 +118,11 @@ stars.open();
 stars.isOpened; // true
 ```
 
-### `isOpening: boolean` <Badge type="tip" text="computed" />   
+### `isOpening` <Badge type="tip" text="computed" />   
 Indicates if this route is currently in the process of opening.  
 Returns `true` when the route status is `'opening'`.
 
-### `params: ParsedPathParams | null`  <Badge type="tip" text="computed.struct" />  
+### `params`  <Badge type="tip" text="computed.struct" />  
 Current parsed path parameters. `null` if route isn't open.  
 
 Example:  
@@ -132,7 +132,7 @@ location.href = '/foo/bar/1234';
 routeA.params; // { baz: "1234" }
 ```
 
-### `parent: TParentRoute | null` <Badge type="info" text="observable.ref" />  
+### `parent` <Badge type="info" text="observable.ref" />  
 Parent route  
 
 Example:  
@@ -143,7 +143,7 @@ const routeB = routeA.extend('/b');
 routeB.parent === routeA; // true
 ```
 
-### `path: ParsedPathName | null` <Badge type="tip" text="computed" />   
+### `path` <Badge type="tip" text="computed" />   
 Matched path segment for current URL. `null` if route isn't open.  
 
 Example:  
@@ -366,5 +366,5 @@ const route = createRoute('/foo/bar/baz',{
 });
 
 route.createUrl(); // /foo/bar/baz?openModal=true
-route.open(); // /foo/bar/baz?openModal=true
+await route.open(); // /foo/bar/baz?openModal=true
 ```
