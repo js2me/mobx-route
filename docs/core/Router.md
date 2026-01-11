@@ -56,7 +56,7 @@ router.history.back();
 
 ## Methods and properties  
 
-### `routes: TRoutesCollection`  
+### `routes`  
 
 Root collection of application routes. Can contain nested `RouteGroups`.  
 
@@ -66,7 +66,7 @@ router.routes.home.open();
 router.routes.admin.routes.dashboard.isOpened;  
 ```
 
-### `history: AnyHistory`  
+### `history`  
 Interface for managing browser history from [`mobx-location-history` package](https://github.com/js2me/mobx-location-history).  
 Handles navigation operations.   
 
@@ -75,7 +75,7 @@ Example:
 router.history.back();
 ```
 
-### `location: AnyLocation`  
+### `location`  
 Reactive object with browser location from [`mobx-location-history` package](https://github.com/js2me/mobx-location-history).  
 
 Example:
@@ -85,7 +85,7 @@ autorun(() => {
 });
 ```
 
-### `query: IQueryParams`  
+### `query`  
 Interface for managing query parameters from [`mobx-location-history` package](https://github.com/js2me/mobx-location-history).  
 Automatically synchronized with current url.  
 
@@ -96,7 +96,7 @@ router.query.update({ bar: 1 });
 router.query.data; // { q: 'test', bar: '1' }
 ```
 
-### `navigate(url: string, options?): void` <Badge type="info" text="action" />   
+### `navigate()` <Badge type="info" text="action" />   
 
 Universal method for URL navigation.  
 

@@ -48,7 +48,7 @@ route.open({
 
 ## Methods and properties  
 
-### `open(...args)`   
+### `open()`   
 
 Navigates to this route.   
 First argument can be required based on path declaration (first argument)  
@@ -154,7 +154,7 @@ routeA.path; // '/foo/bar/1234'
 ```
 
 
-### `pathDeclaration: string`  
+### `pathDeclaration`  
 Route path pattern declaration (used for route matching, `path-to-regexp`)  
 
 Example:  
@@ -165,7 +165,7 @@ routeA.pathDeclaration; // '/foo/bar/:baz'
 routeA.path; // '/foo/bar/1234'
 ```
 
-### `hasOpenedChildren: boolean` <Badge type="tip" text="computed" />   
+### `hasOpenedChildren` <Badge type="tip" text="computed" />   
 `true` when any child route is currently opened.  
 
 Example:   
@@ -185,10 +185,10 @@ routeB.hasOpenedChildren; // true
 routeC.hasOpenedChildren; // false
 ```
 
-### `children: AnyRoute[]` <Badge type="info" text="observable" />   
+### `children` <Badge type="info" text="observable" />   
 Array of child routes. Automatically updated when using `extend()`.  
 
-### `createUrl(params?, query?, mergeQuery?): string`  
+### `createUrl()`  
 Generates full URL for route. Respects base URL and parent routes.  
 
 Example:   
@@ -201,10 +201,10 @@ starDetails.createUrl({ starId: 1 }, { baz: 2 }, true); // /stars/1?bar=1&baz=2
 
 More about `mergeQuery` you can read [here](/core/routeConfig#mergequery)   
 
-### `addChildren(...routes: AnyRoute[]): void` <Badge type="info" text="action" />     
+### `addChildren()` <Badge type="info" text="action" />     
 Manually add child routes. Prefer `extend()` for typical use cases.  
 
-### `removeChildren(...routes: AnyRoute[]): void` <Badge type="info" text="action" />     
+### `removeChildren()` <Badge type="info" text="action" />     
 Remove specified routes from children.  
 
 

@@ -47,7 +47,7 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
   private skipAutoOpenClose: boolean;
 
   /**
-   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#isouteropened-boolean)
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#isouteropened)
    */
   isOuterOpened: boolean | undefined;
 
@@ -108,28 +108,28 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
   }
 
   /**
-   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#isopened-boolean)
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#isopened)
    */
   get isOpened() {
     return this.status === 'opened' && this.isOuterOpened !== false;
   }
 
   /**
-   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#isopening-boolean)
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#isopening)
    */
   get isOpening() {
     return this.status === 'opening';
   }
 
   /**
-   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#isclosing-boolean)
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#isclosing)
    */
   get isClosing() {
     return this.status === 'closing';
   }
 
   /**
-   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#setopenchecker-openchecker-void)
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#setopenchecker)
    */
   setOpenChecker(
     openChecker: Maybe<VirtualRouteConfiguration<TParams>['checkOpened']>,
@@ -138,7 +138,7 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
   }
 
   /**
-   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#open-params-extraparams-query-replace-promise-void)
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#open)
    */
   open(
     ...args: IsPartial<TParams> extends true
@@ -163,7 +163,7 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
   }
 
   /**
-   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#close-void)
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#close)
    */
   async close() {
     this.skipAutoOpenClose = true;

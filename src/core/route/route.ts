@@ -79,14 +79,14 @@ export class Route<
   /**
    * Indicates if this route is an index route. Index routes activate when parent route path matches exactly.
    *
-   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#isindex-boolean)
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#isindex)
    */
   isIndex: boolean;
 
   /**
    * Indicates if this route is an hash route.
    *
-   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#ishash-boolean)
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#ishash)
    */
   isHash: boolean;
 
@@ -161,7 +161,7 @@ export class Route<
   }
 
   /**
-   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#isopening-boolean)
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#isopening)
    */
   get isOpening() {
     return this.status === 'opening';
@@ -170,7 +170,7 @@ export class Route<
   /**
    * Matched path segment for current URL.
    *
-   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#path-parsedpathname-null)
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#path)
    */
   get path(): string | null {
     return this.parsedPathData?.path ?? null;
@@ -179,7 +179,7 @@ export class Route<
   /**
    * Current parsed path parameters.
    *
-   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#params-parsedpathparams-null)
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#params)
    */
   get params(): TOutputParams | null {
     if (!this.parsedPathData?.params) {
@@ -211,7 +211,7 @@ export class Route<
   /**
    * Defines the "open" state for this route.
    *
-   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#isopened-boolean)
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#isopened)
    */
   get isOpened() {
     if (
@@ -231,7 +231,7 @@ export class Route<
   /**
    * Allows to create child route based on this route with merging this route path and extending path.
    *
-   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#extend-path-config-route)
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#extend)
    */
   extend<
     TExtendedPath extends string,
@@ -281,7 +281,7 @@ export class Route<
   }
 
   /**
-   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#hasopenedchildren-boolean)
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#hasopenedchildren)
    */
   get hasOpenedChildren(): boolean {
     return this.children.some(
@@ -360,7 +360,7 @@ export class Route<
   /**
    * Navigates to this route.
    *
-   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#open-args)
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#open)
    */
   open(
     ...args: IsPartial<TInputParams> extends true
@@ -393,7 +393,7 @@ export class Route<
   /**
    * Navigates to this route.
    *
-   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#open-args)
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#open)
    */
   async open(...args: any[]) {
     const {

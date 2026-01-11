@@ -35,7 +35,7 @@ export class RouteGroup<TRoutesCollection extends RoutesCollection>
   /**
    * Returns true if at least one route in the group is open.
    *
-   * [**Documentation**](https://js2me.github.io/mobx-route/core/RouteGroup.html#isopened-boolean)
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/RouteGroup.html#isopened)
    */
   get isOpened(): boolean {
     const routes = Object.values(this.routes);
@@ -49,7 +49,7 @@ export class RouteGroup<TRoutesCollection extends RoutesCollection>
   /**
    * First found index route.
    *
-   * [**Documentation**](https://js2me.github.io/mobx-route/core/RouteGroup.html#indexroute-route-undefined)
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/RouteGroup.html#indexroute)
    */
   get indexRoute(): AnyRouteEntity | undefined {
     return (this._indexRoute ??
@@ -61,7 +61,7 @@ export class RouteGroup<TRoutesCollection extends RoutesCollection>
   /**
    * Main navigation method for the group.
    *
-   * [**Documentation**](https://js2me.github.io/mobx-route/core/RouteGroup.html#open-args-any-void)
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/RouteGroup.html#open)
    */
   open(...args: any[]) {
     let lastGroupRoute: RouteGroup<any> | undefined;

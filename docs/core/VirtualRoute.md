@@ -43,7 +43,7 @@ const ageModalRoute = createVirtualRoute<{ age: number }>({
 
 ## Methods and properties  
 
-### `isOpened: boolean` <Badge type="tip" text="computed" />  
+### `isOpened` <Badge type="tip" text="computed" />  
 Indicates whether route is active. Automatically updates when dependencies change.  
 
 Example:   
@@ -57,19 +57,15 @@ autorun(() => {
 });
 ```
 
-### `isOuterOpened: boolean | undefined` <Badge type="info" text="observable.ref" />  
-Indicates the external "opened" state determined by the `checkOpened` function.  
-This value is automatically updated when the `checkOpened` function's dependencies change.
-
-### `isOpening: boolean` <Badge type="tip" text="computed" />  
+### `isOpening` <Badge type="tip" text="computed" />  
 Indicates if this route is currently in the process of opening.  
 Returns `true` when the route status is `'opening'`.
 
-### `isClosing: boolean` <Badge type="tip" text="computed" />  
+### `isClosing` <Badge type="tip" text="computed" />  
 Indicates if this route is currently in the process of closing.  
 Returns `true` when the route status is `'closing'`.
 
-### `params: TParams` <Badge type="info" text="observable" />  
+### `params` <Badge type="info" text="observable" />  
 Current virtual route parameters. Type is determined by generic type parameter.   
 Example:  
 ```ts
@@ -78,23 +74,30 @@ route.open({ userId: '123' });
 route.params?.userId; // '123'
 ```
 
-### `query: IQueryParams`  
+### `query`  
 Interface for managing query parameters from [`mobx-location-history` package](https://github.com/js2me/mobx-location-history).  
 Automatically synchronized with current url.  
 
-### `open(params?, extraParams?: { query?, replace?   }): Promise<void> ` <Badge type="info" text="action" />  
+### `open()` <Badge type="info" text="action" />  
 Activates the route with execution flow:  
 1. Updates params/query
 2. Uses custom `open` handler if provided for change `isOpened` or sets `isOpened` `true   
 
-### `close(): void` <Badge type="info" text="action" />  
+### `close()` <Badge type="info" text="action" />  
 Deactivates the route. Behavior depends on configuration:  
 1. Uses custom close handler if provided  
 2. Default behavior sets isOpened to false  
 
-### `setOpenChecker(openChecker): void` <Badge type="info" text="action" />
+### `setOpenChecker()` <Badge type="info" text="action" />
 Updates the `openChecker` value with the provided one.   
 `openChecker` is a function or a boolean value that determines whether the route is open or not.
+
+### `isOuterOpened` <Badge type="info" text="observable.ref" />  
+::: warning This property is not recommended for detecting the opened state. Use the [`isOpened`](/core/VirtualRoute#isopened) property instead.
+:::
+
+Indicates the external "opened" state determined by the `checkOpened` function.  
+This value is automatically updated when the `checkOpened` function's dependencies change.
 
 ## Configuration   
 **Interface**: `VirtualRouteConfiguration`  

@@ -32,7 +32,7 @@ const routesGroup = createRouteGroup({
 ## Methods and properties  
 
 
-### `isOpened: boolean` <Badge type="tip" text="computed.struct" />   
+### `isOpened` <Badge type="tip" text="computed" />   
 
 Returns `true` if at least one route in the group is open.  
 
@@ -47,8 +47,8 @@ group.routes.home.open();
 group.isOpened; // true
 ```
 
-### `indexRoute: Route | undefined` <Badge type="tip" text="computed.struct" />  
-First found `index` route defined by [`isIndex` property](/core/Route.html#isindex-boolean)   
+### `indexRoute` <Badge type="tip" text="computed" />  
+First found `index` route defined by [`isIndex` property](/core/Route.html#isindex)   
 
 Example:  
 ```ts
@@ -60,7 +60,7 @@ const fruits = createRouteGroup({
 fruits.routes.list === fruits.indexRoute; // true
 ```
 
-### `open(...args: any[]): void`    
+### `open()`    
 
 Main navigation method for the group. Behavior:  
 1. Looks for an index route (with the `index: true` flag) in the group  

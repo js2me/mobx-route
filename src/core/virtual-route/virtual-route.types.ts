@@ -22,7 +22,7 @@ export interface AbstractVirtualRoute<
   params: TParams | null;
 
   /**
-   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#open-params-extraparams-query-replace-promise-void)
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#open)
    */
   open(
     ...args: IsPartial<TParams> extends true

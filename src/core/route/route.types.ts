@@ -125,14 +125,14 @@ export interface IRoute<
   pathDeclaration: TPath;
 
   /**
-   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#hasopenedchildren-boolean)
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#hasopenedchildren)
    */
   hasOpenedChildren: boolean;
 
   /**
    * Navigates to this route.
    *
-   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#open-args)
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#open)
    */
   open(
     ...args: IsPartial<TInputParams> extends true
