@@ -57,6 +57,18 @@ autorun(() => {
 });
 ```
 
+### `isOuterOpened: boolean | undefined` <Badge type="info" text="observable.ref" />  
+Indicates the external "opened" state determined by the `checkOpened` function.  
+This value is automatically updated when the `checkOpened` function's dependencies change.
+
+### `isOpening: boolean` <Badge type="tip" text="computed" />  
+Indicates if this route is currently in the process of opening.  
+Returns `true` when the route status is `'opening'`.
+
+### `isClosing: boolean` <Badge type="tip" text="computed" />  
+Indicates if this route is currently in the process of closing.  
+Returns `true` when the route status is `'closing'`.
+
 ### `params: TParams` <Badge type="info" text="observable" />  
 Current virtual route parameters. Type is determined by generic type parameter.   
 Example:  
@@ -162,6 +174,23 @@ const route = createVirtualRoute({
 })
 ```
 
+### `getAutomatedOpenParams()`   
+Function that returns parameters for automated route opening.  
+This function is called when the route is automatically opened based on the `checkOpened` function result.  
+It should return an object with `params` and optionally `extra` properties.
+
+Example:   
+```ts
+const route = createVirtualRoute({
+  checkOpened: () => !!queryParams.data.modal,
+  getAutomatedOpenParams: (route) => {
+    return {
+      params: { id: queryParams.data.modalId },
+      extra: { query: { modal: 'true' } }
+    };
+  }
+})
+```
 
 ### `beforeOpen`  
 Event handler "before opening" a route, required for various checks before the route itself is opened.   
@@ -181,6 +210,22 @@ const route = createVirtualRoute('/foo/bar', {
   beforeOpen: () => {
     if (!auth.isAuth) {
       return false;
+    }
+  }
+})
+```
+
+### `beforeClose()`  
+Event handler "before closing" a route, required for various checks before the route itself is closed.   
+With this handler, we can prevent the route from closing by returning `false`.
+
+Example:   
+```ts
+const route = createVirtualRoute({
+  checkOpened: () => !!queryParams.data.modal,
+  beforeClose: () => {
+    if (hasUnsavedChanges) {
+      return false; // Prevent closing
     }
   }
 })

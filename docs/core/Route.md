@@ -118,6 +118,9 @@ stars.open();
 stars.isOpened; // true
 ```
 
+### `isOpening: boolean` <Badge type="tip" text="computed" />   
+Indicates if this route is currently in the process of opening.  
+Returns `true` when the route status is `'opening'`.
 
 ### `params: ParsedPathParams | null`  <Badge type="tip" text="computed.struct" />  
 Current parsed path parameters. `null` if route isn't open.  
@@ -152,7 +155,7 @@ routeA.path; // '/foo/bar/1234'
 
 
 ### `pathDeclaration: string`  
-Route path declaration (used for `path-to-regexp`)  
+Route path pattern declaration (used for route matching, `path-to-regexp`)  
 
 Example:  
 ```ts
@@ -197,15 +200,6 @@ starDetails.createUrl({ starId: 1 }, { baz: 2 }, true); // /stars/1?bar=1&baz=2
 ```
 
 More about `mergeQuery` you can read [here](/core/routeConfig#mergequery)   
-
-### `path: string`  
-Original path pattern used for route matching.  
-
-Example:   
-```ts
-const starDetails = createRoute('/stars/:starId');
-starDetails.path; // /stars/:starId
-```
 
 ### `addChildren(...routes: AnyRoute[]): void` <Badge type="info" text="action" />     
 Manually add child routes. Prefer `extend()` for typical use cases.  
