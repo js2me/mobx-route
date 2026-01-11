@@ -1,14 +1,8 @@
 import { LinkedAbortController } from 'linked-abort-controller';
-import {
-  action,
-  computed,
-  makeObservable,
-  observable,
-  reaction,
-  runInAction,
-} from 'mobx';
+import { action, computed, observable, reaction, runInAction } from 'mobx';
 import type { IQueryParams } from 'mobx-location-history';
 import { callFunction } from 'yummies/common';
+import { applyObservable, type ObservableAnnotationsArray } from 'yummies/mobx';
 import type { AnyObject, EmptyObject, IsPartial, Maybe } from 'yummies/types';
 import { routeConfig } from '../config/index.js';
 import type {
@@ -17,6 +11,13 @@ import type {
   VirtualRouteConfiguration,
   VirtualRouteTrx,
 } from './virtual-route.types.js';
+
+const annotations: ObservableAnnotationsArray<VirtualRoute<any>> = [
+  [observable, 'params'],
+  [observable.ref, 'status', 'trx', 'openChecker', 'isOuterOpened'],
+  [computed, 'isOpened', 'isOpening', 'isClosing'],
+  [action, 'setOpenChecker', 'open', 'close'],
+];
 
 /**
  * Class for creating routes with custom activation logic
@@ -45,7 +46,10 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
 
   private skipAutoOpenClose: boolean;
 
-  private isOuterOpened: boolean | undefined;
+  /**
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#isouteropened-boolean)
+   */
+  isOuterOpened: boolean | undefined;
 
   constructor(protected config: VirtualRouteConfiguration<TParams> = {}) {
     this.abortController = new LinkedAbortController(config.abortSignal);
@@ -56,18 +60,7 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
     this.isOuterOpened = this.openChecker?.(this);
     this.status = this.isOuterOpened ? 'opened' : 'unknown';
 
-    observable(this, 'params');
-    observable.ref(this, 'status');
-    observable.ref(this, 'trx');
-    observable.ref(this, 'openChecker');
-    observable.ref(this, 'isOuterOpened');
-    computed(this, 'isOpened');
-    computed(this, 'isOpening');
-    computed(this, 'isClosing');
-    action(this, 'setOpenChecker');
-    action(this, 'open');
-    action(this, 'close');
-    makeObservable(this);
+    applyObservable(this, annotations);
 
     this.abortController.signal.addEventListener(
       'abort',

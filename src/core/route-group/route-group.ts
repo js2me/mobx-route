@@ -1,5 +1,5 @@
-import { computed, makeObservable, observable } from 'mobx';
-
+import { computed, observable } from 'mobx';
+import { applyObservable, type ObservableAnnotationsArray } from 'yummies/mobx';
 import type {
   AbstractRouteGroup,
   AnyRouteEntity,
@@ -7,6 +7,11 @@ import type {
 } from './route-group.types.js';
 
 declare const process: { env: { NODE_ENV?: string } };
+
+const annotations: ObservableAnnotationsArray<RouteGroup<any>> = [
+  [computed, 'isOpened', 'indexRoute'],
+  [observable.shallow, 'routes'],
+];
 
 /**
  * Class for grouping related routes and managing their state.
@@ -24,10 +29,7 @@ export class RouteGroup<TRoutesCollection extends RoutesCollection>
   ) {
     this.routes = routes;
 
-    computed.struct(this, 'isOpened');
-    computed.struct(this, 'indexRoute');
-    observable.shallow(this, 'routes');
-    makeObservable(this);
+    applyObservable(this, annotations);
   }
 
   /**

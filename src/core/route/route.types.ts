@@ -122,7 +122,7 @@ export interface IRoute<
 > {
   isOpened: boolean;
   isOpening: boolean;
-  path: TPath;
+  pathDeclaration: TPath;
 
   /**
    * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#hasopenedchildren-boolean)
@@ -181,7 +181,7 @@ type Simplify<T> = T extends infer U ? { [K in keyof U]: U[K] } : never;
 
 export type RouteParams<TRoute extends AnyAbstractRouteEntity> =
   TRoute extends { path: string }
-    ? ParsedPathParams<TRoute['path']>
+    ? ParsedPathParams<TRoute['pathDeclaration']>
     : TRoute extends { params: infer TParams }
       ? Exclude<TParams, null>
       : AnyObject;

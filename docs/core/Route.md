@@ -140,14 +140,26 @@ const routeB = routeA.extend('/b');
 routeB.parent === routeA; // true
 ```
 
-### `currentPath: ParsedPathName | null` <Badge type="tip" text="computed" />   
+### `path: ParsedPathName | null` <Badge type="tip" text="computed" />   
 Matched path segment for current URL. `null` if route isn't open.  
 
 Example:  
 ```ts
 const routeA = createRoute('/foo/bar/:baz');
 location.href = '/foo/bar/1234';
-routeA.currentPath; // '/foo/bar/1234'
+routeA.path; // '/foo/bar/1234'
+```
+
+
+### `pathDeclaration: string`  
+Route path declaration (used for `path-to-regexp`)  
+
+Example:  
+```ts
+const routeA = createRoute('/foo/bar/:baz');
+location.href = '/foo/bar/1234';
+routeA.pathDeclaration; // '/foo/bar/:baz'
+routeA.path; // '/foo/bar/1234'
 ```
 
 ### `hasOpenedChildren: boolean` <Badge type="tip" text="computed" />   

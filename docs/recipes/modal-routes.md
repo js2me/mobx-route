@@ -15,15 +15,15 @@ There are two primary approaches here:
 One possible implementation:   
 
 ```ts
-export const modalRoute = createVirtualRoute({
-  checkOpened: ({ query }) => !!query.data.yourModal,
+export const authModal = createVirtualRoute({
+  checkOpened: ({ query }) => !!query.data.authModal,
   open: (_, { query }) => {
-    query.update({ yourModal: true });
-    return true;
+    if (query.data.authModal) {
+      query.update({ authModal: true });
+    }
   },
   close: ({ query }) => {
-    query.update({ yourModal: undefined });
-    return false;
+    query.update({ authModal: null });
   },
 });
 ```
@@ -31,19 +31,19 @@ export const modalRoute = createVirtualRoute({
 Variant with specifying additional parameters via Query:     
 
 ```ts
-export const modalRoute = createVirtualRoute({
+export const authModal = createVirtualRoute({
   initialParams: ({ query }) => ({
     paramA: query.data.paramA || '',
     paramB: query.data.paramA || '',
   }),
-  checkOpened: ({ query }) => !!query.data.yourModal,
+  checkOpened: ({ query }) => !!query.data.authModal,
   open: (params, { query }) => {
-    query.update({ yourModal: true, ...params });
-    return true;
+    if (query.data.authModal) {
+      query.update({ authModal: true, ...params });
+    }
   },
   close: ({ query }) => {
-    query.update({ yourModal: undefined });
-    return false;
+    query.update({ authModal: undefined });
   },
 });
 ```
@@ -54,20 +54,22 @@ Possible implementations:
 
 _local state_  
 ```ts
-export const modalRoute = createVirtualRoute();
+export const authModal = createVirtualRoute();
 ```
 
 _using `localStorage`_  
 ```ts
-export const modalRoute = createVirtualRoute({
-  checkOpened: () => !!localStorage.getItem('yourModal'),
+export const authModal = createVirtualRoute({
+  checkOpened: () => !!localStorage.getItem('authModal'),
   open: () => {
-    localStorage.setItem('yourModal', true);
-    return true;
+    localStorage.setItem('authModal', true);
   },
   close: () => {
-    localStorage.removeItem('yourModal');
-    return false;
+    localStorage.removeItem('authModal');
   },
 });
 ```
+
+::: warning `localStorage.getItem()` is not reactive
+It means that route cannot use it to track changes to the `authModal` state **in dynamic**.
+:::

@@ -18,23 +18,24 @@ import { createRoute, Route } from './route.js';
 import type { InputPathParam } from './route.types.js';
 
 export const mockHistory = <THistory extends History>(history: THistory) => {
-  const spies = {
-    push: vi.spyOn(history, 'push' as any),
-    replace: vi.spyOn(history, 'replace' as any),
-  };
+  const originPush = history.push.bind(history);
+  const originReplace = history.replace.bind(history);
+
+  const pushSpy = vi.fn(originPush);
+  const replaceSpy = vi.fn(originReplace);
 
   const resetMock = () => {
-    spies.push.mockClear();
-    spies.replace.mockClear();
+    pushSpy.mockReset();
+    replaceSpy.mockReset();
   };
 
   Object.assign(history, {
-    spies,
+    push: pushSpy,
+    replace: replaceSpy,
     resetMock,
   });
 
   return history as THistory & {
-    spies: typeof spies;
     resetMock: () => void;
   };
 };
@@ -64,7 +65,7 @@ describe('route', () => {
   it('/test', async ({ signal }) => {
     const route = new Route('/test', { abortSignal: signal });
     await route.open();
-    expect(history.spies.push).toBeCalledWith('/test', null);
+    expect(history.push).toBeCalledWith('/test', null);
   });
 
   it('/test/:id/:bar{/:bar3}', async ({ signal }) => {
@@ -73,7 +74,7 @@ describe('route', () => {
       id: 1,
       bar: 'barg',
     });
-    expect(history.spies.push).toBeCalledWith('/test/1/barg', null);
+    expect(history.push).toBeCalledWith('/test/1/barg', null);
     expectTypeOf(route.open).toBeFunction();
     expectTypeOf(route.open).parameter(0).toEqualTypeOf<
       | string
@@ -90,7 +91,7 @@ describe('route', () => {
     await route.open({
       splat: [1, 2, 3],
     });
-    expect(history.spies.push).toBeCalledWith('/test/1/2/3', null);
+    expect(history.push).toBeCalledWith('/test/1/2/3', null);
   });
 
   it('/users{/:id}/delete', async () => {
@@ -98,12 +99,12 @@ describe('route', () => {
     await route.open({
       id: 1,
     });
-    expect(history.spies.push).toBeCalledWith('/users/1/delete', null);
+    expect(history.push).toBeCalledWith('/users/1/delete', null);
 
     history.resetMock();
 
     await route.open();
-    expect(history.spies.push).toBeCalledWith('/users/delete', null);
+    expect(history.push).toBeCalledWith('/users/delete', null);
 
     history.resetMock();
 
@@ -113,7 +114,7 @@ describe('route', () => {
       bar: 2,
       id: 3,
     });
-    expect(history.spies.push).toBeCalledWith('/users/3/delete/push/1/2', null);
+    expect(history.push).toBeCalledWith('/users/3/delete/push/1/2', null);
   });
 
   it('/posts{/:slug}/*rest', async () => {
@@ -122,13 +123,13 @@ describe('route', () => {
       slug: true,
       rest: [1, 2, 3, 'bar'],
     });
-    expect(history.spies.push).toBeCalledWith('/posts/true/1/2/3/bar', null);
+    expect(history.push).toBeCalledWith('/posts/true/1/2/3/bar', null);
     const otherRoute = new Route('/kek/pek');
 
     expect(otherRoute.isOpened).toBe(false);
     expect(route.isOpened).toBe(true);
     expect({
-      path: route.currentPath,
+      path: route.path,
       params: route.params,
     }).toEqual({
       path: '/posts/true/1/2/3/bar',
@@ -150,7 +151,7 @@ describe('route', () => {
         query: { a: 1 },
       },
     );
-    expect(history.spies.push).toBeCalledWith(
+    expect(history.push).toBeCalledWith(
       '/mobx-view-model/test/1/barg?a=1',
       null,
     );
@@ -196,7 +197,8 @@ describe('route', () => {
     };
 
     expect(history.location.pathname).toBe('/');
-    expect(routes.private.isOpened).toBe(true); // because location.pathname === '/' and private has index '/' route
+    // because location.pathname === '/' and private has index '/' route
+    expect(routes.private.isOpened).toBe(true);
     expect(routes.private.routes.matrices.isOpened).toBe(false);
 
     history.push('/matrices', null);
@@ -213,7 +215,7 @@ describe('route', () => {
     expect(routes.private.routes.index.isOpened).toBe(true);
     expect(routes.private.routes.techreview.isOpened).toBe(false);
 
-    expect(history.spies.push).toBeCalledWith('/', null);
+    expect(history.push).toBeCalledWith('/', null);
     expect(location.href).toBe('http://localhost:3000/');
     history.resetMock();
   });
@@ -312,7 +314,7 @@ describe('route', () => {
 
     await route.open(null, { query: { a: 1, b: 2, c: 3 } });
 
-    expect(history.spies.push).toHaveBeenNthCalledWith(
+    expect(history.push).toHaveBeenNthCalledWith(
       1,
       '/foo/bar/baz?a=1&b=2&c=3',
       null,
@@ -324,7 +326,7 @@ describe('route', () => {
       mergeQuery: true,
     });
 
-    expect(history.spies.push).toHaveBeenNthCalledWith(
+    expect(history.push).toHaveBeenNthCalledWith(
       2,
       '/asdfdsafdsa?a=1&b=2&c=4&d=4&e=5&f=6',
       null,
@@ -343,7 +345,7 @@ describe('route', () => {
       mergeQuery: true,
     });
 
-    expect(history.spies.push).toHaveBeenNthCalledWith(
+    expect(history.push).toHaveBeenNthCalledWith(
       3,
       '/route3?a=1&b=2&c=4&d=4&e=5&f=6',
       null,
@@ -504,7 +506,6 @@ describe('route', () => {
     expect(rout2.isOpened).toBe(false);
   });
 
-  // Test 1: Testing route with custom checkOpened function
   it('should respect custom checkOpened function', async () => {
     const route = new Route('/test/:id', {
       checkOpened: (parsedData) => {
@@ -512,54 +513,43 @@ describe('route', () => {
       },
     });
 
-    // Should not be opened with wrong ID
     history.push('/test/456');
     expect(route.isOpened).toBe(false);
 
-    // Should be opened with correct ID
     history.push('/test/123');
     expect(route.isOpened).toBe(true);
   });
 
-  // Test 2: Testing route with fallbackPath
   it('should use fallbackPath when compilation fails', async () => {
     const route = new Route('/test/:id', {
       fallbackPath: '/fallback',
     });
 
-    // This should trigger the fallback path since we're passing invalid params
-    const spyPush = vi.spyOn(history, 'push');
+    // null should cause compilation issue
+    await route.open({ id: null });
 
-    await route.open({ id: null }); // null should cause compilation issue
-
-    expect(spyPush).toHaveBeenCalledWith('/fallback', null);
+    expect(history.push).toHaveBeenCalledWith('/fallback', null);
   });
 
-  // Test 3: Testing route with hash routing
   it('should handle hash routing correctly', async () => {
     const route = new Route('/hash', { hash: true });
 
-    // Navigate to hash route
     history.push('#/hash');
 
     expect(route.isOpened).toBe(true);
-    expect(route.currentPath).toBe('/hash');
+    expect(route.path).toBe('/hash');
   });
 
-  // Test 4: Testing route with exact matching
   it('should respect exact matching flag', async () => {
     const route = new Route('/test', { exact: true });
 
-    // Should not match /testing
     history.push('/testing');
     expect(route.isOpened).toBe(false);
 
-    // Should match /test exactly
     history.push('/test');
     expect(route.isOpened).toBe(true);
   });
 
-  // Test 5: Testing route with custom createUrl function
   it('should use custom createUrl function', async () => {
     const customCreateUrl = vi.fn((params, query) => {
       return {
@@ -579,7 +569,6 @@ describe('route', () => {
     expect(url).toContain('/custom/test/123');
   });
 
-  // Test 6: Testing route with afterClose callback
   it('should call afterClose when route closes', async () => {
     const afterCloseFn = vi.fn();
 
@@ -587,20 +576,16 @@ describe('route', () => {
       afterClose: afterCloseFn,
     });
 
-    // Open the route
     await route.open();
     expect(route.isOpened).toBe(true);
 
-    // Change to a different route to trigger close
     history.push('/other');
 
-    // Wait a bit for the close to happen
     await sleep(10);
 
     expect(afterCloseFn).toHaveBeenCalled();
   });
 
-  // Test 7: Testing route with abort controller
   it('should properly handle abort signal', async () => {
     const abortController = new AbortController();
 
@@ -608,38 +593,31 @@ describe('route', () => {
       abortSignal: abortController.signal,
     });
 
-    // Abort the controller
     abortController.abort();
 
-    // Try to open the route - should not succeed
     await route.open();
 
-    // We can't directly access status, but we can verify it didn't open
     expect(route.isOpened).toBe(false);
   });
 
-  // Test 8: Testing route with complex nested children
   it('should handle complex nested route hierarchy', async () => {
     const parent = new Route('/admin');
     const child1 = parent.extend('/users');
     const child2 = parent.extend('/settings');
     const grandchild = child1.extend('/profile/:id');
 
-    // Open parent
     await parent.open();
     expect(parent.isOpened).toBe(true);
     expect(child1.isOpened).toBe(false);
     expect(child2.isOpened).toBe(false);
     expect(grandchild.isOpened).toBe(false);
 
-    // Open child1
     await child1.open();
     expect(parent.isOpened).toBe(true);
     expect(child1.isOpened).toBe(true);
     expect(child2.isOpened).toBe(false);
     expect(grandchild.isOpened).toBe(false);
 
-    // Open grandchild
     await grandchild.open({ id: '123' });
     expect(parent.isOpened).toBe(true);
     expect(child1.isOpened).toBe(true);
@@ -647,27 +625,156 @@ describe('route', () => {
     expect(grandchild.isOpened).toBe(true);
   });
 
-  // Test 9: Testing route with query parameter merging behavior
   it('should properly merge query parameters with different scenarios', async () => {
     const route = new Route('/test');
 
-    // Open with initial query
     await route.open(null, { query: { a: 1, b: 2 } });
 
     expect(history.locationUrl).toBe('/test?a=1&b=2');
 
-    // Open with mergeQuery: true (should preserve previous query)
     await route.open(null, {
       query: { c: 3 },
       mergeQuery: true,
     });
     expect(history.locationUrl).toBe('/test?a=1&b=2&c=3');
 
-    // Open with mergeQuery: false (should not merge)
     await route.open(null, {
       query: { d: 4 },
       mergeQuery: false,
     });
     expect(history.locationUrl).toBe('/test?d=4');
+  });
+
+  it('should skip reflect opening state because route do not have any async ops', async () => {
+    const route = new Route('/test');
+
+    expect(route.isOpening).toBe(false);
+
+    const openPromise = route.open();
+
+    expect(route.isOpening).toBe(false);
+    // because route do not have any async ops
+    expect(route.isOpened).toBe(true);
+
+    await openPromise;
+
+    expect(route.isOpening).toBe(false);
+    expect(route.isOpened).toBe(true);
+  });
+
+  it('should reflect opening state because route have any async ops', async () => {
+    const route = new Route('/test', {
+      beforeOpen: async () => {},
+    });
+
+    expect(route.isOpening).toBe(false);
+
+    const openPromise = route.open();
+
+    expect(route.isOpening).toBe(true);
+    expect(route.isOpened).toBe(false);
+
+    await openPromise;
+
+    expect(route.isOpening).toBe(false);
+    expect(route.isOpened).toBe(true);
+  });
+
+  it('should correctly identify opened children in complex hierarchy', async () => {
+    const parent = new Route('/admin');
+    const child1 = parent.extend('/users');
+    const child2 = parent.extend('/settings');
+    const grandchild1 = child1.extend('/profile');
+
+    expect(parent.hasOpenedChildren).toBe(false);
+    expect(child1.hasOpenedChildren).toBe(false);
+    expect(child2.hasOpenedChildren).toBe(false);
+
+    await parent.open();
+
+    await child1.open();
+    expect(parent.hasOpenedChildren).toBe(true);
+
+    await grandchild1.open();
+    expect(parent.hasOpenedChildren).toBe(true);
+    expect(child1.hasOpenedChildren).toBe(true);
+  });
+
+  it('should correctly transform params with custom params function', async () => {
+    const route = new Route('/test/:id', {
+      params: (parsedParams) => {
+        return {
+          transformedId: parseInt(parsedParams.id) * 2,
+          originalId: parsedParams.id,
+        };
+      },
+    });
+
+    await route.open({ id: '5' });
+
+    expect(route.params).toEqual({
+      transformedId: 10,
+      originalId: '5',
+    });
+  });
+
+  it('should correctly return current path for different route configurations', async () => {
+    const regularRoute = new Route('/test/:id');
+    await regularRoute.open({ id: '123' });
+    expect(regularRoute.path).toBe('/test/123');
+
+    const hashRoute = new Route('/hash', { hash: true });
+    history.push('#/hash');
+    expect(hashRoute.path).toBe('/hash');
+
+    const baseUrlRoute = new Route('/path', { baseUrl: '/app' });
+    history.push('/app/path');
+    expect(baseUrlRoute.path).toBe('/path');
+  });
+
+  it('should correctly generate URLs with various parameter combinations', async () => {
+    const route = new Route('/test/:id/:name');
+
+    const url1 = route.createUrl({ id: '123', name: 'john' });
+    expect(url1).toBe('/test/123/john');
+
+    const url2 = route.createUrl(
+      { id: '123', name: 'john' },
+      { filter: 'active' },
+    );
+    expect(url2).toBe('/test/123/john?filter=active');
+
+    const url3 = route.createUrl(
+      { id: '123', name: 'john' },
+      { filter: 'active' },
+      true,
+    );
+    expect(url3).toBe('/test/123/john?filter=active');
+  });
+
+  it('should respect global mergeQuery setting of true', async () => {
+    routeConfig.update({
+      mergeQuery: true,
+    });
+
+    const route = new Route('/test');
+
+    await route.open(null, { query: { a: 1, b: 2 } });
+    expect(history.location.pathname).toBe('/test');
+    expect(history.location.search).toBe('?a=1&b=2');
+
+    await route.open(null, { query: { c: 3 } });
+    expect(history.location.search).toBe('?a=1&b=2&c=3');
+
+    routeConfig.update({
+      mergeQuery: false,
+    });
+  });
+
+  it('should handle baseUrl that ends with slash correctly', async () => {
+    const route = new Route('/test', { baseUrl: '/app/' });
+
+    await route.open();
+    expect(history.push).toHaveBeenCalledWith('/app/test', null);
   });
 });

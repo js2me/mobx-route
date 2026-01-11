@@ -1,12 +1,5 @@
 import { LinkedAbortController } from 'linked-abort-controller';
-import {
-  action,
-  computed,
-  makeObservable,
-  observable,
-  reaction,
-  runInAction,
-} from 'mobx';
+import { computed, observable, reaction, runInAction } from 'mobx';
 import {
   buildSearchString,
   type History,
@@ -19,6 +12,7 @@ import {
   parse,
   type TokenData,
 } from 'path-to-regexp';
+import { applyObservable, type ObservableAnnotationsArray } from 'yummies/mobx';
 import type { AnyObject, IsPartial, Maybe } from 'yummies/types';
 import { routeConfig } from '../config/index.js';
 import type {
@@ -33,6 +27,22 @@ import type {
   RouteNavigateParams,
   UrlCreateParams,
 } from './route.types.js';
+
+const annotations: ObservableAnnotationsArray<Route<any, any, any, any>> = [
+  [
+    computed,
+    'isPathMatched',
+    'isOpened',
+    'isOpening',
+    'path',
+    'hasOpenedChildren',
+    'isAbleToMergeQuery',
+    'baseUrl',
+  ],
+  [computed.struct, 'parsedPathData', 'params'],
+  [observable, 'children'],
+  [observable.ref, 'parent', 'status'],
+];
 
 /**
  * Class for creating path based route.
@@ -83,7 +93,7 @@ export class Route<
   children: AnyRoute[] = [];
 
   constructor(
-    public path: TPath,
+    public pathDeclaration: TPath,
     protected config: RouteConfiguration<
       TPath,
       TInputParams,
@@ -100,23 +110,7 @@ export class Route<
     this.status = 'unknown';
     this.parent = config.parent ?? (null as unknown as TParentRoute);
 
-    computed(this, 'isPathMatched');
-    computed(this, 'isOpened');
-    computed.struct(this, 'data');
-    computed.struct(this, 'params');
-    computed(this, 'currentPath');
-    computed(this, 'hasOpenedChildren');
-    computed(this, 'isAbleToMergeQuery');
-    computed(this, 'baseUrl');
-
-    observable(this, 'children');
-    observable.ref(this, 'parent');
-    observable.ref(this, 'status');
-    computed(this, 'isOpening');
-    action(this, 'addChildren');
-    action(this, 'removeChildren');
-
-    makeObservable(this);
+    applyObservable(this, annotations);
 
     reaction(() => this.isPathMatched, this.checkPathMatch, {
       signal: this.abortController.signal,
@@ -147,7 +141,7 @@ export class Route<
     }
 
     if (
-      (this.path === '' || this.path === '/') &&
+      (this.pathDeclaration === '' || this.pathDeclaration === '/') &&
       (pathnameToCheck === '/' || pathnameToCheck === '')
     ) {
       return { params: {} as any, path: pathnameToCheck };
@@ -173,9 +167,9 @@ export class Route<
   /**
    * Matched path segment for current URL.
    *
-   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#currentpath-parsedpathname-null)
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#path-parsedpathname-null)
    */
-  get currentPath(): string | null {
+  get path(): string | null {
     return this.parsedPathData?.path ?? null;
   }
 
@@ -243,7 +237,7 @@ export class Route<
     TExtendedOutputParams extends AnyObject = TInputParams &
       ParsedPathParams<`${TPath}${TExtendedPath}`>,
   >(
-    path: TExtendedPath,
+    pathDeclaration: TExtendedPath,
     config?: Omit<
       RouteConfiguration<
         `${TPath}${TExtendedPath}`,
@@ -264,7 +258,7 @@ export class Route<
       TInputParams & TExtendedInputParams,
       TExtendedOutputParams,
       ParentRoute
-    >(`${this.path}${path}`, {
+    >(`${this.pathDeclaration}${pathDeclaration}`, {
       ...configFromCurrentRoute,
       ...config,
       parent: this,
@@ -437,7 +431,7 @@ export class Route<
 
   protected get tokenData() {
     if (!this._tokenData) {
-      this._tokenData = parse(this.path, this.config.parseOptions);
+      this._tokenData = parse(this.pathDeclaration, this.config.parseOptions);
     }
     return this._tokenData;
   }

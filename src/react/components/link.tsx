@@ -26,11 +26,11 @@ interface LinkAnchorProps
 
 type LinkPathRouteProps<TRoute extends AnyRoute> = {
   to: TRoute;
-} & (IsPartial<InputPathParams<TRoute['path']>> extends true
+} & (IsPartial<InputPathParams<TRoute['pathDeclaration']>> extends true
   ? {
-      params?: InputPathParams<TRoute['path']> | null | undefined;
+      params?: InputPathParams<TRoute['pathDeclaration']> | null | undefined;
     }
-  : { params: InputPathParams<TRoute['path']> });
+  : { params: InputPathParams<TRoute['pathDeclaration']> });
 
 type LinkSimpleRouteProps =
   | {

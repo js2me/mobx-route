@@ -1,17 +1,20 @@
-import { computed, makeObservable } from 'mobx';
+import { computed } from 'mobx';
 import {
   buildSearchString,
   type History,
   type IQueryParams,
 } from 'mobx-location-history';
-
+import { applyObservable, type ObservableAnnotationsArray } from 'yummies/mobx';
 import { routeConfig } from '../config/index.js';
 import type { RoutesCollection } from '../route-group/index.js';
-
 import type {
   RouterConfiguration,
   RouterNavigateOptions,
 } from './router.types.js';
+
+const annotations: ObservableAnnotationsArray<Router<any>> = [
+  [computed.struct, 'location'],
+];
 
 /**
  * Class for centralized routing management.
@@ -28,9 +31,7 @@ export class Router<TRoutesCollection extends RoutesCollection> {
     this.history = config.history ?? routeConfig.get().history;
     this.query = config.queryParams ?? routeConfig.get().queryParams;
 
-    computed.struct(this, 'location');
-
-    makeObservable(this);
+    applyObservable(this, annotations);
   }
 
   get location() {

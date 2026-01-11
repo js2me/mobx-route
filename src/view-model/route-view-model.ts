@@ -12,7 +12,13 @@ import {
   ViewModelBase,
   type ViewModelParams,
 } from 'mobx-view-model';
+import type { ObservableAnnotationsArray } from 'yummies/mobx';
 import type { EmptyObject } from 'yummies/types';
+
+const annotations: ObservableAnnotationsArray<RouteViewModel<any>> = [
+  [computed.struct, 'pathParams'],
+  [computed, 'query'],
+];
 
 export abstract class RouteViewModel<
   TRoute extends AnyAbstractRouteEntity = AnyAbstractRouteEntity,
@@ -22,14 +28,7 @@ export abstract class RouteViewModel<
   constructor(params: ViewModelParams<EmptyObject, any>) {
     super(params);
 
-    applyObservable(
-      this,
-      [
-        ['pathParams', computed.struct],
-        ['query', computed],
-      ],
-      this.vmConfig.observable.viewModels,
-    );
+    applyObservable(this, annotations, this.vmConfig.observable.viewModels);
 
     when(
       () => this.isMounted,
