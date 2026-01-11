@@ -453,6 +453,8 @@ export class Route<
         runInAction(() => {
           this.status = 'open-rejected';
         });
+
+        return;
       }
 
       if (typeof feedback === 'object') {

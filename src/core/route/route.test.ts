@@ -1,6 +1,6 @@
 /** biome-ignore-all lint/nursery/noFloatingPromises: <explanation> */
 
-import { when } from 'mobx';
+import { observable, when } from 'mobx';
 import { createBrowserHistory, type History } from 'mobx-location-history';
 import {
   beforeAll,
@@ -776,5 +776,55 @@ describe('route', () => {
 
     await route.open();
     expect(history.push).toHaveBeenCalledWith('/app/test', null);
+  });
+
+  it('protected route (by checkOpened)', async () => {
+    vi.useFakeTimers();
+
+    const protectBox = observable.box(false);
+
+    const route = createRoute('/foo/bar', {
+      checkOpened: () => protectBox.get(),
+    });
+
+    history.push('/foo/bar');
+
+    await vi.runAllTimersAsync();
+
+    expect(history.locationUrl).toBe('/foo/bar');
+    expect(route.isOpened).toBe(false);
+
+    protectBox.set(true);
+
+    expect(history.locationUrl).toBe('/foo/bar');
+    expect(route.isOpened).toBe(true);
+
+    vi.useRealTimers();
+  });
+
+  it('protected route (by beforeOpen)', async () => {
+    vi.useFakeTimers();
+
+    const protectBox = observable.box(false);
+
+    const route = createRoute('/foo/bar', {
+      beforeOpen: () => protectBox.get(),
+    });
+
+    history.push('/foo/bar');
+
+    await vi.runAllTimersAsync();
+
+    expect(history.locationUrl).toBe('/foo/bar');
+    expect(route.isOpened).toBe(false);
+
+    protectBox.set(true);
+
+    expect(history.locationUrl).toBe('/foo/bar');
+    // because beforeOpen returns false
+    // and it calls once
+    expect(route.isOpened).toBe(false);
+
+    vi.useRealTimers();
   });
 });
