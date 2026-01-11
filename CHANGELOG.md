@@ -1,5 +1,23 @@
 # mobx-route
 
+## 0.22.0
+
+### Minor Changes
+
+- [`285385a`](https://github.com/js2me/mobx-route/commit/285385ab27ebdf31e306b3322a63fa08ef651814) Thanks [@js2me](https://github.com/js2me)! - add `useLastOpened` prop for `<RouteViewGroup/>`
+
+- [`cf5d5ce`](https://github.com/js2me/mobx-route/commit/cf5d5ce0dc2ca751654daaad24d004f29b2a7a98) Thanks [@js2me](https://github.com/js2me)! - [internal] added more unit tests for virtual routes / routes
+
+- [`cf5d5ce`](https://github.com/js2me/mobx-route/commit/cf5d5ce0dc2ca751654daaad24d004f29b2a7a98) Thanks [@js2me](https://github.com/js2me)! - BREAKING!: bump `mobx-view-model` **peer dependency** to 8.x + update yummies to 7.x (for `applyObservable` use)
+
+- [`bd70ebf`](https://github.com/js2me/mobx-route/commit/bd70ebf04796b3a4b9d9305ebc9064243251389e) Thanks [@js2me](https://github.com/js2me)! - added async open\close methods for virtual routes
+
+- [`bd70ebf`](https://github.com/js2me/mobx-route/commit/bd70ebf04796b3a4b9d9305ebc9064243251389e) Thanks [@js2me](https://github.com/js2me)! - realized beforeClose, afterOpen, beforeOpen lifecycle methods for virtual routes
+
+### Patch Changes
+
+- [`cf5d5ce`](https://github.com/js2me/mobx-route/commit/cf5d5ce0dc2ca751654daaad24d004f29b2a7a98) Thanks [@js2me](https://github.com/js2me)! - [internal] added unit tests for `routeConfig`
+
 ## 0.21.0
 
 ### Minor Changes
