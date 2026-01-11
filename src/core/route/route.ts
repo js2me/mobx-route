@@ -160,6 +160,9 @@ export class Route<
     return parsed as ParsedPathData<TPath>;
   }
 
+  /**
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#isopening-boolean)
+   */
   get isOpening() {
     return this.status === 'opening';
   }

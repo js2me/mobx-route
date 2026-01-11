@@ -2,7 +2,7 @@ import type { RawQueryParamsData } from 'mobx-location-history';
 import type { MatchOptions, ParseOptions } from 'path-to-regexp';
 import type { AnyObject, IsPartial, Maybe, MaybePromise } from 'yummies/types';
 import type { RouteGlobalConfig } from '../config/index.js';
-import type { AnyAbstractRouteEntity } from '../route-group/index.js';
+import type { AnyAbstractRouteEntity } from '../route-group/route-group.types.js';
 import type { VirtualRoute } from '../virtual-route/index.js';
 import type { Route } from './route.js';
 
@@ -180,7 +180,9 @@ export type ParsedPathParam = string;
 type Simplify<T> = T extends infer U ? { [K in keyof U]: U[K] } : never;
 
 export type RouteParams<TRoute extends AnyAbstractRouteEntity> =
-  TRoute extends { path: string }
+  TRoute extends {
+    pathDeclaration: string;
+  }
     ? ParsedPathParams<TRoute['pathDeclaration']>
     : TRoute extends { params: infer TParams }
       ? Exclude<TParams, null>
