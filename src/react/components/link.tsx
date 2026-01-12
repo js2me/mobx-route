@@ -96,7 +96,7 @@ export const Link = observer(
 
       if (outerHref) {
         href = outerHref;
-      } else {
+      } else if (to) {
         if (typeof to === 'string') {
           const isNeedToMergeQuery =
             navigateParams.mergeQuery ?? cfg.mergeQuery;
@@ -112,7 +112,7 @@ export const Link = observer(
           };
 
           href = `${path}${buildSearchString(query)}`;
-        } else if ('createUrl' in to) {
+        } else {
           href = to.createUrl(
             params,
             navigateParams.query,
