@@ -17,7 +17,7 @@ import {
   useRef,
 } from 'react';
 import { isShallowEqual } from 'yummies/data';
-import type { IsPartial } from 'yummies/types';
+import type { IsPartial, Maybe } from 'yummies/types';
 
 interface LinkAnchorProps
   extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
@@ -37,7 +37,7 @@ type LinkSimpleRouteProps =
       to: string;
     }
   | {
-      href: string;
+      href: Maybe<string>;
     };
 
 export type LinkProps<TRoute extends AnyRoute> = LinkAnchorProps &
