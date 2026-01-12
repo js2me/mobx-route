@@ -1,5 +1,11 @@
 # mobx-route
 
+## 0.23.0
+
+### Minor Changes
+
+- [`087ab33`](https://github.com/js2me/mobx-route/commit/087ab3363d365699e73a07f985568e7475944fed) Thanks [@js2me](https://github.com/js2me)! - make href prop is Maybe for Link component
+
 ## 0.22.1
 
 ### Patch Changes
