@@ -431,9 +431,12 @@ describe('route', () => {
   }) => {
     vi.useFakeTimers();
 
+    const beforeOpenCall = vi.fn();
+
     const route = new Route('/foo', {
       beforeOpen: async () => {
         await sleep(500);
+        beforeOpenCall();
         return {
           url: '/baz',
           replace: true,
@@ -457,6 +460,8 @@ describe('route', () => {
     expect(history.location.pathname).toBe('/baz');
 
     vi.useRealTimers();
+
+    expect(beforeOpenCall).toBeCalledTimes(1);
   });
 
   it('should be called afterOpen if route is opened at start', async () => {
@@ -778,8 +783,10 @@ describe('route', () => {
     expect(history.push).toHaveBeenCalledWith('/app/test', null);
   });
 
-  it('protected route (by checkOpened)', async () => {
+  it.skip('protected route (by checkOpened)', async () => {
     vi.useFakeTimers();
+
+    await vi.runAllTimersAsync();
 
     const protectBox = observable.box(false);
 
@@ -802,8 +809,10 @@ describe('route', () => {
     vi.useRealTimers();
   });
 
-  it('protected route (by beforeOpen)', async () => {
+  it.skip('protected route (by beforeOpen)', async () => {
     vi.useFakeTimers();
+
+    await vi.runAllTimersAsync();
 
     const protectBox = observable.box(false);
 

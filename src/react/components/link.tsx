@@ -57,117 +57,115 @@ export const Link = observer(
         to: string | AnyRoute;
         href: string;
       }
-  >(
-    (
-      {
-        to,
-        href: outerHref,
+  >((props, ref) => {
+    const {
+      to,
+      href: outerHref,
+      mergeQuery,
+      asChild,
+      children,
+      params,
+      // route navigate params
+      query,
+      replace,
+      state,
+      //
+      ...outerAnchorProps
+    } = props;
+
+    const isExternalNavigation =
+      outerAnchorProps.target === '_blank' ||
+      outerAnchorProps.target === 'blank';
+    const queryDataRef = useRef<RouteNavigateParams['query']>(query);
+
+    if (!isShallowEqual(queryDataRef.current, query)) {
+      queryDataRef.current = query;
+    }
+
+    const { href, navigateParams } = useMemo(() => {
+      const navigateParams: RouteNavigateParams = {
         mergeQuery,
-        asChild,
-        children,
-        params,
-        // route navigate params
         query,
         replace,
         state,
-        ...outerAnchorProps
-      },
-      ref,
-    ) => {
-      const isExternalNavigation =
-        outerAnchorProps.target === '_blank' ||
-        outerAnchorProps.target === 'blank';
-      const queryDataRef = useRef<RouteNavigateParams['query']>(query);
+      };
 
-      if (!isShallowEqual(queryDataRef.current, query)) {
-        queryDataRef.current = query;
+      const cfg = routeConfig.get();
+
+      let href: string = '';
+
+      if (outerHref) {
+        href = outerHref;
+      } else {
+        if (typeof to === 'string') {
+          const isNeedToMergeQuery =
+            navigateParams.mergeQuery ?? cfg.mergeQuery;
+
+          const [path, ...querySegments] = to.split('?');
+
+          const existedQuery = parseSearchString(querySegments.join('?'));
+
+          const query = {
+            ...(isNeedToMergeQuery ? cfg.queryParams.data : {}),
+            ...existedQuery,
+            ...navigateParams.query,
+          };
+
+          href = `${path}${buildSearchString(query)}`;
+        } else if ('createUrl' in to) {
+          href = to.createUrl(
+            params,
+            navigateParams.query,
+            navigateParams.mergeQuery,
+          );
+        }
       }
 
-      const { href, navigateParams } = useMemo(() => {
-        const navigateParams: RouteNavigateParams = {
-          mergeQuery,
-          query,
-          replace,
-          state,
-        };
+      return {
+        href: cfg.formatLinkHref?.(href) ?? href,
+        navigateParams,
+      };
+    }, [mergeQuery, replace, state, outerHref, to, queryDataRef.current]);
 
-        const cfg = routeConfig.get();
+    const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
+      if (
+        isExternalNavigation ||
+        event.ctrlKey ||
+        event.metaKey ||
+        event.altKey ||
+        event.shiftKey ||
+        event.button !== 0
+      )
+        return;
 
-        let href: string;
+      outerAnchorProps.onClick?.(event);
 
-        if (outerHref) {
-          href = outerHref;
+      if (!event.defaultPrevented) {
+        event.preventDefault();
+
+        if (navigateParams.replace) {
+          routeConfig.get().history.replace(href, navigateParams.state);
         } else {
-          if (typeof to === 'string') {
-            const isNeedToMergeQuery =
-              navigateParams.mergeQuery ?? cfg.mergeQuery;
-
-            const [path, ...querySegments] = to.split('?');
-
-            const existedQuery = parseSearchString(querySegments.join('?'));
-
-            const query = {
-              ...(isNeedToMergeQuery ? cfg.queryParams.data : {}),
-              ...existedQuery,
-              ...navigateParams.query,
-            };
-
-            href = `${path}${buildSearchString(query)}`;
-          } else {
-            href = to.createUrl(
-              params,
-              navigateParams.query,
-              navigateParams.mergeQuery,
-            );
-          }
+          routeConfig.get().history.push(href, navigateParams.state);
         }
+      }
+    };
 
-        return {
-          href: cfg.formatLinkHref?.(href) ?? href,
-          navigateParams,
-        };
-      }, [mergeQuery, replace, state, to, queryDataRef.current]);
+    const anchorProps = {
+      ...outerAnchorProps,
+      href,
+      onClick: handleClick,
+      rel:
+        outerAnchorProps.rel ??
+        (isExternalNavigation ? 'noopener noreferrer' : undefined),
+    };
 
-      const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
-        if (
-          isExternalNavigation ||
-          event.ctrlKey ||
-          event.metaKey ||
-          event.altKey ||
-          event.shiftKey ||
-          event.button !== 0
-        )
-          return;
-
-        outerAnchorProps.onClick?.(event);
-
-        if (!event.defaultPrevented) {
-          event.preventDefault();
-
-          if (navigateParams.replace) {
-            routeConfig.get().history.replace(href, navigateParams.state);
-          } else {
-            routeConfig.get().history.push(href, navigateParams.state);
-          }
-        }
-      };
-
-      const anchorProps = {
-        ...outerAnchorProps,
-        href,
-        onClick: handleClick,
-        rel:
-          outerAnchorProps.rel ??
-          (isExternalNavigation ? 'noopener noreferrer' : undefined),
-      };
-
-      return asChild && isValidElement(children) ? (
-        cloneElement(children, anchorProps)
-      ) : (
-        <a {...anchorProps} ref={ref}>
-          {children}
-        </a>
-      );
-    },
-  ),
+    return asChild && isValidElement(children) ? (
+      cloneElement(children, anchorProps)
+    ) : (
+      <a {...anchorProps} ref={ref}>
+        {children}
+      </a>
+    );
+  }),
 ) as unknown as LinkComponentType;
