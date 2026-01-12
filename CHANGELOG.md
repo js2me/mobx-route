@@ -1,5 +1,13 @@
 # mobx-route
 
+## 0.22.1
+
+### Patch Changes
+
+- [`4422689`](https://github.com/js2me/mobx-route/commit/4422689271f0a9f584d0a9bcec92cadffc5de433) Thanks [@js2me](https://github.com/js2me)! - fix `<Link />` component for more safety process props from bad users
+
+- [`3255c7c`](https://github.com/js2me/mobx-route/commit/3255c7ce8349bdd4d812b3573f74fbc49656303f) Thanks [@js2me](https://github.com/js2me)! - fixed `beforeOpen` `false` case handling
+
 ## 0.22.0
 
 ### Minor Changes
