@@ -140,7 +140,11 @@ export const Link = observer(
 
       outerAnchorProps.onClick?.(event);
 
-      if (!event.defaultPrevented) {
+      if (
+        !event.defaultPrevented &&
+        href.startsWith('https://') &&
+        !href.startsWith('http://')
+      ) {
         event.preventDefault();
 
         if (navigateParams.replace) {
