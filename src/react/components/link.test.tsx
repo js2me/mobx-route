@@ -16,15 +16,15 @@ describe('<Link />', () => {
     });
   });
 
-  it('should intercept https links and use history push', () => {
+  it('should intercept non-http links and use history push', () => {
     const screen = render(
-      <Link href="https://example.com/test" state={null}>
-        Go
+      <Link href="/app/profile" state={null}>
+        Go local
       </Link>,
     );
 
-    fireEvent.click(screen.getByText('Go'));
+    fireEvent.click(screen.getByText('Go local'));
 
-    expect(history.push).toHaveBeenCalledWith('https://example.com/test', null);
+    expect(history.push).toHaveBeenCalledWith('/app/profile', null);
   });
 });

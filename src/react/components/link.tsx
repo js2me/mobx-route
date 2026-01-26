@@ -142,7 +142,7 @@ export const Link = observer(
 
       if (
         !event.defaultPrevented &&
-        href.startsWith('https://') &&
+        !href.startsWith('https://') &&
         !href.startsWith('http://')
       ) {
         event.preventDefault();
