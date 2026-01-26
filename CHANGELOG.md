@@ -1,5 +1,11 @@
 # mobx-route
 
+## 0.23.2
+
+### Patch Changes
+
+- [`be514c0`](https://github.com/js2me/mobx-route/commit/be514c02266bb8fee5c8f5df55193176893ce71f) Thanks [@js2me](https://github.com/js2me)! - fixed http https links navigation using `<Link />` component
+
 ## 0.23.1
 
 ### Patch Changes
