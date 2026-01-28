@@ -2,10 +2,8 @@ import { computed, reaction, when } from 'mobx';
 import {
   type AnyAbstractRouteEntity,
   type IQueryParams,
-  Route,
   type RouteParams,
   routeConfig,
-  VirtualRoute,
 } from 'mobx-route';
 import {
   applyObservable,
@@ -48,12 +46,8 @@ export abstract class RouteViewModel<
   }
 
   override get payload(): RouteParams<TRoute> {
-    if (this.route instanceof Route) {
+    if ('params' in this.route) {
       return this.route.params || ({} as any);
-    }
-
-    if (this.route instanceof VirtualRoute) {
-      return this.route.params as any;
     }
 
     return {} as EmptyObject as any;
