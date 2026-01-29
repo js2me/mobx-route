@@ -1,5 +1,11 @@
 # mobx-route
 
+## 0.23.3
+
+### Patch Changes
+
+- [`6c2b27a`](https://github.com/js2me/mobx-route/commit/6c2b27a99430fc7932adcf8e99e48b91a72bdad9) Thanks [@js2me](https://github.com/js2me)! - fix path params for route view model
+
 ## 0.23.2
 
 ### Patch Changes
