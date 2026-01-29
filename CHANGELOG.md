@@ -1,5 +1,11 @@
 # mobx-route
 
+## 0.23.4
+
+### Patch Changes
+
+- [`c78911a`](https://github.com/js2me/mobx-route/commit/c78911a77af30c979e706d0bb0d0abe974181709) Thanks [@js2me](https://github.com/js2me)! - fixed bug with open by path match ignoring (route)
+
 ## 0.23.3
 
 ### Patch Changes
