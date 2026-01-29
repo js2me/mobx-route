@@ -464,6 +464,103 @@ describe('route', () => {
     expect(beforeOpenCall).toBeCalledTimes(1);
   });
 
+  it('should reset ignoreOpenByPathMatch when history update is skipped', async () => {
+    const route = new Route('/foo');
+    const routeAny = route as unknown as {
+      ignoreOpenByPathMatch: boolean;
+      confirmOpening: (trx: {
+        url: string;
+        params: Record<string, unknown>;
+        state: unknown;
+        query: Record<string, unknown>;
+        preferSkipHistoryUpdate: boolean;
+      }) => Promise<boolean | void>;
+    };
+
+    routeAny.ignoreOpenByPathMatch = true;
+
+    await routeAny.confirmOpening({
+      url: '/foo',
+      params: {},
+      state: null,
+      query: {},
+      preferSkipHistoryUpdate: true,
+    });
+
+    expect(routeAny.ignoreOpenByPathMatch).toBe(false);
+    expect(history.push).not.toHaveBeenCalled();
+    expect(history.replace).not.toHaveBeenCalled();
+  });
+
+  it('should set ignoreOpenByPathMatch after manual open', async () => {
+    const route = new Route('/foo');
+    const routeAny = route as unknown as {
+      ignoreOpenByPathMatch: boolean;
+    };
+
+    await route.open();
+
+    expect(routeAny.ignoreOpenByPathMatch).toBe(true);
+  });
+
+  it('should reset ignoreOpenByPathMatch on first path match', async () => {
+    const beforeOpen = vi.fn();
+    const route = new Route('/foo', {
+      beforeOpen,
+    });
+    const routeAny = route as unknown as {
+      ignoreOpenByPathMatch: boolean;
+    };
+
+    routeAny.ignoreOpenByPathMatch = true;
+
+    history.push('/foo');
+    await sleep(10);
+
+    expect(routeAny.ignoreOpenByPathMatch).toBe(false);
+    expect(beforeOpen).not.toHaveBeenCalled();
+  });
+
+  it('should keep ignoreOpenByPathMatch when path does not match', async () => {
+    const route = new Route('/foo');
+    const routeAny = route as unknown as {
+      ignoreOpenByPathMatch: boolean;
+    };
+
+    routeAny.ignoreOpenByPathMatch = true;
+
+    history.push('/bar');
+    await sleep(10);
+
+    expect(routeAny.ignoreOpenByPathMatch).toBe(true);
+  });
+
+  it('should allow path-based open after flag reset', async () => {
+    const beforeOpen = vi.fn();
+    const route = new Route('/foo', {
+      beforeOpen,
+    });
+    const routeAny = route as unknown as {
+      ignoreOpenByPathMatch: boolean;
+    };
+
+    routeAny.ignoreOpenByPathMatch = true;
+
+    history.push('/foo');
+    await sleep(10);
+
+    expect(beforeOpen).not.toHaveBeenCalled();
+    expect(routeAny.ignoreOpenByPathMatch).toBe(false);
+
+    history.push('/bar');
+    await sleep(10);
+
+    history.push('/foo');
+    await sleep(10);
+
+    expect(beforeOpen).toHaveBeenCalledTimes(1);
+  });
+
   it('should be called afterOpen if route is opened at start', async () => {
     await sleep(1000);
 

@@ -446,6 +446,10 @@ export class Route<
 
     let skipHistoryUpdate = !!trx.preferSkipHistoryUpdate;
 
+    if (skipHistoryUpdate) {
+      this.ignoreOpenByPathMatch = false;
+    }
+
     if (this.config.beforeOpen) {
       const feedback = await this.config.beforeOpen(trx);
 
