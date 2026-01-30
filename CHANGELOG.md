@@ -1,5 +1,13 @@
 # mobx-route
 
+## 0.23.5
+
+### Patch Changes
+
+- [`ab14c85`](https://github.com/js2me/mobx-route/commit/ab14c8503acc91eb119173d27fc27c47f27cde76) Thanks [@js2me](https://github.com/js2me)! - fix one creation of loadable
+
+- [`ab14c85`](https://github.com/js2me/mobx-route/commit/ab14c8503acc91eb119173d27fc27c47f27cde76) Thanks [@js2me](https://github.com/js2me)! - fixed deviant behaviout of opening\opened routes
+
 ## 0.23.4
 
 ### Patch Changes
