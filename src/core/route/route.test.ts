@@ -808,11 +808,14 @@ describe('route', () => {
     await sleep(10);
 
     await quizRoute.open();
-    await sleep(10);
+    await when(() => quizRoute.isOpened);
 
     expect(quizRoute.isOpened).toBe(true);
     expect(homeRoute.isOpened).toBe(false);
     expect(aboutRoute.isOpened).toBe(false);
+    expect(quizRoute.isOpening).toBe(false);
+    expect(homeRoute.isOpening).toBe(false);
+    expect(aboutRoute.isOpening).toBe(false);
   });
 
   it('should be called afterOpen if route is opened at start', async () => {
