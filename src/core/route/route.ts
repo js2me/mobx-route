@@ -427,8 +427,11 @@ export class Route<
       query,
     };
 
-    if (await this.confirmOpening(trx)) {
-      this.ignoreOpenByPathMatch = true;
+    this.ignoreOpenByPathMatch = true;
+    const isConfirmed = await this.confirmOpening(trx);
+
+    if (isConfirmed !== true) {
+      this.ignoreOpenByPathMatch = false;
     }
   }
 
@@ -512,6 +515,12 @@ export class Route<
       // after manual open call
       if (this.ignoreOpenByPathMatch) {
         this.ignoreOpenByPathMatch = false;
+        if (this.status === 'opening' && this.parsedPathData) {
+          runInAction(() => {
+            this.status = 'open-confirmed';
+          });
+          this.config.afterOpen?.(this.parsedPathData, this);
+        }
         return;
       }
 
@@ -525,6 +534,8 @@ export class Route<
 
       await this.confirmOpening(trx);
     } else {
+      this.ignoreOpenByPathMatch = false;
+
       const isConfirmed = this.confirmClosing();
 
       if (isConfirmed) {

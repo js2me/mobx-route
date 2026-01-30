@@ -4,7 +4,6 @@ import type {
   AnyRoute,
   AnyVirtualRoute,
 } from 'mobx-route';
-import { useRef } from 'react';
 import { type LoadableConfig, loadable } from 'react-simple-loadable';
 
 export type RouteViewComponent<TRoute extends AnyAbstractRouteEntity> =
@@ -14,11 +13,15 @@ interface RouteViewConfigWithoutRoute {
   children?: React.ReactNode | (() => React.ReactNode);
 }
 
+type LoadViewFn<TRoute extends AnyAbstractRouteEntity> = (
+  route: TRoute,
+) => Promise<RouteViewComponent<TRoute>>;
+
 export interface RouteViewConfigWithRoute<TRoute extends AnyAbstractRouteEntity>
   extends Pick<LoadableConfig, 'loading' | 'preload' | 'throwOnError'> {
   route: TRoute;
   view?: RouteViewComponent<TRoute>;
-  loadView?: (route: TRoute) => Promise<RouteViewComponent<TRoute>>;
+  loadView?: LoadViewFn<TRoute>;
   /**
    * Case when route is not opened
    */
@@ -51,9 +54,6 @@ type RouteViewBaseComponent = <TRoute extends AnyAbstractRouteEntity>(
 function RouteViewBase<TRoute extends AnyAbstractRouteEntity>(
   props: Readonly<RouteViewConfig<TRoute>>,
 ): React.ReactNode {
-  // @ts-expect-error redundand pass first argument
-  const lazyViewComponentRef = useRef<React.ComponentType<any>>();
-
   let Component: React.ComponentType<any> | undefined;
 
   if (!('route' in props)) {
@@ -66,16 +66,20 @@ function RouteViewBase<TRoute extends AnyAbstractRouteEntity>(
     return props.fallback ?? null;
   }
 
-  if (props.loadView) {
-    if (!lazyViewComponentRef.current) {
-      lazyViewComponentRef.current = loadable({
+  const loadViewFn = props.loadView as
+    | (LoadViewFn<TRoute> & { _loadableComponent: any })
+    | undefined;
+
+  if (loadViewFn) {
+    if (!loadViewFn._loadableComponent) {
+      loadViewFn._loadableComponent = loadable({
         load: () => props.loadView!(props.route),
         loading: props.loading,
         preload: props.preload,
         throwOnError: props.throwOnError,
       });
     }
-    Component = lazyViewComponentRef.current;
+    Component = loadViewFn._loadableComponent;
   } else {
     Component = props.view;
   }

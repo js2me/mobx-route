@@ -1,7 +1,12 @@
 /** biome-ignore-all lint/nursery/noFloatingPromises: <explanation> */
 
 import { observable, when } from 'mobx';
-import { createBrowserHistory, type History } from 'mobx-location-history';
+import {
+  createBrowserHistory,
+  createHashHistory,
+  createQueryParams,
+  type History,
+} from 'mobx-location-history';
 import {
   beforeAll,
   beforeEach,
@@ -464,93 +469,28 @@ describe('route', () => {
     expect(beforeOpenCall).toBeCalledTimes(1);
   });
 
-  it('should reset ignoreOpenByPathMatch when history update is skipped', async () => {
-    const route = new Route('/foo');
-    const routeAny = route as unknown as {
-      ignoreOpenByPathMatch: boolean;
-      confirmOpening: (trx: {
-        url: string;
-        params: Record<string, unknown>;
-        state: unknown;
-        query: Record<string, unknown>;
-        preferSkipHistoryUpdate: boolean;
-      }) => Promise<boolean | void>;
-    };
-
-    routeAny.ignoreOpenByPathMatch = true;
-
-    await routeAny.confirmOpening({
-      url: '/foo',
-      params: {},
-      state: null,
-      query: {},
-      preferSkipHistoryUpdate: true,
+  it('should not call beforeOpen twice after manual open', async () => {
+    const beforeOpen = vi.fn();
+    const route = new Route('/foo', {
+      beforeOpen,
     });
-
-    expect(routeAny.ignoreOpenByPathMatch).toBe(false);
-    expect(history.push).not.toHaveBeenCalled();
-    expect(history.replace).not.toHaveBeenCalled();
-  });
-
-  it('should set ignoreOpenByPathMatch after manual open', async () => {
-    const route = new Route('/foo');
-    const routeAny = route as unknown as {
-      ignoreOpenByPathMatch: boolean;
-    };
 
     await route.open();
+    await sleep(10);
 
-    expect(routeAny.ignoreOpenByPathMatch).toBe(true);
+    expect(beforeOpen).toHaveBeenCalledTimes(1);
   });
 
-  it('should reset ignoreOpenByPathMatch on first path match', async () => {
+  it('should allow path-based open after manual open', async () => {
     const beforeOpen = vi.fn();
     const route = new Route('/foo', {
       beforeOpen,
     });
-    const routeAny = route as unknown as {
-      ignoreOpenByPathMatch: boolean;
-    };
 
-    routeAny.ignoreOpenByPathMatch = true;
-
-    history.push('/foo');
+    await route.open();
     await sleep(10);
 
-    expect(routeAny.ignoreOpenByPathMatch).toBe(false);
-    expect(beforeOpen).not.toHaveBeenCalled();
-  });
-
-  it('should keep ignoreOpenByPathMatch when path does not match', async () => {
-    const route = new Route('/foo');
-    const routeAny = route as unknown as {
-      ignoreOpenByPathMatch: boolean;
-    };
-
-    routeAny.ignoreOpenByPathMatch = true;
-
-    history.push('/bar');
-    await sleep(10);
-
-    expect(routeAny.ignoreOpenByPathMatch).toBe(true);
-  });
-
-  it('should allow path-based open after flag reset', async () => {
-    const beforeOpen = vi.fn();
-    const route = new Route('/foo', {
-      beforeOpen,
-    });
-    const routeAny = route as unknown as {
-      ignoreOpenByPathMatch: boolean;
-    };
-
-    routeAny.ignoreOpenByPathMatch = true;
-
-    history.push('/foo');
-    await sleep(10);
-
-    expect(beforeOpen).not.toHaveBeenCalled();
-    expect(routeAny.ignoreOpenByPathMatch).toBe(false);
+    beforeOpen.mockClear();
 
     history.push('/bar');
     await sleep(10);
@@ -559,6 +499,320 @@ describe('route', () => {
     await sleep(10);
 
     expect(beforeOpen).toHaveBeenCalledTimes(1);
+  });
+
+  it('should allow path-based open after manual open rejection', async () => {
+    let isFirstCall = true;
+    const beforeOpen = vi.fn(() => {
+      if (isFirstCall) {
+        isFirstCall = false;
+        return false;
+      }
+    });
+    const route = new Route('/foo', {
+      beforeOpen,
+    });
+
+    await route.open();
+    await sleep(10);
+
+    expect(route.isOpened).toBe(false);
+    expect(beforeOpen).toHaveBeenCalledTimes(1);
+
+    history.push('/foo');
+    await sleep(10);
+
+    expect(beforeOpen).toHaveBeenCalledTimes(2);
+    expect(route.isOpened).toBe(true);
+  });
+
+  it('should keep home opened after manual and link navigation (hash)', async () => {
+    const hashHistory = mockHistory(createHashHistory());
+    const hashQuery = createQueryParams({ history: hashHistory });
+
+    const routeConfigWithHash = {
+      exact: true,
+      history: hashHistory,
+      queryParams: hashQuery,
+    };
+
+    const aboutRoute = createRoute('/about', routeConfigWithHash);
+    const homeRoute = createRoute('/', routeConfigWithHash);
+    const quizRoute = createRoute('/quiz', routeConfigWithHash);
+
+    hashHistory.replace('/', null);
+
+    await quizRoute.open();
+    await homeRoute.open(null, { replace: true });
+
+    hashHistory.push('/about', null);
+    await sleep(10);
+
+    hashHistory.push('/', null);
+    await sleep(10);
+
+    expect(homeRoute.isOpened).toBe(true);
+    expect(aboutRoute.isOpened).toBe(false);
+    expect(quizRoute.isOpened).toBe(false);
+  });
+
+  it('should keep quiz opened after link chain and manual quiz open', async () => {
+    const homeRoute = createRoute('/', { exact: true });
+    const quizRoute = createRoute('/quiz', { exact: true });
+    const aboutRoute = createRoute('/about', { exact: true });
+
+    history.push('/');
+    await sleep(10);
+
+    history.push('/');
+    await sleep(10);
+
+    history.push('/quiz');
+    await sleep(10);
+
+    history.push('/about');
+    await sleep(10);
+
+    await quizRoute.open();
+    await when(() => quizRoute.isOpened);
+
+    expect(quizRoute.isOpened).toBe(true);
+    expect(homeRoute.isOpened).toBe(false);
+    expect(aboutRoute.isOpened).toBe(false);
+  });
+
+  it('should open home after manual home following link chain', async () => {
+    const homeRoute = createRoute('/', { exact: true });
+    const quizRoute = createRoute('/quiz', { exact: true });
+    const aboutRoute = createRoute('/about', { exact: true });
+
+    history.push('/');
+    await sleep(10);
+
+    history.push('/quiz');
+    await sleep(10);
+
+    history.push('/about');
+    await sleep(10);
+
+    await homeRoute.open();
+    await sleep(10);
+
+    expect(homeRoute.isOpened).toBe(true);
+    expect(quizRoute.isOpened).toBe(false);
+    expect(aboutRoute.isOpened).toBe(false);
+    expect(homeRoute.isOpening).toBe(false);
+    expect(quizRoute.isOpening).toBe(false);
+    expect(aboutRoute.isOpening).toBe(false);
+  });
+
+  it('should open home after manual quiz then link home', async () => {
+    const homeRoute = createRoute('/', { exact: true });
+    const quizRoute = createRoute('/quiz', { exact: true });
+    const aboutRoute = createRoute('/about', { exact: true });
+
+    history.push('/');
+    await sleep(10);
+
+    await quizRoute.open();
+    await sleep(10);
+    expect(quizRoute.isOpening).toBe(false);
+
+    history.push('/');
+    await sleep(10);
+    expect(homeRoute.isOpening).toBe(false);
+
+    expect(homeRoute.isOpened).toBe(true);
+    expect(quizRoute.isOpened).toBe(false);
+    expect(aboutRoute.isOpened).toBe(false);
+    expect(homeRoute.isOpening).toBe(false);
+    expect(quizRoute.isOpening).toBe(false);
+    expect(aboutRoute.isOpening).toBe(false);
+  });
+
+  it('should open home after manual replace', async () => {
+    const homeRoute = createRoute('/', { exact: true });
+    const quizRoute = createRoute('/quiz', { exact: true });
+    const aboutRoute = createRoute('/about', { exact: true });
+
+    history.push('/');
+    await sleep(10);
+    expect(homeRoute.isOpening).toBe(false);
+
+    history.push('/quiz');
+    await sleep(10);
+    expect(quizRoute.isOpening).toBe(false);
+
+    await homeRoute.open(null, { replace: true });
+    await sleep(10);
+    expect(homeRoute.isOpening).toBe(false);
+
+    expect(homeRoute.isOpened).toBe(true);
+    expect(quizRoute.isOpened).toBe(false);
+    expect(aboutRoute.isOpened).toBe(false);
+    expect(homeRoute.isOpening).toBe(false);
+    expect(quizRoute.isOpening).toBe(false);
+    expect(aboutRoute.isOpening).toBe(false);
+  });
+
+  it('should open about after manual quiz and link about', async () => {
+    const homeRoute = createRoute('/', { exact: true });
+    const quizRoute = createRoute('/quiz', { exact: true });
+    const aboutRoute = createRoute('/about', { exact: true });
+
+    history.push('/');
+    await sleep(10);
+    expect(homeRoute.isOpening).toBe(false);
+
+    await quizRoute.open();
+    await sleep(10);
+    expect(quizRoute.isOpening).toBe(false);
+
+    history.push('/about');
+    await sleep(10);
+    expect(aboutRoute.isOpening).toBe(false);
+
+    expect(aboutRoute.isOpened).toBe(true);
+    expect(homeRoute.isOpened).toBe(false);
+    expect(quizRoute.isOpened).toBe(false);
+    expect(aboutRoute.isOpening).toBe(false);
+    expect(homeRoute.isOpening).toBe(false);
+    expect(quizRoute.isOpening).toBe(false);
+  });
+
+  it('should keep quiz opened after manual quiz on same path', async () => {
+    const homeRoute = createRoute('/', { exact: true });
+    const quizRoute = createRoute('/quiz', { exact: true });
+    const aboutRoute = createRoute('/about', { exact: true });
+
+    history.push('/');
+    await sleep(10);
+
+    history.push('/quiz');
+    await sleep(10);
+
+    await quizRoute.open();
+    await sleep(10);
+
+    expect(quizRoute.isOpened).toBe(true);
+    expect(homeRoute.isOpened).toBe(false);
+    expect(aboutRoute.isOpened).toBe(false);
+    expect(quizRoute.isOpening).toBe(false);
+    expect(homeRoute.isOpening).toBe(false);
+    expect(aboutRoute.isOpening).toBe(false);
+  });
+
+  it('should open quiz after link replace and manual string open', async () => {
+    const homeRoute = createRoute('/', { exact: true });
+    const quizRoute = createRoute('/quiz', { exact: true });
+    const aboutRoute = createRoute('/about', { exact: true });
+
+    history.push('/');
+    await sleep(10);
+
+    history.replace('/quiz', null);
+    await sleep(10);
+
+    history.push('/about');
+    await sleep(10);
+
+    await quizRoute.open('/quiz?mode=fast');
+    await sleep(10);
+
+    expect(quizRoute.isOpened).toBe(true);
+    expect(homeRoute.isOpened).toBe(false);
+    expect(aboutRoute.isOpened).toBe(false);
+    expect(quizRoute.isOpening).toBe(false);
+    expect(homeRoute.isOpening).toBe(false);
+    expect(aboutRoute.isOpening).toBe(false);
+  });
+
+  it('should open about after manual home replace and link about', async () => {
+    const homeRoute = createRoute('/', { exact: true });
+    const quizRoute = createRoute('/quiz', { exact: true });
+    const aboutRoute = createRoute('/about', { exact: true });
+
+    history.push('/');
+    await sleep(10);
+
+    await quizRoute.open();
+    await sleep(10);
+
+    await homeRoute.open(null, { replace: true });
+    await sleep(10);
+
+    history.push('/about?from=home');
+    await sleep(10);
+
+    expect(aboutRoute.isOpened).toBe(true);
+    expect(homeRoute.isOpened).toBe(false);
+    expect(quizRoute.isOpened).toBe(false);
+    expect(aboutRoute.isOpening).toBe(false);
+    expect(homeRoute.isOpening).toBe(false);
+    expect(quizRoute.isOpening).toBe(false);
+  });
+
+  it('should open home after manual quiz and history replace home', async () => {
+    const homeRoute = createRoute('/', { exact: true });
+    const quizRoute = createRoute('/quiz', { exact: true });
+    const aboutRoute = createRoute('/about', { exact: true });
+
+    history.push('/about');
+    await sleep(10);
+
+    await quizRoute.open();
+    await sleep(10);
+
+    history.replace('/', null);
+    await sleep(10);
+
+    expect(homeRoute.isOpened).toBe(true);
+    expect(quizRoute.isOpened).toBe(false);
+    expect(aboutRoute.isOpened).toBe(false);
+    expect(homeRoute.isOpening).toBe(false);
+    expect(quizRoute.isOpening).toBe(false);
+    expect(aboutRoute.isOpening).toBe(false);
+  });
+
+  it('should open quiz after sequential manual opens', async () => {
+    const homeRoute = createRoute('/', { exact: true });
+    const quizRoute = createRoute('/quiz', { exact: true });
+    const aboutRoute = createRoute('/about', { exact: true });
+
+    history.push('/');
+    await sleep(10);
+
+    await homeRoute.open();
+    await sleep(10);
+
+    await quizRoute.open();
+    await sleep(10);
+
+    expect(quizRoute.isOpened).toBe(true);
+    expect(homeRoute.isOpened).toBe(false);
+    expect(aboutRoute.isOpened).toBe(false);
+    expect(quizRoute.isOpening).toBe(false);
+    expect(homeRoute.isOpening).toBe(false);
+    expect(aboutRoute.isOpening).toBe(false);
+  });
+
+  it('should open quiz after manual open from about link', async () => {
+    const homeRoute = createRoute('/', { exact: true });
+    const quizRoute = createRoute('/quiz', { exact: true });
+    const aboutRoute = createRoute('/about', { exact: true });
+
+    history.push('/');
+    await sleep(10);
+
+    history.push('/about');
+    await sleep(10);
+
+    await quizRoute.open();
+    await sleep(10);
+
+    expect(quizRoute.isOpened).toBe(true);
+    expect(homeRoute.isOpened).toBe(false);
+    expect(aboutRoute.isOpened).toBe(false);
   });
 
   it('should be called afterOpen if route is opened at start', async () => {
@@ -589,6 +843,51 @@ describe('route', () => {
     expect(route.isOpened).toBe(true);
     expect(route.isOpening).toBe(false);
     expect(afterOpenFn).toBeCalledTimes(1);
+  });
+
+  it('should set isOpening immediately for manual navigation', async () => {
+    vi.useFakeTimers();
+
+    const route = new Route('/opening', {
+      beforeOpen: async () => {
+        await sleep(50);
+      },
+    });
+
+    const openPromise = route.open();
+
+    expect(route.isOpening).toBe(true);
+    expect(route.isOpened).toBe(false);
+
+    await vi.runAllTimersAsync();
+    await openPromise;
+
+    expect(route.isOpening).toBe(false);
+    expect(route.isOpened).toBe(true);
+
+    vi.useRealTimers();
+  });
+
+  it('should set isOpening immediately for history navigation', async () => {
+    vi.useFakeTimers();
+
+    const route = new Route('/auto-opening', {
+      beforeOpen: async () => {
+        await sleep(50);
+      },
+    });
+
+    history.push('/auto-opening');
+
+    expect(route.isOpening).toBe(true);
+    expect(route.isOpened).toBe(false);
+
+    await vi.runAllTimersAsync();
+
+    expect(route.isOpening).toBe(false);
+    expect(route.isOpened).toBe(true);
+
+    vi.useRealTimers();
   });
 
   it('two routes opens should not affect each other', async () => {
