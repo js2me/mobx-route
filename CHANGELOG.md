@@ -1,5 +1,11 @@
 # mobx-route
 
+## 0.24.0
+
+### Minor Changes
+
+- [`bfa3dac`](https://github.com/js2me/mobx-route/commit/bfa3dac0b9ebd587302242e0649eeabfb099d8be) Thanks [@js2me](https://github.com/js2me)! - added support mobx-view-model 9.x
+
 ## 0.23.5
 
 ### Patch Changes
