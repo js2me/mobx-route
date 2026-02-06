@@ -1,5 +1,11 @@
 # mobx-route
 
+## 0.25.0
+
+### Minor Changes
+
+- [`457f811`](https://github.com/js2me/mobx-route/commit/457f811faaf4d1dc7106171b2a0288bc996d178b) Thanks [@js2me](https://github.com/js2me)! - fixed double unmounts in `RouteViewModel`
+
 ## 0.24.0
 
 ### Minor Changes
