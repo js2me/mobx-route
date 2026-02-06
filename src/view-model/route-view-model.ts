@@ -1,4 +1,4 @@
-import { computed, reaction, when } from 'mobx';
+import { computed } from 'mobx';
 import {
   type AnyAbstractRouteEntity,
   type IQueryParams,
@@ -27,22 +27,6 @@ export abstract class RouteViewModel<
     super(params);
 
     applyObservable(this, annotations, this.vmConfig.observable.viewModels);
-
-    when(
-      () => this.isMounted,
-      () => {
-        reaction(
-          () => this.route.isOpened,
-          (isOpened) => {
-            if (!isOpened && this.isMounted) {
-              this.unmount();
-            }
-          },
-          { fireImmediately: true, signal: this.unmountSignal },
-        );
-      },
-      { signal: this.unmountSignal },
-    );
   }
 
   override get payload(): RouteParams<TRoute> {
