@@ -1,5 +1,11 @@
 # mobx-route
 
+## 0.26.1
+
+### Patch Changes
+
+- [`36a9e65`](https://github.com/js2me/mobx-route/commit/36a9e65b8fa5202a9266a257e2816169ec1a2827) Thanks [@js2me](https://github.com/js2me)! - fixed cache loadable components
+
 ## 0.26.0
 
 ### Minor Changes
