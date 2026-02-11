@@ -1,6 +1,6 @@
 import type { RawQueryParamsData } from 'mobx-location-history';
 import type { MatchOptions, ParseOptions } from 'path-to-regexp';
-import type { AnyObject, IsPartial, Maybe, MaybePromise } from 'yummies/types';
+import type { AnyObject, Maybe, MaybePromise } from 'yummies/types';
 import type { RouteGlobalConfig } from '../config/index.js';
 import type { AnyAbstractRouteEntity } from '../route-group/route-group.types.js';
 import type { VirtualRoute } from '../virtual-route/index.js';
@@ -113,65 +113,7 @@ export interface RouteConfiguration<
   createUrl?: UrlCreateParamsFn<TInputParams>;
 }
 
-export type AnyRoute = IRoute;
-
-export interface IRoute<
-  TPath extends string = string,
-  TInputParams extends InputPathParams<TPath> = InputPathParams<TPath>,
-  TOutputParams extends AnyObject = ParsedPathParams<TPath>,
-> {
-  isOpened: boolean;
-  isOpening: boolean;
-  pathDeclaration: TPath;
-
-  /**
-   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#hasopenedchildren)
-   */
-  hasOpenedChildren: boolean;
-
-  /**
-   * Navigates to this route.
-   *
-   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#open)
-   */
-  open(
-    ...args: IsPartial<TInputParams> extends true
-      ? [
-          params?: TInputParams | null | undefined,
-          navigateParams?: RouteNavigateParams,
-        ]
-      : [params: TInputParams, navigateParams?: RouteNavigateParams]
-  ): Promise<void>;
-  open(
-    ...args: IsPartial<TInputParams> extends true
-      ? [
-          params?: TInputParams | null | undefined,
-          replace?: RouteNavigateParams['replace'],
-          query?: RouteNavigateParams['query'],
-        ]
-      : [
-          params: TInputParams,
-          replace?: RouteNavigateParams['replace'],
-          query?: RouteNavigateParams['query'],
-        ]
-  ): Promise<void>;
-  open(url: string, navigateParams?: RouteNavigateParams): Promise<void>;
-  open(
-    url: string,
-    replace?: RouteNavigateParams['replace'],
-    query?: RouteNavigateParams['query'],
-  ): Promise<void>;
-
-  createUrl(
-    ...args: IsPartial<TInputParams> extends true
-      ? [params?: Maybe<TInputParams>, query?: AnyObject, mergeQuery?: boolean]
-      : [params: TInputParams, query?: AnyObject, mergeQuery?: boolean]
-  ): string;
-
-  destroy(): void;
-
-  readonly params: TOutputParams | null;
-}
+export type AnyRoute = Route<any, any, any, any>;
 
 export type InputPathParam = string | number | boolean | null;
 
@@ -228,8 +170,9 @@ export interface ParsedPathData<TPath extends string> {
   params: ParsedPathParams<TPath>;
 }
 
-export type InferPath<T extends AnyRoute> = T extends IRoute<
+export type InferPath<T extends AnyRoute> = T extends Route<
   infer TPath,
+  any,
   any,
   any
 >
@@ -240,7 +183,7 @@ export type InferInputParams<T extends AnyRoute> = T extends VirtualRoute<
   infer TParams
 >
   ? TParams
-  : T extends IRoute<any, infer TInputParams, any>
+  : T extends Route<any, infer TInputParams, any, any>
     ? TInputParams
     : never;
 
@@ -248,6 +191,6 @@ export type InferParams<T extends AnyRoute> = T extends VirtualRoute<
   infer TParams
 >
   ? TParams
-  : T extends IRoute<any, any, infer TParams>
+  : T extends Route<any, any, infer TParams, any>
     ? TParams
     : never;

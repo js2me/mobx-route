@@ -312,6 +312,131 @@ describe('route', () => {
     expect(foo).toBeDefined();
   });
 
+  it('extend typings: should merge parent and child input params', () => {
+    const parent = new Route<
+      '/users/:userId',
+      { userId: number; locale: string },
+      { userId: string }
+    >('/users/:userId');
+    const child = parent.extend('/posts/:postId');
+
+    void (() => {
+      child.open({ userId: 1, locale: 'en', postId: 2 });
+      child.open('/users/1/posts/2');
+    });
+
+    expectTypeOf(child.open).parameter(0).toMatchTypeOf<
+      | string
+      | {
+          userId: number;
+          locale: string;
+          postId: InputPathParam;
+        }
+    >();
+
+    expect(child).toBeDefined();
+  });
+
+  it('extend typings: should keep optional params from optional segment', () => {
+    const parent = new Route('/users/:userId');
+    const child = parent.extend('/details{/:tab}');
+
+    void (() => {
+      child.open({ userId: 1 });
+      child.open({ userId: 1, tab: 'overview' });
+    });
+
+    expectTypeOf(child.open).parameter(0).toMatchTypeOf<
+      | string
+      | {
+          userId: InputPathParam;
+          tab?: InputPathParam;
+        }
+    >();
+
+    expect(child).toBeDefined();
+  });
+
+  it('extend typings: should infer merged params across chained extend calls', () => {
+    const parent = new Route('/orgs/:orgId');
+    const level2 = parent.extend('/teams/:teamId');
+    const level3 = level2.extend('/members/:memberId');
+
+    void (() => {
+      level3.open({ orgId: 1, teamId: 2, memberId: 3 });
+    });
+
+    expectTypeOf(level3.open).parameter(0).toMatchTypeOf<
+      | string
+      | {
+          orgId: InputPathParam;
+          teamId: InputPathParam;
+          memberId: InputPathParam;
+        }
+    >();
+
+    expect(level3).toBeDefined();
+  });
+
+  it('extend typings: should infer path declaration literal for extended route', () => {
+    const parent = new Route('/projects/:projectId');
+    const child = parent.extend('/issues/:issueId');
+
+    expectTypeOf(
+      child.pathDeclaration,
+    ).toEqualTypeOf<'/projects/:projectId/issues/:issueId'>();
+
+    expect(child).toBeDefined();
+  });
+
+  it('extend typings: should infer custom output params from params config', () => {
+    const parent = new Route('/users/:userId');
+    const child = parent.extend('/posts/:postId', {
+      params: (params) => {
+        return {
+          slug: `${params.userId}-${params.postId}`,
+          ids: [params.userId, params.postId],
+        };
+      },
+    });
+
+    expectTypeOf(child.params).toEqualTypeOf<null | {
+      slug: string;
+      ids: string[];
+    }>();
+
+    expect(child).toBeDefined();
+  });
+
+  it('extend typings: should keep params in deep chain from service route', () => {
+    const servicesRoute = new Route('/services');
+    const serviceRoute = servicesRoute.extend('/details/:serviceId');
+    const extended = serviceRoute
+      .extend('/foo')
+      .extend('/bar')
+      .extend('/baz/:kekPek');
+
+    expectTypeOf(
+      extended.pathDeclaration,
+    ).toEqualTypeOf<'/services/details/:serviceId/foo/bar/baz/:kekPek'>();
+
+    void (() => {
+      extended.open({ serviceId: 10, kekPek: 'abc' });
+      extended.open({ serviceId: '10', kekPek: 55 });
+      extended.open('/services/details/10/foo/bar/baz/55');
+    });
+
+    expectTypeOf(extended.open).parameter(0).toMatchTypeOf<
+      | string
+      | {
+          serviceId: InputPathParam;
+          kekPek: InputPathParam;
+        }
+    >();
+
+    expect(extended).toBeDefined();
+  });
+
   it('test mergeQuery', async () => {
     const route = new Route('/foo/bar/baz');
     const route2 = new Route('/asdfdsafdsa');

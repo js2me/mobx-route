@@ -19,7 +19,6 @@ import type {
   AnyRoute,
   CreatedUrlOutputParams,
   InputPathParams,
-  IRoute,
   NavigationTrx,
   ParsedPathData,
   ParsedPathParams,
@@ -54,8 +53,7 @@ export class Route<
   TInputParams extends InputPathParams<TPath> = InputPathParams<TPath>,
   TOutputParams extends AnyObject = ParsedPathParams<TPath>,
   TParentRoute extends Route<any, any, any, any> | null = null,
-> implements IRoute<TPath, TInputParams, TOutputParams>
-{
+> {
   protected abortController: AbortController;
   protected history: History;
   parent: TParentRoute;
