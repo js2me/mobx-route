@@ -77,6 +77,7 @@ function RouteViewBase<TRoute extends AnyAbstractRouteEntity>(
         loading: props.loading,
         preload: props.preload,
         throwOnError: props.throwOnError,
+        cache: false,
       });
     }
     Component = loadViewFn._loadableComponent;

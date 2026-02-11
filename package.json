@@ -48,7 +48,7 @@
     "linked-abort-controller": "^1.1.1",
     "mobx-location-history": "^9.2.1",
     "path-to-regexp": "^8.3.0",
-    "react-simple-loadable": "^3.0.0",
+    "react-simple-loadable": "^3.1.0",
     "yummies": "^7.0.1"
   },
   "peerDependencies": {
