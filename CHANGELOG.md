@@ -1,5 +1,11 @@
 # mobx-route
 
+## 0.26.0
+
+### Minor Changes
+
+- [`7b8ed7e`](https://github.com/js2me/mobx-route/commit/7b8ed7ece48a08c5b8197fc63ee82d5390949a57) Thanks [@js2me](https://github.com/js2me)! - removed `IRoute` interface (no benefits to stay in source code)
+
 ## 0.25.0
 
 ### Minor Changes
