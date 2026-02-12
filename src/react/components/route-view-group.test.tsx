@@ -2,7 +2,7 @@ import { act, render } from '@testing-library/react';
 import { when } from 'mobx';
 import { createBrowserHistory } from 'mobx-location-history';
 import { withViewModel } from 'mobx-view-model';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { Route, routeConfig } from '../../core/index.js';
 import { mockHistory } from '../../core/route/route.test.js';
 import { RouteViewModel } from '../../view-model/route-view-model.js';
@@ -318,5 +318,114 @@ describe('<RouteViewGroup />', () => {
     expect(() => screen1.getByText('route2')).toThrowError();
     expect(screen1.getByText('route3')).toBeDefined();
     expect(() => screen1.getByText('not_found1')).toThrowError();
+  });
+
+  it('Should navigate to string otherwise URL with query/state', async () => {
+    const history = mockHistory(createBrowserHistory());
+
+    routeConfig.update({
+      history,
+    });
+
+    const route1 = new Route('/test1');
+
+    await act(async () => {
+      render(
+        <RouteViewGroup
+          otherwise="/not-found"
+          query={{ from: 'route-group' }}
+          state={{ code: 404 }}
+        >
+          <RouteView route={route1} view={() => <div>route1</div>} />
+        </RouteViewGroup>,
+      );
+    });
+
+    expect(history.push).toHaveBeenCalledWith(
+      '/not-found?from=route-group',
+      expect.objectContaining({ code: 404 }),
+    );
+  });
+
+  it('Should use history.replace for string otherwise when replace=true', async () => {
+    const history = mockHistory(createBrowserHistory());
+
+    routeConfig.update({
+      history,
+    });
+
+    const route1 = new Route('/test1');
+
+    await act(async () => {
+      render(
+        <RouteViewGroup otherwise="/not-found" replace>
+          <RouteView route={route1} view={() => <div>route1</div>} />
+        </RouteViewGroup>,
+      );
+    });
+
+    expect(history.replace).toHaveBeenCalledWith('/not-found', undefined);
+    expect(history.push).not.toHaveBeenCalled();
+  });
+
+  it('Should open route passed to otherwise with params and navigation options', async () => {
+    const history = mockHistory(createBrowserHistory());
+
+    routeConfig.update({
+      history,
+    });
+
+    const route1 = new Route('/test1');
+    const otherwiseRoute = new Route('/fallback/:id');
+    const otherwiseSpy = vi.spyOn(otherwiseRoute, 'open');
+
+    await act(async () => {
+      render(
+        <RouteViewGroup
+          otherwise={otherwiseRoute}
+          params={{ id: '42' }}
+          query={{ source: 'group' }}
+          replace
+          state={{ test: true }}
+        >
+          <RouteView route={route1} view={() => <div>route1</div>} />
+        </RouteViewGroup>,
+      );
+    });
+
+    expect(otherwiseSpy).toHaveBeenCalledWith(
+      { id: '42' },
+      expect.objectContaining({
+        query: { source: 'group' },
+        replace: true,
+        state: { test: true },
+      }),
+    );
+  });
+
+  it('Should wrap rendered node with layout', async () => {
+    const history = mockHistory(createBrowserHistory());
+
+    routeConfig.update({
+      history,
+    });
+
+    const route1 = new Route('/test1');
+
+    const Layout = ({ children }: { children?: React.ReactNode }) => (
+      <section data-testid="layout">{children}</section>
+    );
+
+    const screen = await act(async () =>
+      render(
+        <RouteViewGroup layout={Layout}>
+          <RouteView route={route1} view={() => <div>route1</div>} />
+          <div>fallback-content</div>
+        </RouteViewGroup>,
+      ),
+    );
+
+    expect(screen.getByTestId('layout')).toBeDefined();
+    expect(screen.getByText('fallback-content')).toBeDefined();
   });
 });

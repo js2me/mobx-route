@@ -100,7 +100,7 @@ location.pathname; // /stars/1
 
 ### `isIndex`  
 Indicates if this route is an index route. Index routes activate when parent route path matches exactly.  
-Useful with groupping routes using [`RouteGroup`](/core/RouteGroup)   
+Useful with groupping routes using [`groupRoutes`](/core/groupRoutes)   
 
 ### `isHash`  
 Indicates if this route is an hash based route.  

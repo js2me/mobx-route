@@ -1,11 +1,11 @@
-# RouteGroup  
+# groupRoutes  
 
-Class for grouping related routes and managing their state.
-Allows to organize routes into hierarchical structures.   
+Creates hierarchical route groups and exposes group-level navigation state.
+Prefer `groupRoutes` for declarations. Also available as the `RouteGroup` class form.   
 
 ## Constructor  
 ```ts
-createRouteGroup(routes: TRoutesCollection)
+groupRoutes(routes: TRoutesCollection)
 new RouteGroup(routes: TRoutesCollection) // class form
 ```
 Accepts an object with a collection of routes/groups.
@@ -14,13 +14,13 @@ Routes can be either regular `Route` objects or other entities, such as `RouteGr
 ### Basic example
 
 ```ts
-import { createRouteGroup } from 'mobx-route';
+import { groupRoutes } from 'mobx-route';
 
-const routesGroup = createRouteGroup({
+const routesGroup = groupRoutes({
   index: createRoute('/', { index: true }),
   fruits: createRoute('/fruits'),
   zombies: createRoute('/zombies'),
-  memes: createRouteGroup({
+  memes: groupRoutes({
     index: createRoute('/memes', { index: true }),
     list: createRoute('/memes/list'),
     create: createRoute('/memes/create'),
@@ -38,7 +38,7 @@ Returns `true` if at least one route in the group is open.
 
 Example:  
 ```ts
-const group = createRouteGroup({
+const group = groupRoutes({
   home: createRoute('/'),
   about: createRoute('/about')
 });
@@ -48,11 +48,11 @@ group.isOpened; // true
 ```
 
 ### `indexRoute` <Badge type="tip" text="computed" />  
-First found `index` route defined by [`isIndex` property](/core/Route.html#isindex)   
+First found `index` route defined by [`isIndex` property](/core/Route#isindex)   
 
 Example:  
 ```ts
-const fruits = createRouteGroup({
+const fruits = groupRoutes({
   list: createRoute('/fruits', { index: true }),
   details: createRoute('/fruits/:id'),
 });
@@ -70,14 +70,14 @@ Main navigation method for the group. Behavior:
 
 Example:  
 ```ts
-const group = createRouteGroup({
+const group = groupRoutes({
   index: createRoute('/', { index: true }),
   other: createRoute('/other')
 });
 group.open(); // Navigates to /
 
 // Sending arguments
-const paramGroup = createRouteGroup({
+const paramGroup = groupRoutes({
   index: createRoute('/user/:id', { index: true })
 });
 paramGroup.open({ id: 42 }); // /user/42

@@ -39,7 +39,7 @@ const route = createRoute('/foo/bar/:baz');
 ## Writing first routes
 
 ```ts
-import { createRoute, createRouteGroup } from "mobx-route";
+import { createRoute, groupRoutes } from "mobx-route";
 
 const feed = createRoute("/");
 const users = createRoute("/users", { exact: true });
@@ -49,7 +49,7 @@ export const routes = {
   feed,
   users,
   userDetails,
-  memes: createRouteGroup({
+  memes: groupRoutes({
     list: createRoute("/memes", { index: true }),
     details: createRoute("/memes/:memeId"),
   }),

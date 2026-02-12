@@ -33,10 +33,10 @@ export default defineDocsVitepressConfig(configs, {
       {
         text: 'Core API',
         items: [
-          { text: 'Route', link: '/core/Route' },
-          { text: 'RouteGroup', link: '/core/RouteGroup' },
-          { text: 'VirtualRoute', link: '/core/VirtualRoute' },
+          { text: 'Routes', link: '/core/Route' },
+          { text: 'Virtual Routes', link: '/core/VirtualRoute' },
           { text: 'Router', link: '/core/Router' },
+          { text: 'groupRoutes', link: '/core/groupRoutes' },
           { text: 'routeConfig', link: '/core/routeConfig' },
         ],
       },

@@ -16,11 +16,11 @@ Accepts configuration with route collection and routing settings.
 ```ts
 import {
   createBrowserHistory,
+  createRoute,
+  createRouter,
+  groupRoutes,
   QueryParams,
-  Route,
   routeConfig,
-  RouteGroup,
-  Router,
 } from 'mobx-route';
 
 const history = createBrowserHistory();
@@ -34,7 +34,7 @@ routeConfig.set({
 
 export const routes = {
   home: createRoute('/'),
-  projects: createRouteGroup({
+  projects: groupRoutes({
     index: createRoute('/projects', { index: true }),
     new: createRoute('/projects/new'),
     details: createRoute('/projects/:projectId'),

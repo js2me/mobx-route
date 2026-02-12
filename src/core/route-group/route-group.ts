@@ -16,7 +16,7 @@ const annotations: ObservableAnnotationsArray<RouteGroup<any>> = [
 /**
  * Class for grouping related routes and managing their state.
  *
- * [**Documentation**](https://js2me.github.io/mobx-route/core/RouteGroup.html)
+ * [**Documentation**](https://js2me.github.io/mobx-route/core/groupRoutes.html)
  */
 export class RouteGroup<TRoutesCollection extends RoutesCollection>
   implements AbstractRouteGroup<TRoutesCollection>
@@ -35,7 +35,7 @@ export class RouteGroup<TRoutesCollection extends RoutesCollection>
   /**
    * Returns true if at least one route in the group is open.
    *
-   * [**Documentation**](https://js2me.github.io/mobx-route/core/RouteGroup.html#isopened)
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/groupRoutes.html#isopened)
    */
   get isOpened(): boolean {
     const routes = Object.values(this.routes);
@@ -49,7 +49,7 @@ export class RouteGroup<TRoutesCollection extends RoutesCollection>
   /**
    * First found index route.
    *
-   * [**Documentation**](https://js2me.github.io/mobx-route/core/RouteGroup.html#indexroute)
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/groupRoutes.html#indexroute)
    */
   get indexRoute(): AnyRouteEntity | undefined {
     return (this._indexRoute ??
@@ -61,7 +61,7 @@ export class RouteGroup<TRoutesCollection extends RoutesCollection>
   /**
    * Main navigation method for the group.
    *
-   * [**Documentation**](https://js2me.github.io/mobx-route/core/RouteGroup.html#open)
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/groupRoutes.html#open)
    */
   open(...args: any[]) {
     let lastGroupRoute: RouteGroup<any> | undefined;
@@ -88,7 +88,12 @@ export class RouteGroup<TRoutesCollection extends RoutesCollection>
   }
 }
 
-export const createRouteGroup = <TRoutesCollection extends RoutesCollection>(
+/**
+ * Helper for creating route groups.
+ *
+ * [**Documentation**](https://js2me.github.io/mobx-route/core/groupRoutes.html)
+ */
+export const groupRoutes = <TRoutesCollection extends RoutesCollection>(
   routes: TRoutesCollection,
   indexRoute?: AnyRouteEntity,
 ) => new RouteGroup<TRoutesCollection>(routes, indexRoute);

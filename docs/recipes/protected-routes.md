@@ -6,7 +6,7 @@ usually used for implementing routes closed to unauthorized users.
 Implementation of such routes can be achieved in different ways   
 
 
-## Configure protection using [`beforeOpen`](/core/Route#beforeenter) and [`checkOpened`](/core/Route#checkopened)
+## Configure protection using [`beforeOpen`](/core/Route#beforeopen) and [`checkOpened`](/core/Route#checkopened)
 
 Example:  
 ```ts

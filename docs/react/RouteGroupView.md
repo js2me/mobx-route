@@ -1,6 +1,6 @@
 # RouteGroupView
 
-Creates route views for [`RouteGroup`](/core/RouteGroup).  
+Creates route views for [`groupRoutes`](/core/groupRoutes).  
 
 ### Example
 
