@@ -21,6 +21,9 @@ export interface RouteViewConfigWithRoute<TRoute extends AnyAbstractRouteEntity>
   extends Pick<LoadableConfig, 'loading' | 'preload' | 'throwOnError'> {
   route: TRoute;
   view?: RouteViewComponent<TRoute>;
+  /**
+   * @deprecated use your own load fn for lazy load view
+   */
   loadView?: LoadViewFn<TRoute>;
   /**
    * Case when route is not opened
