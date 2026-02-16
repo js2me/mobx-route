@@ -82,6 +82,82 @@ await starsWithMeta.open({ meta: 1 }, {
 
 ```
 
+### `confirmOpening()` <Badge type="warning" text="protected" />
+
+Route opening pipeline hook that is called by `open()` and internal path-match synchronization.
+Use it when you need custom side effects around route opening.
+
+**API Signature**
+```ts
+protected confirmOpening(
+  trx: NavigationTrx<TInputParams>,
+): Promise<true | undefined>
+```
+
+`trx` is navigation transaction object:
+- `url`: target URL
+- `params`: input path params passed to `open(...)`
+- `query`: query params for the target URL
+- `state`: history state payload
+- `replace`: use `history.replace` instead of `history.push`
+- `preferSkipHistoryUpdate`: internal flag to skip history update
+
+If opening is rejected (for example, by `beforeOpen`) this method can return `undefined`.
+For inherited implementation, `true` means opening was confirmed.
+
+Example:
+```ts
+class AnalyticsRoute<TPath extends string> extends Route<TPath> {
+  protected async confirmOpening(
+    trx: NavigationTrx<InputPathParams<TPath>>,
+  ): Promise<true | undefined> {
+    const result = await super.confirmOpening(trx);
+
+    if (result) {
+      this.trackEvent('Opened');
+    }
+
+    return result;
+  }
+
+  private trackEvent(name: string) {
+    console.log(name);
+  }
+}
+```
+
+### `confirmClosing()` <Badge type="warning" text="protected" />
+
+Route closing pipeline hook that is called when route path no longer matches current location.
+Use it to execute custom logic before `afterClose` is triggered.
+
+**API Signature**
+```ts
+protected confirmClosing(): boolean | undefined
+```
+
+For inherited implementation, returning truthy value confirms close and allows `afterClose` callback.
+Returning `false` or `undefined` can be used to skip close confirmation side effects.
+
+Example:
+```ts
+class AnalyticsRoute<TPath extends string> extends Route<TPath> {
+  protected confirmClosing(): boolean | undefined {
+    const result = super.confirmClosing();
+
+    if (result) {
+      this.trackEvent('Closed');
+    }
+
+    return result;
+  }
+
+  private trackEvent(name: string) {
+    console.log(name);
+  }
+}
+```
+
 ### `extend()`  
 Allows to create child route based on this route with merging this route path and extending path.   
 
