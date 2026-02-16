@@ -1,5 +1,19 @@
 # mobx-route
 
+## 0.27.0
+
+### Minor Changes
+
+- [`caff007`](https://github.com/js2me/mobx-route/commit/caff0079564fd5fcf1dcd4f5807df4502b923227) Thanks [@js2me](https://github.com/js2me)! - update documentation for all project
+
+- [`caff007`](https://github.com/js2me/mobx-route/commit/caff0079564fd5fcf1dcd4f5807df4502b923227) Thanks [@js2me](https://github.com/js2me)! - added more unit tests for react components
+
+- [`caff007`](https://github.com/js2me/mobx-route/commit/caff0079564fd5fcf1dcd4f5807df4502b923227) Thanks [@js2me](https://github.com/js2me)! - rename `createRouteGroup` -> `groupRoutes`
+
+### Patch Changes
+
+- [`29e5197`](https://github.com/js2me/mobx-route/commit/29e5197fcad546a7d105a4bc57b8d3c4454ee800) Thanks [@js2me](https://github.com/js2me)! - mark `loadView` as deprecated
+
 ## 0.26.1
 
 ### Patch Changes
