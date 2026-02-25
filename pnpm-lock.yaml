@@ -15,8 +15,8 @@ importers:
         specifier: ^6.12.4
         version: 6.13.7
       mobx-location-history:
-        specifier: ^9.2.1
-        version: 9.2.1(mobx@6.13.7)(react@19.1.1)
+        specifier: ^9.3.0
+        version: 9.3.0(mobx@6.13.7)(react@19.1.1)
       mobx-react-lite:
         specifier: ^4.0.7
         version: 4.1.0(mobx@6.13.7)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
@@ -3102,8 +3102,8 @@ packages:
   mlly@1.8.0:
     resolution: {integrity: sha512-l8D9ODSRWLe2KHJSifWGwBqpTZXIXTeo8mlKjY+E2HAakaTeNpqAyBZ8GSqLzHgw4XmHmC8whvpjJNMbFZN7/g==}
 
-  mobx-location-history@9.2.1:
-    resolution: {integrity: sha512-PT6PKQEDpphFPfWbe5On5JTcJPc++iTJq3pRG62NHLKHGtiOwkUSCCHPnXaZiEchw6Ehk+T+KO31FtNimLk9FQ==}
+  mobx-location-history@9.3.0:
+    resolution: {integrity: sha512-fFXziYMMouXQ8p1xM6T3Gq+wDgkNwNwoZ6KrcjM3lSgIbVNq5jg+KBGMHmBlvcZTLovF6GNm1nRy/xNlc9/JeQ==}
     peerDependencies:
       mobx: ^6.13.3
 
@@ -7563,7 +7563,7 @@ snapshots:
       pkg-types: 1.3.1
       ufo: 1.6.1
 
-  mobx-location-history@9.2.1(mobx@6.13.7)(react@19.1.1):
+  mobx-location-history@9.3.0(mobx@6.13.7)(react@19.1.1):
     dependencies:
       '@types/qs': 6.14.0
       history: 5.3.0
