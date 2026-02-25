@@ -277,11 +277,41 @@ starDetails.createUrl({ starId: 1 }, { baz: 2 }, true); // /stars/1?bar=1&baz=2
 
 More about `mergeQuery` you can read [here](/core/routeConfig#mergequery)   
 
+### `matchPath()`
+Checks whether provided path (or current location path) matches the route declaration.
+Returns parsed path data with `params` and matched `path`, or `null` if there is no match.
+
+**API Signature**
+```ts
+matchPath(path?: string | null | undefined): ParsedPathData<TPath> | null
+```
+
+When `path` is omitted:
+- for hash routes (`hash: true`) it checks `location.hash` (without `#`)
+- for regular routes it checks `location.pathname`
+
+If route has `baseUrl`, `matchPath()` validates and strips it before matching.
+
+Example:
+```ts
+const userRoute = createRoute('/users/:userId');
+
+userRoute.matchPath('/users/42');
+// { path: '/users/42', params: { userId: '42' } }
+
+userRoute.matchPath('/posts/42');
+// null
+```
+
 ### `addChildren()` <Badge type="info" text="action" />     
 Manually add child routes. Prefer `extend()` for typical use cases.  
 
 ### `removeChildren()` <Badge type="info" text="action" />     
 Remove specified routes from children.  
+
+### `destroy()`
+Stops route reactions and cleans up internal subscriptions.
+Call this when route instance is no longer needed.
 
 
 

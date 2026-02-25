@@ -1129,6 +1129,58 @@ describe('route', () => {
     expect(route.isOpened).toBe(false);
   });
 
+  it('should return false for isOpened after destroy', async () => {
+    const route = new Route('/destroy-check');
+
+    await route.open();
+
+    expect(route.isOpened).toBe(true);
+
+    route.destroy();
+
+    expect(route.isOpened).toBe(false);
+  });
+
+  it('matchPath should parse explicit path argument', () => {
+    const route = new Route('/users/:id');
+
+    const result = route.matchPath('/users/42');
+
+    expect(result).toEqual({
+      path: '/users/42',
+      params: {
+        id: '42',
+      },
+    });
+  });
+
+  it('matchPath should return null when path does not match baseUrl', () => {
+    const route = new Route('/users/:id', {
+      baseUrl: '/app',
+    });
+
+    const result = route.matchPath('/users/42');
+
+    expect(result).toBeNull();
+  });
+
+  it('matchPath should use hash value for hash routes when path is omitted', () => {
+    const route = new Route('/hash-route/:id', {
+      hash: true,
+    });
+
+    history.push('#/hash-route/99');
+
+    const result = route.matchPath();
+
+    expect(result).toEqual({
+      path: '/hash-route/99',
+      params: {
+        id: '99',
+      },
+    });
+  });
+
   it('should handle complex nested route hierarchy', async () => {
     const parent = new Route('/admin');
     const child1 = parent.extend('/users');

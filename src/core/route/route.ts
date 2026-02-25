@@ -56,6 +56,12 @@ export class Route<
 > {
   protected abortController: AbortController;
   protected history: History;
+
+  /**
+   * Parent route.
+   *
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#parent)
+   */
   parent: TParentRoute;
 
   query: IQueryParams;
@@ -75,6 +81,13 @@ export class Route<
   meta?: AnyObject;
 
   /**
+   * Route path pattern declaration.
+   *
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#pathdeclaration)
+   */
+  pathDeclaration: TPath;
+
+  /**
    * Indicates if this route is an index route. Index routes activate when parent route path matches exactly.
    *
    * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#isindex)
@@ -88,10 +101,15 @@ export class Route<
    */
   isHash: boolean;
 
+  /**
+   * Array of child routes.
+   *
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#children)
+   */
   children: AnyRoute[] = [];
 
   constructor(
-    public pathDeclaration: TPath,
+    pathDeclaration: TPath,
     protected config: RouteConfiguration<
       TPath,
       TInputParams,
@@ -102,6 +120,7 @@ export class Route<
     this.abortController = new LinkedAbortController(config.abortSignal);
     this.history = config.history ?? routeConfig.get().history;
     this.query = config.queryParams ?? routeConfig.get().queryParams;
+    this.pathDeclaration = pathDeclaration;
     this.isIndex = !!this.config.index;
     this.isHash = !!this.config.hash;
     this.meta = this.config.meta;
@@ -121,17 +140,24 @@ export class Route<
     return baseUrl?.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
   }
 
-  protected get parsedPathData(): ParsedPathData<TPath> | null {
+  /**
+   * Checks whether current route matches provided path.
+   *
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#matchpath)
+   */
+  matchPath(path?: Maybe<string>): ParsedPathData<TPath> | null {
     let pathnameToCheck: string;
 
-    if (this.isHash) {
+    if (path != null) {
+      pathnameToCheck = path;
+    } else if (this.isHash) {
       pathnameToCheck = this.history.location.hash.slice(1);
     } else {
       pathnameToCheck = this.history.location.pathname;
     }
 
     if (this.baseUrl) {
-      if (!this.history.location.pathname.startsWith(this.baseUrl)) {
+      if (!pathnameToCheck.startsWith(this.baseUrl)) {
         return null;
       }
 
@@ -156,6 +182,10 @@ export class Route<
     }
 
     return parsed as ParsedPathData<TPath>;
+  }
+
+  protected get parsedPathData(): ParsedPathData<TPath> | null {
+    return this.matchPath();
   }
 
   /**
@@ -213,6 +243,7 @@ export class Route<
    */
   get isOpened() {
     if (
+      this.abortController.signal.aborted ||
       !this.isPathMatched ||
       this.params === null ||
       this.status !== 'open-confirmed'
@@ -270,10 +301,20 @@ export class Route<
     return extendedChild;
   }
 
+  /**
+   * Manually add child routes.
+   *
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#addchildren)
+   */
   addChildren(...routes: AnyRoute[]) {
     this.children.push(...routes);
   }
 
+  /**
+   * Remove specified routes from children.
+   *
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#removechildren)
+   */
   removeChildren(...routes: AnyRoute[]) {
     this.children = this.children.filter((child) => !routes.includes(child));
   }
@@ -300,6 +341,11 @@ export class Route<
     }, {} as ParamData);
   }
 
+  /**
+   * Generates full route URL.
+   *
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#createurl)
+   */
   createUrl(
     ...args: IsPartial<TInputParams> extends true
       ? [
@@ -546,6 +592,11 @@ export class Route<
     return this.config.mergeQuery ?? routeConfig.get().mergeQuery;
   }
 
+  /**
+   * Destroys route subscriptions and reactions.
+   *
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#destroy)
+   */
   destroy() {
     this.abortController.abort();
   }
