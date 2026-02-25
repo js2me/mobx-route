@@ -1,5 +1,11 @@
 # mobx-route
 
+## 0.28.0
+
+### Minor Changes
+
+- [`f7a3529`](https://github.com/js2me/mobx-route/commit/f7a35296abd5dae33a64cd4973d15fd6142c66a6) Thanks [@js2me](https://github.com/js2me)! - update `mobx-location-history` to `9.3.0`
+
 ## 0.27.0
 
 ### Minor Changes
