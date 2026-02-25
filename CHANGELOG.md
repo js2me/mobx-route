@@ -1,5 +1,11 @@
 # mobx-route
 
+## 0.29.0
+
+### Minor Changes
+
+- [`cef1617`](https://github.com/js2me/mobx-route/commit/cef161755b9e5bf0c737d00dee923e51dc2817a0) Thanks [@js2me](https://github.com/js2me)! - added `matchPath` method for routes
+
 ## 0.28.0
 
 ### Minor Changes
