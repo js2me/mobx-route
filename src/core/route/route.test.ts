@@ -1154,6 +1154,35 @@ describe('route', () => {
     });
   });
 
+  it('should navigate on the same route with actual path params', async () => {
+    const route = new Route('/fruits/:id');
+
+    history.push('/fruits/123');
+    await sleep(10);
+
+    expect(route.isOpened).toBe(true);
+    expect(route.path).toBe('/fruits/123');
+    expect(route.params).toEqual({
+      id: '123',
+    });
+
+    history.push('/fruits/543');
+
+    expect(route.isOpened).toBe(true);
+    expect(route.path).toBe('/fruits/543');
+    expect(route.params).toEqual({
+      id: '543',
+    });
+
+    route.open({ id: '888' });
+
+    expect(route.isOpened).toBe(true);
+    expect(route.path).toBe('/fruits/888');
+    expect(route.params).toEqual({
+      id: '888',
+    });
+  });
+
   it('matchPath should return null when path does not match baseUrl', () => {
     const route = new Route('/users/:id', {
       baseUrl: '/app',
