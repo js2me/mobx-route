@@ -1,6 +1,13 @@
-import { describe } from 'node:test';
 import { createMemoryHistory } from 'mobx-location-history';
-import { afterEach, beforeEach, expect, it, type Mock, vi } from 'vitest';
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type Mock,
+  vi,
+} from 'vitest';
 import { routeConfig } from './config.js';
 
 describe('routeConfig', () => {
