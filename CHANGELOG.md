@@ -1,5 +1,13 @@
 # mobx-route
 
+## 0.29.1
+
+### Patch Changes
+
+- [`0817c74`](https://github.com/js2me/mobx-route/commit/0817c740182d7fd57887055616e6ef1b3f254f31) Thanks [@js2me](https://github.com/js2me)! - [internal] update dev deps to latest (+ yummies to latest)
+
+- [`330436e`](https://github.com/js2me/mobx-route/commit/330436e4cc30fb44ff80b9d4337c50853306301d) Thanks [@js2me](https://github.com/js2me)! - updated documentations for Route + routeConfig
+
 ## 0.29.0
 
 ### Minor Changes
