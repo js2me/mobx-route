@@ -46,10 +46,10 @@
   },
   "dependencies": {
     "linked-abort-controller": "^1.1.1",
-    "mobx-location-history": "^9.3.0",
+    "mobx-location-history": "^9.3.1",
     "path-to-regexp": "^8.3.0",
     "react-simple-loadable": "^3.1.0",
-    "yummies": "^7.9.0"
+    "yummies": "^7.10.0"
   },
   "peerDependencies": {
     "mobx": "^6.12.4",
