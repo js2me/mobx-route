@@ -267,12 +267,20 @@ Array of child routes. Automatically updated when using `extend()`.
 ### `createUrl()`  
 Generates full URL for route. Respects base URL and parent routes.  
 
+Third argument can be a boolean (same as `mergeQuery`) or object `CreatedUrlOutputParams`:
+
+- **`mergeQuery`** — при `true` к переданному `query` добавляются текущие query-параметры из location. Подробнее: [routeConfig#mergeQuery](/core/routeConfig#mergequery).
+- **`omitQuery`** — при `true` в сгенерированный URL не добавляется строка запроса (search), возвращается только path (и hash при необходимости).
+
 Example:   
 ```ts
 const starDetails = createRoute('/stars/:starId');
 starDetails.createUrl({ starId: 1 }, { bar: 1 }); // /stars/1?bar=1
 
 starDetails.createUrl({ starId: 1 }, { baz: 2 }, true); // /stars/1?bar=1&baz=2
+
+// только path, без query
+starDetails.createUrl({ starId: 1 }, { bar: 1 }, { omitQuery: true }); // /stars/1
 ```
 
 More about `mergeQuery` you can read [here](/core/routeConfig#mergequery)   

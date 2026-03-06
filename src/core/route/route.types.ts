@@ -44,8 +44,14 @@ export type UrlCreateParamsFn<TInputParams = any> = (
   currentQueryData: RawQueryParamsData,
 ) => Maybe<UrlCreateParams<TInputParams>>;
 
+/**
+ * Output options for `createUrl()` (third argument).
+ * @see [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#createurl)
+ */
 export interface CreatedUrlOutputParams {
+  /** @see [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#createurl) */
   mergeQuery?: boolean;
+  /** @see [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#createurl) */
   omitQuery?: boolean;
 }
 
