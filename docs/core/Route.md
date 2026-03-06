@@ -269,8 +269,8 @@ Generates full URL for route. Respects base URL and parent routes.
 
 Third argument can be a boolean (same as `mergeQuery`) or object `CreatedUrlOutputParams`:
 
-- **`mergeQuery`** — при `true` к переданному `query` добавляются текущие query-параметры из location. Подробнее: [routeConfig#mergeQuery](/core/routeConfig#mergequery).
-- **`omitQuery`** — при `true` в сгенерированный URL не добавляется строка запроса (search), возвращается только path (и hash при необходимости).
+- **`mergeQuery`** — when `true`, current query params from location are merged with the passed `query`. See [routeConfig#mergeQuery](/core/routeConfig#mergequery).
+- **`omitQuery`** — when `true`, the generated URL has no search string; only the path (and hash if applicable) is returned.
 
 Example:   
 ```ts
@@ -279,7 +279,7 @@ starDetails.createUrl({ starId: 1 }, { bar: 1 }); // /stars/1?bar=1
 
 starDetails.createUrl({ starId: 1 }, { baz: 2 }, true); // /stars/1?bar=1&baz=2
 
-// только path, без query
+// path only, no query
 starDetails.createUrl({ starId: 1 }, { bar: 1 }, { omitQuery: true }); // /stars/1
 ```
 
