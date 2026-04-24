@@ -22,6 +22,7 @@ export abstract class RouteViewModel<
   TRoute extends AnyAbstractRouteEntity = AnyAbstractRouteEntity,
 > extends ViewModelBase<EmptyObject> {
   abstract readonly route: TRoute;
+  protected lastPayload: RouteParams<TRoute> = {} as any;
 
   constructor(params: ViewModelParams<EmptyObject, any>) {
     super(params);
@@ -30,11 +31,11 @@ export abstract class RouteViewModel<
   }
 
   override get payload(): RouteParams<TRoute> {
-    if ('params' in this.route) {
-      return this.route.params || ({} as any);
+    if ('params' in this.route && this.route.params != null) {
+      this.lastPayload = this.route.params as RouteParams<TRoute>;
     }
 
-    return {} as EmptyObject as any;
+    return this.lastPayload;
   }
 
   get query(): IQueryParams {
