@@ -1,3 +1,4 @@
+---
 "mobx-route": minor
 ---
 
