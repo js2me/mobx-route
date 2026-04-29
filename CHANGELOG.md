@@ -1,5 +1,15 @@
 # mobx-route
 
+## 0.31.0
+
+### Minor Changes
+
+- [`408064e`](https://github.com/js2me/mobx-route/commit/408064e942e73b535aedc17ee05faac8f6c96b46) Thanks [@js2me](https://github.com/js2me)! - rename `getAutomatedOpenParams` to `getAutoOpenParams` (prev marks as deprecated)
+
+### Patch Changes
+
+- [`408064e`](https://github.com/js2me/mobx-route/commit/408064e942e73b535aedc17ee05faac8f6c96b46) Thanks [@js2me](https://github.com/js2me)! - globally reorganize docs
+
 ## 0.30.0
 
 ### Minor Changes
