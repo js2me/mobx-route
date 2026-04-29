@@ -74,7 +74,9 @@ const AllUsersPage = () => {
 };
 
 const UserDetailsPage = observer(() => {
-  const { params } = routes.userDetails.data!;
+  const params = routes.userDetails.params;
+
+  if (!params) return null;
 
   return <div>{`User id: ${params.userId}`}</div>;
 });

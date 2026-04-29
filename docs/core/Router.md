@@ -26,7 +26,7 @@ import {
 const history = createBrowserHistory();
 const queryParams = new QueryParams({ history });
 
-routeConfig.set({
+routeConfig.update({
   history,
   queryParams,
   baseUrl: '/base-url',
@@ -44,13 +44,12 @@ export const routes = {
 export const router = createRouter({
   routes,
   history,
-  location,
   queryParams,
 });
 
 
 router.routes.home.open();
-router.navigate(router.router.home.createUrl());
+router.navigate(router.routes.home.createUrl());
 router.history.back();
 ```
 

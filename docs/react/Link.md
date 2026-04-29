@@ -1,6 +1,18 @@
 # Link
 
-Navigates user to provided route on click. Has similar props with `<a>` element but instead of `href` has `route` and `params` props.
+Navigates on click using `routeConfig.history`.
+Supports route entities, plain string paths, and direct `href`.
+
+## Props
+
+- `to: AnyRoute | string` - target route entity or URL path.
+- `href?: string` - direct href value (alternative to `to`).
+- `params` - required for `to={route}` when route path has required params.
+- `query?: IQueryParamsInput` - query params for generated URL.
+- `replace?: boolean` - use `history.replace` instead of `history.push`.
+- `state?: any` - history state payload.
+- `mergeQuery?: boolean` - merge current query with provided query.
+- `asChild?: boolean` - render props into child element instead of native `<a>`.
 
 ### Example
 
@@ -15,6 +27,9 @@ function Navbar({ user }) {
       <Link to={routes.users}>All users</Link>
       <Link to={routes.userDetails} params={{ userId: user.id }}>
         User details
+      </Link>
+      <Link href="https://example.com" target="_blank" rel="noreferrer">
+        External
       </Link>
       <Link to={"/custom-url"} replace>Custom url</Link>
       <Link to={"/custom-url/meme"} query={{ foo: 1, bar: 2 }}>

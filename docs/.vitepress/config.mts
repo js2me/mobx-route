@@ -37,6 +37,7 @@ export default defineDocsVitepressConfig(configs, {
           { text: 'Virtual Routes', link: '/core/VirtualRoute' },
           { text: 'Router', link: '/core/Router' },
           { text: 'groupRoutes', link: '/core/groupRoutes' },
+          { text: 'isRouteEntity', link: '/core/isRouteEntity' },
           { text: 'routeConfig', link: '/core/routeConfig' },
         ],
       },

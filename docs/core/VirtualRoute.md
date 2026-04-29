@@ -1,243 +1,314 @@
 # VirtualRoute
 
-Class for creating routes with custom activation logic. Useful for implementing:  
-- Modal windows routing  
-- Feature toggles  
-- Conditional UI states  
-- Non-URL-based routing scenarios  
+Class for creating routes with custom activation logic. Useful for implementing:
+- Modal windows routing
+- Feature toggles
+- Conditional UI states
+- Non-URL-based routing scenarios
 
-Unlike standard `Route`, doesn't depend on URL path. Activation state is determined by custom logic.  
+Unlike `Route`, `VirtualRoute` does not parse URL path declarations. Open state is controlled by your handlers and `checkOpened`.
 
-## Constructor  
+## Constructor
+
 ```ts
 createVirtualRoute(config?: VirtualRouteConfiguration<TParams>)
-new VirtualRoute(config?: VirtualRouteConfiguration<TParams>) // class form
+new VirtualRoute(config?: VirtualRouteConfiguration<TParams>)
 ```
 
-**Configuration options:**  
-- `initialParams`: initial params for this route
-- `checkOpened`: Function/value determining if route is open  
-- `open`: Custom open handler  
-- `close`: Custom close handler  
-- `queryParams`: Custom query params implementation  
+_Simple example:_  
 
-Example:   
+```ts
+const profileDialogRoute = createVirtualRoute<{ userId: string }>();
 
+await profileDialogRoute.open({ userId: '42' });
+
+profileDialogRoute.isOpened; // true
+profileDialogRoute.params; // { userId: '42' }
+
+await profileDialogRoute.close();
+
+profileDialogRoute.isOpened; // false
+profileDialogRoute.params; // null
+```
+
+_Custom open close state handling:_  
 ```ts
 const ageModalRoute = createVirtualRoute<{ age: number }>({
   initialParams: { age: 0 },
-  checkOpened: (route) => !!route.query.showAgeModal,
+  checkOpened: (route) => route.query.data.showAgeModal === 'true',
   open: (params, route) =>
     route.query.update({
       ...params,
-      showAgeModal: 'true'
+      showAgeModal: 'true',
     }),
   close: (route) =>
     route.query.update({
-      showAgeModal: undefined
-    })
+      showAgeModal: undefined,
+    }),
 });
-
 ```
 
+## Properties and methods
 
-## Methods and properties  
+### `isOpened` <Badge type="tip" text="computed" />
+Main flag for UI: `true` means route is currently open.
 
-### `isOpened` <Badge type="tip" text="computed" />  
-Indicates whether route is active. Automatically updates when dependencies change.  
+```ts
+const dialogRoute = createVirtualRoute({
+  checkOpened: (route) => route.query.data.modal === 'profile',
+});
 
-Example:   
+dialogRoute.isOpened; // use this in components to show/hide dialog
+```
+
+### `isOpening` <Badge type="tip" text="computed" />
+`true` while async opening logic is still running.
+
+```ts
+const slowRoute = createVirtualRoute({
+  open: async () => {
+    await new Promise((r) => setTimeout(r, 400));
+  },
+});
+
+slowRoute.open();
+slowRoute.isOpening; // true for a short time
+```
+
+### `isClosing` <Badge type="tip" text="computed" />
+`true` while closing is in progress.
+
 ```ts
 const route = createVirtualRoute({
-  checkOpened: () => Math.random() > 0.5
+  close: () => {
+    localStorage.setItem('lastModal', 'closed');
+  },
 });
 
-autorun(() => {
-  console.log('Route state:', route.isOpened); // Randomly changes
-});
+route.close();
+route.isClosing; // true while close is being processed
 ```
 
-### `isOpening` <Badge type="tip" text="computed" />  
-Indicates if this route is currently in the process of opening.  
-Returns `true` when the route status is `'opening'`.
+### `params` <Badge type="info" text="observable" />
+Stores current route params; after successful close becomes `null`.
 
-### `isClosing` <Badge type="tip" text="computed" />  
-Indicates if this route is currently in the process of closing.  
-Returns `true` when the route status is `'closing'`.
-
-### `params` <Badge type="info" text="observable" />  
-Current virtual route parameters. Type is determined by generic type parameter.   
-Example:  
 ```ts
-const route = createVirtualRoute<{ userId: string }>();
-route.open({ userId: '123' });
-route.params?.userId; // '123'
+const panelRoute = createVirtualRoute<{ tab: 'info' | 'settings' }>();
+
+await panelRoute.open({ tab: 'settings' });
+panelRoute.params?.tab; // 'settings'
+
+await panelRoute.close();
+panelRoute.params; // null
 ```
 
-### `query`  
-Interface for managing query parameters from [`mobx-location-history` package](https://github.com/js2me/mobx-location-history).  
-Automatically synchronized with current url.  
+### `query`
+Access to query params object used by this route.
 
-### `open()` <Badge type="info" text="action" />  
-Activates the route with execution flow:  
-1. Updates params/query
-2. Uses custom `open` handler if provided for change `isOpened` or sets `isOpened` `true   
+```ts
+const filtersRoute = createVirtualRoute({
+  checkOpened: (route) => route.query.data.filters === '1',
+});
 
-### `close()` <Badge type="info" text="action" />  
-Deactivates the route. Behavior depends on configuration:  
-1. Uses custom close handler if provided  
-2. Default behavior sets isOpened to false  
+filtersRoute.query.update({ filters: '1' });
+```
+
+### `open(params?, extra?)` <Badge type="info" text="action" />
+Opens the route manually and optionally updates query.
+
+```ts
+const profileRoute = createVirtualRoute<{ userId: string }>();
+
+await profileRoute.open(
+  { userId: '42' },
+  { query: { modal: 'profile' }, replace: true },
+);
+```
+
+### `close()` <Badge type="info" text="action" />
+Closes the route manually.
+
+```ts
+const helpRoute = createVirtualRoute({
+  checkOpened: (route) => route.query.data.modal === 'help',
+});
+
+await helpRoute.close();
+```
 
 ### `setOpenChecker()` <Badge type="info" text="action" />
-Updates the `openChecker` value with the provided one.   
-`openChecker` is a function or a boolean value that determines whether the route is open or not.
+Changes open condition at runtime.
 
-### `isOuterOpened` <Badge type="info" text="observable.ref" />  
-::: warning This property is not recommended for detecting the opened state. Use the [`isOpened`](/core/VirtualRoute#isopened) property instead.
-:::
+```ts
+const route = createVirtualRoute();
 
-Indicates the external "opened" state determined by the `checkOpened` function.  
-This value is automatically updated when the `checkOpened` function's dependencies change.
+route.setOpenChecker((r) => r.query.data.modal === 'settings');
+```
 
-## Configuration   
-**Interface**: `VirtualRouteConfiguration`  
+### `isOuterOpened` <Badge type="info" text="observable.ref" />
+Raw result of current `checkOpened`. Usually needed only for debugging.
 
-This is specific object used to detailed configure virtual route.  
-Here is list of configuration properties which can be helpful:  
+```ts
+const route = createVirtualRoute({
+  checkOpened: (r) => r.query.data.modal === 'x',
+});
 
-### `abortSignal`   
-`AbortSignal` used to destroy\cleanup route subscriptions  
+console.log(route.isOuterOpened);
+```
 
-### `meta`  
-Additional object which can contains meta information   
+## Configuration
+
+Interface: `VirtualRouteConfiguration<TParams>`.
+
+### `abortSignal`
+Abort signal for route lifecycle cleanup.
+
+```ts
+const controller = new AbortController();
+const route = createVirtualRoute({
+  abortSignal: controller.signal,
+});
+
+controller.abort();
+```
+
+### `queryParams`
+Custom query params implementation for this route.
+
+```ts
+const route = createVirtualRoute({
+  queryParams: myCustomQueryParams,
+});
+```
+
+### `initialParams`
+Initial params value or factory `(route) => params`.
+
+```ts
+const route = createVirtualRoute<{ page: number }>({
+  initialParams: { page: 1 },
+});
+```
+
+### `checkOpened`
+Function `(route) => boolean` that defines external open state.
+
+```ts
+const route = createVirtualRoute({
+  checkOpened: (r) => r.query.data.modal === 'auth',
+});
+```
+
+### `getAutoOpenParams`
+Called when `checkOpened` turns `true` and route auto-opens.
+
+Example:
+```ts
+const modalRoute = createVirtualRoute<{ id: string | null }>({
+  checkOpened: (route) => Boolean(route.query.data.modalId),
+  getAutoOpenParams: (route) => ({
+    params: {
+      id: String(route.query.data.modalId ?? ''),
+    },
+    extra: {
+      query: { modal: 'true' },
+      replace: true,
+    },
+  }),
+});
+```
+
+### `beforeOpen`
+Hook `(params, route) => void | boolean | Promise<void | boolean>`.
+Return `false` to reject opening.
+
+Example:
+```ts
+const authModalRoute = createVirtualRoute<{ redirectTo?: string }>({
+  checkOpened: (route) => route.query.data.modal === 'auth',
+  beforeOpen: (params) => {
+    if (!auth.canOpenModal) {
+      return false;
+    }
+
+    if (params?.redirectTo && !params.redirectTo.startsWith('/')) {
+      return false;
+    }
+  },
+});
+```
+
+### `open`
+Custom open handler `(params, route) => void | boolean | Promise<void | boolean>`.
+Return `false` to reject opening.
+
+```ts
+const route = createVirtualRoute<{ id: string }>({
+  open: (params, r) => {
+    r.query.update({ modalId: params?.id });
+  },
+});
+```
+
+### `afterOpen`
+Hook called after successful opening.
+
+```ts
+const route = createVirtualRoute({
+  afterOpen: () => {
+    analytics.track('modal_opened');
+  },
+});
+```
+
+### `beforeClose`
+Hook `() => void | boolean | Promise<void | boolean>`.
+Return `false` to reject closing.
+
+Example:
+```ts
+const editorModalRoute = createVirtualRoute({
+  checkOpened: (route) => route.query.data.modal === 'editor',
+  beforeClose: () => {
+    if (hasUnsavedChanges) {
+      return false;
+    }
+  },
+});
+```
+
+### `close`
+Custom close handler `(route) => void | boolean`.
+Return `false` to reject closing.
+
+```ts
+const route = createVirtualRoute({
+  close: (r) => {
+    r.query.update({ modal: undefined });
+  },
+});
+```
+
+### `afterClose`
+Configuration field exists in API, but current implementation does not call it.
+
+```ts
+const route = createVirtualRoute({
+  afterClose: () => {
+    // currently not called by implementation
+  },
+});
+```
+
+### `meta`
+Arbitrary metadata in configuration object (not exposed as a `VirtualRoute` instance field).
+
+Example:
 
 ```ts
 const route = createVirtualRoute({
   meta: {
-    memes: true
-  }
+    memes: true,
+  },
 });
-
-console.log(route.meta?.memes); // true
 ```
-
-### `open()`  
-Custom implementation of open behaviour for this route.  
-It can be helpful if you need custom open/close behaviour  
-
-::: tip Will be used default implementation if is not specified:
-:::
-
-```ts
-defaultOpenImplementation = () => true;
-```
-
-Examples:   
-```ts
-const route = createVirtualRoute({
-  checkOpened: () => !!queryParams.data.yummiesDialog,
-  open: () => {
-    queryParams.update({ yummiesDialog: true });
-    return true
-  }
-})
-```
-
-
-### `close()`  
-Custom implementation of close behaviour for this route  
-It can be helpful if you need custom open/close behaviour  
-
-::: tip Will be used default implementation if is not specified:
-:::
-
-```ts
-defaultCloseImplementation = () => false;
-```
-
-Examples:   
-```ts
-const route = createVirtualRoute({
-  checkOpened: () => !!queryParams.data.yummiesDialog,
-  close: () => {
-    queryParams.update({ yummiesDialog: false });
-    return false
-  }
-})
-```
-
-### `checkOpened()`   
-Custom implementation of close/open statement for this route  
-It can be helpful if you need custom open/close behaviour  
-
-Examples:   
-```ts
-const route = createVirtualRoute({
-  checkOpened: () => !!queryParams.data.yummiesDialog,
-})
-```
-
-### `getAutomatedOpenParams()`   
-Function that returns parameters for automated route opening.  
-This function is called when the route is automatically opened based on the `checkOpened` function result.  
-It should return an object with `params` and optionally `extra` properties.
-
-Example:   
-```ts
-const route = createVirtualRoute({
-  checkOpened: () => !!queryParams.data.modal,
-  getAutomatedOpenParams: (route) => {
-    return {
-      params: { id: queryParams.data.modalId },
-      extra: { query: { modal: 'true' } }
-    };
-  }
-})
-```
-
-### `beforeOpen`  
-Event handler "before opening" a route, required for various checks before the route itself is opened.   
-With this handler, we can prevent the route from opening by returning `false`,  
-or override the navigation to another one by returning   
-```ts
-{
-  url: string;
-  state?: any;
-  replace?: boolean;
-}
-```
-
-Example:   
-```ts
-const route = createVirtualRoute('/foo/bar', {
-  beforeOpen: () => {
-    if (!auth.isAuth) {
-      return false;
-    }
-  }
-})
-```
-
-### `beforeClose()`  
-Event handler "before closing" a route, required for various checks before the route itself is closed.   
-With this handler, we can prevent the route from closing by returning `false`.
-
-Example:   
-```ts
-const route = createVirtualRoute({
-  checkOpened: () => !!queryParams.data.modal,
-  beforeClose: () => {
-    if (hasUnsavedChanges) {
-      return false; // Prevent closing
-    }
-  }
-})
-```
-
-### `afterClose()`  
-Calls after close route.   
-
-### `afterOpen()`  
-Calls after open route.   
-
-

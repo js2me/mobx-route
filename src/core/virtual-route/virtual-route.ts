@@ -89,7 +89,8 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
           // biome-ignore lint/nursery/noFloatingPromises: <explanation>
           this.confirmOpening({
             params: this.params ?? null,
-            ...this.config.getAutomatedOpenParams?.(this),
+            ...(this.config.getAutoOpenParams?.(this) ??
+              this.config.getAutomatedOpenParams?.(this)),
           });
         } else {
           if (this.status === 'closed' || this.status === 'unknown') {

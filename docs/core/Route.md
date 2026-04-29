@@ -168,7 +168,7 @@ Allows to create child route based on this route with merging this route path an
 Example:
 ```ts
 const stars = createRoute('/stars');
-const starDetails = stars.extends('/:starId');
+const starDetails = stars.extend('/:starId');
 starDetails.path; // '/stars/:starId'
 await starDetails.open({ starId: 1 });
 location.pathname; // /stars/1
@@ -422,7 +422,7 @@ Function allows you to add custom logic for "opened" statement
 
 ```ts
 const route = createRoute('/numbers/:number', {
-  checkOpened: (params) => {
+  checkOpened: ({ params }) => {
     return !Number.isNaN(Number(params.number))
   }
 });
