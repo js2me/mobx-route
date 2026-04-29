@@ -1,5 +1,13 @@
 # mobx-route
 
+## 0.30.0
+
+### Minor Changes
+
+- [`8a7027d`](https://github.com/js2me/mobx-route/commit/8a7027d4455c8d5df04b94ea467a6f0eaaa4b014) Thanks [@js2me](https://github.com/js2me)! - Keep the last route params in `RouteViewModel.payload` after a path route is closed.
+
+  This prevents `payload` and `pathParams` from resetting to an empty object when navigation moves to another route, so view models can still access the most recent path params.
+
 ## 0.29.1
 
 ### Patch Changes
