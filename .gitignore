@@ -4,3 +4,7 @@ dist
 .vscode
 coverage
 docs/.vitepress/cache
+
+# llms-full.txt is emitted by vitepress-plugin-llms (sborshik) at docs build, not hand-maintained in public/
+docs/public/llms-full.txt
+.pnpm-store

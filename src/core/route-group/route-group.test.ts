@@ -4,6 +4,8 @@ import { createRoute } from '../route/route.js';
 import { createVirtualRoute } from '../virtual-route/virtual-route.js';
 import { groupRoutes, RouteGroup } from './route-group.js';
 
+declare const process: { env: { NODE_ENV?: string } };
+
 describe('route-group', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
@@ -110,7 +112,7 @@ describe('route-group', () => {
     expect(secondGroupOpenSpy).toHaveBeenCalledWith('foo');
   });
 
-  it('open should warn when no index route and no nested groups exist', () => {
+  it('open should warn with detailed message when not in production and no index route and no nested groups exist', () => {
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const group = groupRoutes({
       foo: createVirtualRoute(),
@@ -121,7 +123,30 @@ describe('route-group', () => {
 
     expect(warnSpy).toHaveBeenCalledTimes(1);
     expect(warnSpy).toHaveBeenCalledWith(
-      "RouteGroup doesn't have index route. open() method doesn't work.",
+      'Warning #1: RouteGroup.open() cannot navigate\n' +
+        'This group has no index route (`index: true` or `groupRoutes(routes, indexRoute)`) and no nested RouteGroup, so open() does nothing.\n' +
+        'See docs: https://js2me.github.io/mobx-route/warnings/1',
     );
+  });
+
+  it('open should warn with minified message in production when no index route and no nested groups exist', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const prev = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'production';
+    try {
+      const group = groupRoutes({
+        foo: createVirtualRoute(),
+        bar: createVirtualRoute(),
+      });
+
+      group.open();
+
+      expect(warnSpy).toHaveBeenCalledTimes(1);
+      expect(warnSpy).toHaveBeenCalledWith(
+        'minified warning #1; visit https://js2me.github.io/mobx-route/warnings/1 for the full message.',
+      );
+    } finally {
+      process.env.NODE_ENV = prev;
+    }
   });
 });

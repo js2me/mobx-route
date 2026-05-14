@@ -285,6 +285,8 @@ starDetails.createUrl({ starId: 1 }, { bar: 1 }, { omitQuery: true }); // /stars
 
 More about `mergeQuery` you can read [here](/core/routeConfig#mergequery)   
 
+If compiling the path throws, the URL falls back to `fallbackPath` or `'/'` — see [Error #1](/errors/1).
+
 ### `matchPath()`
 Checks whether provided path (or current location path) matches the route declaration.
 Returns parsed path data with `params` and matched `path`, or `null` if there is no match.
@@ -482,3 +484,11 @@ const route = createRoute('/foo/bar/baz',{
 route.createUrl(); // /foo/bar/baz?openModal=true
 await route.open(); // /foo/bar/baz?openModal=true
 ```
+
+## Errors 🚨
+
+- [Error #1: Route path compilation failed](/errors/1) (`minified error #1` in production)
+
+## Warnings ⚠️
+
+- [Warning #1: `RouteGroup.open()` has nothing to open](/warnings/1) (`minified warning #1` in production, full message otherwise) — [`groupRoutes` → `open()`](/core/groupRoutes#open)

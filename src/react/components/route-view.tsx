@@ -4,7 +4,6 @@ import type {
   AnyRoute,
   AnyVirtualRoute,
 } from 'mobx-route';
-import { type LoadableConfig, loadable } from 'react-simple-loadable';
 
 export type RouteViewComponent<TRoute extends AnyAbstractRouteEntity> =
   React.ComponentType<RouteViewProps<TRoute>>;
@@ -13,18 +12,11 @@ interface RouteViewConfigWithoutRoute {
   children?: React.ReactNode | (() => React.ReactNode);
 }
 
-type LoadViewFn<TRoute extends AnyAbstractRouteEntity> = (
-  route: TRoute,
-) => Promise<RouteViewComponent<TRoute>>;
-
-export interface RouteViewConfigWithRoute<TRoute extends AnyAbstractRouteEntity>
-  extends Pick<LoadableConfig, 'loading' | 'preload' | 'throwOnError'> {
+export interface RouteViewConfigWithRoute<
+  TRoute extends AnyAbstractRouteEntity,
+> {
   route: TRoute;
   view?: RouteViewComponent<TRoute>;
-  /**
-   * @deprecated use your own load fn for lazy load view
-   */
-  loadView?: LoadViewFn<TRoute>;
   /**
    * Case when route is not opened
    */
@@ -69,24 +61,7 @@ function RouteViewBase<TRoute extends AnyAbstractRouteEntity>(
     return props.fallback ?? null;
   }
 
-  const loadViewFn = props.loadView as
-    | (LoadViewFn<TRoute> & { _loadableComponent: any })
-    | undefined;
-
-  if (loadViewFn) {
-    if (!loadViewFn._loadableComponent) {
-      loadViewFn._loadableComponent = loadable({
-        load: () => props.loadView!(props.route),
-        loading: props.loading,
-        preload: props.preload,
-        throwOnError: props.throwOnError,
-        cache: false,
-      });
-    }
-    Component = loadViewFn._loadableComponent;
-  } else {
-    Component = props.view;
-  }
+  Component = props.view;
 
   const params: any = 'params' in props.route ? props.route.params : {};
 

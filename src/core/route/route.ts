@@ -27,6 +27,8 @@ import type {
   UrlCreateParams,
 } from './route.types.js';
 
+declare const process: { env: { NODE_ENV?: string } };
+
 const annotations: ObservableAnnotationsArray<Route<any, any, any, any>> = [
   [
     computed,
@@ -388,7 +390,16 @@ export class Route<
     try {
       path = this._compiler(this.processParams(urlCreateParams.params));
     } catch (e) {
-      console.error('Error while compiling route path', e);
+      if (process.env.NODE_ENV !== 'production') {
+        console.error(
+          'Error #1: Route path compilation failed\n' +
+            'The path pattern could not be built into a URL (often missing or invalid params for a `:param` segment). Using fallbackPath or "/".\n' +
+            'See docs: https://js2me.github.io/mobx-route/errors/1',
+          e,
+        );
+      } else {
+        console.error('minified error #1;see mobx-route docs', e);
+      }
       path = this.config.fallbackPath ?? routeConfig.get().fallbackPath ?? '/';
     }
 

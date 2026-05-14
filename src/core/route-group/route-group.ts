@@ -80,10 +80,16 @@ export class RouteGroup<TRoutesCollection extends RoutesCollection>
 
     if (lastGroupRoute) {
       lastGroupRoute.open(...args);
-    } else if (process.env.NODE_ENV !== 'production') {
-      console.warn(
-        "RouteGroup doesn't have index route. open() method doesn't work.",
-      );
+    } else {
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn(
+          'Warning #1: RouteGroup.open() cannot navigate\n' +
+            'This group has no index route (`index: true` or `groupRoutes(routes, indexRoute)`) and no nested RouteGroup, so open() does nothing.\n' +
+            'See docs: https://js2me.github.io/mobx-route/warnings/1',
+        );
+      } else {
+        console.warn('minified warning #1;see mobx-route docs');
+      }
     }
   }
 }

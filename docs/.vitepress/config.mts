@@ -67,7 +67,25 @@ export default defineDocsVitepressConfig(configs, {
           { text: 'Protected routes', link: '/recipes/protected-routes' },
           { text: 'Rest path params', link: '/recipes/rest-path-params' },
         ],
-      }
+      },
+      {
+        text: 'Errors 🚨',
+        items: [
+          {
+            text: '#1: Route path compilation failed',
+            link: '/errors/1',
+          },
+        ],
+      },
+      {
+        text: 'Warnings ⚠️',
+        items: [
+          {
+            text: '#1: RouteGroup.open() has nothing to open',
+            link: '/warnings/1',
+          },
+        ],
+      },
     ],
   },
 });

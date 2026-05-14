@@ -7,10 +7,6 @@ const { loadableMock } = vi.hoisted(() => ({
   loadableMock: vi.fn(),
 }));
 
-vi.mock('react-simple-loadable', () => ({
-  loadable: loadableMock,
-}));
-
 import { RouteView } from './route-view.js';
 
 const mockHistory = <THistory extends History>(history: THistory) => {
@@ -124,47 +120,5 @@ describe('<RouteView />', () => {
 
     expect(children).toHaveBeenCalledWith(route.params, route);
     expect(screen.getByText('5:true')).toBeDefined();
-  });
-
-  it('should create loadable component once and pass loadable config', async () => {
-    const route = createRoute('/lazy/:id');
-    const loading = () => <div>loading</div>;
-    const preload = true;
-    const throwOnError = true;
-    const loadView = vi.fn(async () => {
-      return ({ params }: any) => <div>{params.id}</div>;
-    });
-    await route.open({ id: '1' });
-
-    const { rerender } = render(
-      <RouteView
-        route={route}
-        loadView={loadView}
-        loading={loading}
-        preload={preload}
-        throwOnError={throwOnError}
-      >
-        child
-      </RouteView>,
-    );
-
-    expect(loadableMock).toHaveBeenCalledTimes(1);
-
-    const loadableConfig = loadableMock.mock.calls[0][0];
-    expect(loadableConfig.loading).toBe(loading);
-    expect(loadableConfig.preload).toBe(preload);
-    expect(loadableConfig.throwOnError).toBe(throwOnError);
-    expect(loadableConfig.cache).toBe(false);
-
-    await loadableConfig.load();
-    expect(loadView).toHaveBeenCalledWith(route);
-    expect(screen.getByText('lazy:1:child')).toBeDefined();
-
-    rerender(
-      <RouteView route={route} loadView={loadView}>
-        child
-      </RouteView>,
-    );
-    expect(loadableMock).toHaveBeenCalledTimes(1);
   });
 });

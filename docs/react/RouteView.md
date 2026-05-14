@@ -46,7 +46,7 @@ function Routing() {
 
 Route entity (`Route` or `VirtualRoute`) to observe.
 
-- When `route.isOpened === true`, `RouteView` renders `view`, the `loadView` result (deprecated), or `children`.
+- When `route.isOpened === true`, `RouteView` renders `view` or `children`.
 - When `route.isOpened === false`, `RouteView` renders `fallback` (or `null` if `fallback` is not provided).
 
 ### `view`
@@ -61,34 +61,6 @@ The component receives:
 
 - `params` (typed from the route declaration);
 - `children` (if passed to `RouteView`).
-
-### `loadView` (deprecated)
-
-**Deprecated.** The `loadView` prop is deprecated and **will be removed in a future major release**. Prefer handling code-splitting in your own components instead.
-
-**Alternatives:** use a dedicated lazy-loading library and pass the resulting component to `view` (or `children`), for example:
-
-- [`react-loadable`](https://github.com/jamiebuilds/react-loadable)
-- [`react-simple-loadable`](https://github.com/js2me/react-simple-loadable)
-- [`@loadable/component`](https://loadable-components.com/)
-
----
-
-Lazy view factory: `(route) => Promise<Component>`.
-
-```tsx
-<RouteView
-  route={routes.userDetails}
-  loadView={async (route) => (await import('./user-page')).UserPage}
-  loading={GlobalLoader}
-/>
-```
-
-`RouteView` internally wraps this with `react-simple-loadable` and forwards:
-
-- `loading`
-- `preload`
-- `throwOnError`
 
 ### `fallback`
 
