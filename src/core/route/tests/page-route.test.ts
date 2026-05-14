@@ -112,7 +112,7 @@ describe('page route extend typings', () => {
     >();
 
     // @ts-expect-error locale is required from parent route input params
-    child.open({ userId: 1, postId: 2 });
+    void child.open({ userId: 1, postId: 2 });
   });
 
   it('should infer full path literal and parent route type', () => {

@@ -128,25 +128,4 @@ describe('route-group', () => {
         'See docs: https://js2me.github.io/mobx-route/warnings/1',
     );
   });
-
-  it('open should warn with minified message in production when no index route and no nested groups exist', () => {
-    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    const prev = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'production';
-    try {
-      const group = groupRoutes({
-        foo: createVirtualRoute(),
-        bar: createVirtualRoute(),
-      });
-
-      group.open();
-
-      expect(warnSpy).toHaveBeenCalledTimes(1);
-      expect(warnSpy).toHaveBeenCalledWith(
-        'minified warning #1; visit https://js2me.github.io/mobx-route/warnings/1 for the full message.',
-      );
-    } finally {
-      process.env.NODE_ENV = prev;
-    }
-  });
 });

@@ -1,4 +1,3 @@
-import { LinkedAbortController } from 'linked-abort-controller';
 import { computed, observable, reaction, runInAction } from 'mobx';
 import {
   buildSearchString,
@@ -56,7 +55,9 @@ export class Route<
   TOutputParams extends AnyObject = ParsedPathParams<TPath>,
   TParentRoute extends Route<any, any, any, any> | null = null,
 > {
-  protected abortController: AbortController;
+  private isDestroyed?: boolean;
+  private disposer?: VoidFunction;
+
   protected history: History;
 
   /**
@@ -119,7 +120,6 @@ export class Route<
       TParentRoute
     > = {},
   ) {
-    this.abortController = new LinkedAbortController(config.abortSignal);
     this.history = config.history ?? routeConfig.get().history;
     this.query = config.queryParams ?? routeConfig.get().queryParams;
     this.pathDeclaration = pathDeclaration;
@@ -131,10 +131,16 @@ export class Route<
 
     applyObservable(this, annotations);
 
-    reaction(() => this.isPathMatched, this.checkPathMatch, {
-      signal: this.abortController.signal,
-      fireImmediately: true,
-    });
+    if (this.config.abortSignal?.aborted) {
+      this.isDestroyed = true;
+    } else {
+      this.disposer = reaction(() => this.isPathMatched, this.checkPathMatch, {
+        fireImmediately: true,
+      });
+      this.config.abortSignal?.addEventListener('abort', () => this.destroy(), {
+        once: true,
+      });
+    }
   }
 
   protected get baseUrl() {
@@ -245,7 +251,7 @@ export class Route<
    */
   get isOpened() {
     if (
-      this.abortController.signal.aborted ||
+      this.isDestroyed ||
       !this.isPathMatched ||
       this.params === null ||
       this.status !== 'open-confirmed'
@@ -525,7 +531,7 @@ export class Route<
       }
     }
 
-    if (this.abortController.signal.aborted) {
+    if (this.isDestroyed) {
       return;
     }
 
@@ -609,7 +615,9 @@ export class Route<
    * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#destroy)
    */
   destroy() {
-    this.abortController.abort();
+    this.isDestroyed = true;
+    this.disposer?.();
+    this.disposer = undefined;
   }
 }
 

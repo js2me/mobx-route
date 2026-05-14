@@ -1,4 +1,3 @@
-import { LinkedAbortController } from 'linked-abort-controller';
 import { action, computed, observable, reaction, runInAction } from 'mobx';
 import type { IQueryParams } from 'mobx-location-history';
 import { callFunction } from 'yummies/common';
@@ -16,7 +15,7 @@ const annotations: ObservableAnnotationsArray<VirtualRoute<any>> = [
   [observable, 'params'],
   [observable.ref, 'status', 'trx', 'openChecker', 'isOuterOpened'],
   [computed, 'isOpened', 'isOpening', 'isClosing'],
-  [action, 'setOpenChecker', 'open', 'close'],
+  [action, 'setOpenChecker', 'open', 'close', 'destroy'],
 ];
 
 /**
@@ -27,10 +26,11 @@ const annotations: ObservableAnnotationsArray<VirtualRoute<any>> = [
 export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
   implements AbstractVirtualRoute<TParams>
 {
+  private isDestroyed?: boolean;
+  private disposer?: VoidFunction;
+
   query: IQueryParams;
   params: TParams | null;
-
-  protected abortController: AbortController;
 
   protected status:
     | 'opening'
@@ -52,7 +52,6 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
   isOuterOpened: boolean | undefined;
 
   constructor(protected config: VirtualRouteConfiguration<TParams> = {}) {
-    this.abortController = new LinkedAbortController(config.abortSignal);
     this.query = config.queryParams ?? routeConfig.get().queryParams;
     this.params = callFunction(config.initialParams, this) ?? null;
     this.openChecker = config.checkOpened;
@@ -62,46 +61,41 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
 
     applyObservable(this, annotations);
 
-    this.abortController.signal.addEventListener(
-      'abort',
-      action(() => {
-        this.status = 'unknown';
-      }),
-    );
+    if (this.config.abortSignal?.aborted) {
+      this.isDestroyed = true;
+    } else {
+      this.disposer = reaction(
+        () => this.openChecker?.(this),
+        action((isOuterOpened) => {
+          this.isOuterOpened = isOuterOpened;
 
-    reaction(
-      () => this.openChecker?.(this),
-      action((isOuterOpened) => {
-        this.isOuterOpened = isOuterOpened;
-
-        if (
-          this.skipAutoOpenClose ||
-          this.status === 'closing' ||
-          this.status === 'opening'
-        ) {
-          return;
-        }
-
-        if (this.isOuterOpened) {
-          if (this.status === 'opened') {
+          if (
+            this.skipAutoOpenClose ||
+            this.status === 'closing' ||
+            this.status === 'opening'
+          ) {
             return;
           }
-          // biome-ignore lint/nursery/noFloatingPromises: <explanation>
-          this.confirmOpening({
-            params: this.params ?? null,
-            ...(this.config.getAutoOpenParams?.(this) ??
-              this.config.getAutomatedOpenParams?.(this)),
-          });
-        } else {
-          if (this.status === 'closed' || this.status === 'unknown') {
-            return;
+
+          if (this.isOuterOpened) {
+            if (this.status === 'opened') {
+              return;
+            }
+            void this.confirmOpening({
+              params: this.params ?? null,
+              ...(this.config.getAutoOpenParams?.(this) ??
+                this.config.getAutomatedOpenParams?.(this)),
+            });
+          } else {
+            if (this.status === 'closed' || this.status === 'unknown') {
+              return;
+            }
+            void this.confirmClosing();
           }
-          // biome-ignore lint/nursery/noFloatingPromises: <explanation>
-          this.confirmClosing();
-        }
-      }),
-      { signal: this.abortController.signal, fireImmediately: true },
-    );
+        }),
+        { signal: this.config.abortSignal, fireImmediately: true },
+      );
+    }
 
     if (this.status === 'opened') {
       this.config.afterOpen?.(this.params, this);
@@ -112,7 +106,11 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
    * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#isopened)
    */
   get isOpened() {
-    return this.status === 'opened' && this.isOuterOpened !== false;
+    return (
+      !this.isDestroyed &&
+      this.status === 'opened' &&
+      this.isOuterOpened !== false
+    );
   }
 
   /**
@@ -243,7 +241,9 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
   }
 
   destroy() {
-    this.abortController.abort();
+    this.isDestroyed = true;
+    this.status = 'unknown';
+    this.disposer?.();
   }
 }
 

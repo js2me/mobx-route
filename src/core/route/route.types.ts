@@ -176,27 +176,19 @@ export interface ParsedPathData<TPath extends string> {
   params: ParsedPathParams<TPath>;
 }
 
-export type InferPath<T extends AnyRoute> = T extends Route<
-  infer TPath,
-  any,
-  any,
-  any
->
-  ? TPath
-  : never;
+export type InferPath<T extends AnyRoute> =
+  T extends Route<infer TPath, any, any, any> ? TPath : never;
 
-export type InferInputParams<T extends AnyRoute> = T extends VirtualRoute<
-  infer TParams
->
-  ? TParams
-  : T extends Route<any, infer TInputParams, any, any>
-    ? TInputParams
-    : never;
-
-export type InferParams<T extends AnyRoute> = T extends VirtualRoute<
-  infer TParams
->
-  ? TParams
-  : T extends Route<any, any, infer TParams, any>
+export type InferInputParams<T extends AnyRoute> =
+  T extends VirtualRoute<infer TParams>
     ? TParams
-    : never;
+    : T extends Route<any, infer TInputParams, any, any>
+      ? TInputParams
+      : never;
+
+export type InferParams<T extends AnyRoute> =
+  T extends VirtualRoute<infer TParams>
+    ? TParams
+    : T extends Route<any, any, infer TParams, any>
+      ? TParams
+      : never;
