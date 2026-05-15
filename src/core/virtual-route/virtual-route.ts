@@ -83,8 +83,7 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
             }
             void this.confirmOpening({
               params: this.params ?? null,
-              ...(this.config.getAutoOpenParams?.(this) ??
-                this.config.getAutomatedOpenParams?.(this)),
+              ...this.config.getAutoOpenParams?.(this),
             });
           } else {
             if (this.status === 'closed' || this.status === 'unknown') {

@@ -57,14 +57,6 @@ export interface VirtualRouteConfiguration<
   ) => Maybe<Omit<VirtualRouteTrx, 'manual'>>;
 
   /**
-   * @deprecated Use `getAutoOpenParams` instead.
-   * Will be removed in the next major release.
-   */
-  getAutomatedOpenParams?: (
-    route: VirtualRoute<NoInfer<TParams>>,
-  ) => Maybe<Omit<VirtualRouteTrx, 'manual'>>;
-
-  /**
    * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#meta)
    */
   meta?: AnyObject;
