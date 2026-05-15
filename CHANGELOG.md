@@ -1,5 +1,27 @@
 # mobx-route
 
+## 1.0.0
+
+### Major Changes
+
+- [`fd88b5f`](https://github.com/js2me/mobx-route/commit/fd88b5feeabaea8b71d77af56d8b209de88877d3) Thanks [@js2me](https://github.com/js2me)! - Removed `getAutomatedOpenParams` from `VirtualRouteConfiguration`. Use `getAutoOpenParams` instead.
+
+- [`f62dae6`](https://github.com/js2me/mobx-route/commit/f62dae67e1940b7d5735c5c60ee43362aa470d77) Thanks [@js2me](https://github.com/js2me)! - Removed `protected abortController` property from `Route` and `VirtualRoute`. If you were accessing `abortController` directly, you now need to manage abort/cleanup yourself or use the `abortSignal` config option.
+
+  - `VirtualRoute.isOpened` now returns `false` after `destroy()` is called
+  - `VirtualRoute.destroy()` now also sets status to `'unknown'` and explicitly disposes the reaction
+  - Added `react-dom` as an optional peer dependency
+
+- [`6df1753`](https://github.com/js2me/mobx-route/commit/6df1753f8118c4110a34219ab64da5307fc44665) Thanks [@js2me](https://github.com/js2me)! - First release. Removed deprecations.
+
+  Removed the deprecated `loadView` API and all props that existed only to support it.
+
+  Dropped the `react-simple-loadable` dependency; it was only used by `loadView`.
+
+### Patch Changes
+
+- [`f62dae6`](https://github.com/js2me/mobx-route/commit/f62dae67e1940b7d5735c5c60ee43362aa470d77) Thanks [@js2me](https://github.com/js2me)! - update all deps to latest
+
 ## 0.31.0
 
 ### Minor Changes
