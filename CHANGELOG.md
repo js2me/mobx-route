@@ -1,5 +1,11 @@
 # mobx-route
 
+## 1.1.0
+
+### Minor Changes
+
+- [`5688038`](https://github.com/js2me/mobx-route/commit/568803826caac68bd34cddb02a9fba11e12402ab) Thanks [@js2me](https://github.com/js2me)! - added `absolutePath` property for path routes (`createRoute`, `Route`)
+
 ## 1.0.0
 
 ### Major Changes
