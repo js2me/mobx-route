@@ -1332,14 +1332,17 @@ describe('route', () => {
     const regularRoute = new Route('/test/:id');
     await regularRoute.open({ id: '123' });
     expect(regularRoute.path).toBe('/test/123');
+    expect(regularRoute.absolutePath).toBe('/test/123');
 
     const hashRoute = new Route('/hash', { hash: true });
     history.push('#/hash');
     expect(hashRoute.path).toBe('/hash');
+    expect(hashRoute.absolutePath).toBe('/hash');
 
     const baseUrlRoute = new Route('/path', { baseUrl: '/app' });
     history.push('/app/path');
     expect(baseUrlRoute.path).toBe('/path');
+    expect(baseUrlRoute.absolutePath).toBe('/app/path');
   });
 
   it('should correctly generate URLs with various parameter combinations', async () => {

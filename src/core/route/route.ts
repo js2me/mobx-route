@@ -35,6 +35,7 @@ const annotations: ObservableAnnotationsArray<Route<any, any, any, any>> = [
     'isOpened',
     'isOpening',
     'path',
+    'absolutePath',
     'hasOpenedChildren',
     'isAbleToMergeQuery',
     'baseUrl',
@@ -210,6 +211,21 @@ export class Route<
    */
   get path(): string | null {
     return this.parsedPathData?.path ?? null;
+  }
+
+  /**
+   * Matched path segment for current URL with base URL.
+   *
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#absolutepath)
+   */
+  get absolutePath(): string | null {
+    const path = this.path;
+
+    if (path === null) {
+      return null;
+    }
+
+    return `${this.baseUrl || ''}${path}`;
   }
 
   /**

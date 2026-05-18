@@ -230,6 +230,16 @@ routeA.path; // '/foo/bar/1234'
 ```
 
 
+### `absolutePath` <Badge type="tip" text="computed" />   
+Matched path segment for current URL with base URL. `null` if route isn't open.  
+
+Example:  
+```ts
+const routeA = createRoute('/foo/bar/:baz', { baseUrl: '/app' });
+location.href = '/app/foo/bar/1234';
+routeA.absolutePath; // '/app/foo/bar/1234'
+```
+
 ### `pathDeclaration`  
 Route path pattern declaration (used for route matching, `path-to-regexp`)  
 
