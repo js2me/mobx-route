@@ -11,6 +11,7 @@
     "build:watch": "pnpm build && nodemon --watch src --ext ts --exec \"pnpm build\"",
     "build": "vite build",
     "pub": "pnpm build && sborshik publish --useDistDir",
+    "changeset:version": "bash scripts/changeset-version.sh",
     "pub:patch": "PUBLISH_VERSION=patch pnpm pub",
     "pub:minor": "PUBLISH_VERSION=minor pnpm pub",
     "pub:major": "PUBLISH_VERSION=major pnpm pub",
@@ -42,7 +43,7 @@
   "homepage": "https://js2me.github.io/mobx-route",
   "repository": {
     "type": "git",
-    "url": "git://github.com/js2me/mobx-route"
+    "url": "https://github.com/js2me/mobx-route"
   },
   "dependencies": {
     "mobx-location-history": "^9.4.0",
