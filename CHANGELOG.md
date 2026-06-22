@@ -1,5 +1,11 @@
 # mobx-route
 
+## 1.1.1
+
+### Patch Changes
+
+- [`22fc7e1`](https://github.com/js2me/mobx-route/commit/22fc7e17fe1b1334d62aa66ba6fd851affd24e85) Thanks [@js2me](https://github.com/js2me)! - update `mobx-location-history` to 9.4.0 (improved QueryParams)
+
 ## 1.1.0
 
 ### Minor Changes
