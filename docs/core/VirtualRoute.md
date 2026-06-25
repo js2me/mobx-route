@@ -1,12 +1,7 @@
 # VirtualRoute
 
-Class for creating routes with custom activation logic. Useful for implementing:
-- Modal windows routing
-- Feature toggles
-- Conditional UI states
-- Non-URL-based routing scenarios
-
-Unlike `Route`, `VirtualRoute` does not parse URL path declarations. Open state is controlled by your handlers and `checkOpened`.
+URL-less route.  
+This class behaves like `Route`, but its open state is controlled by user-defined `checkOpened` / `open` / `close` handlers instead of URL matching. Typical use cases: modals, feature toggles, tabs, conditional UI states.
 
 ## Constructor
 
@@ -290,12 +285,12 @@ const route = createVirtualRoute({
 ```
 
 ### `afterClose`
-Configuration field exists in API, but current implementation does not call it.
+Hook called after successful closing.
 
 ```ts
 const route = createVirtualRoute({
   afterClose: () => {
-    // currently not called by implementation
+    analytics.track('modal_closed');
   },
 });
 ```

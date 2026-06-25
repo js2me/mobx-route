@@ -1,11 +1,10 @@
 # RouteView
 
-Renders UI for a specific route when it is opened.
+React route renderer.  
+Renders a component (or `children`) when the bound route is open. Two rendering modes:
 
-`RouteView` supports three rendering modes:
-
-- through `view` component;
-- through `children` (static node or render function).
+- via the `view` prop;
+- via `children` (static node or render function).
 
 ### Example
 

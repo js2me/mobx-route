@@ -16,34 +16,30 @@ One possible implementation:
 
 ```ts
 export const authModal = createVirtualRoute({
-  checkOpened: ({ query }) => !!query.data.authModal,
-  open: (_, { query }) => {
-    if (query.data.authModal) {
-      query.update({ authModal: true });
-    }
+  checkOpened: (route) => Boolean(route.query.data.authModal),
+  open: (_params, route) => {
+    route.query.update({ authModal: true });
   },
-  close: ({ query }) => {
-    query.update({ authModal: null });
+  close: (route) => {
+    route.query.update({ authModal: undefined });
   },
 });
 ```
 
-Variant with specifying additional parameters via Query:     
+Variant with specifying additional parameters via query:     
 
 ```ts
 export const authModal = createVirtualRoute({
-  initialParams: ({ query }) => ({
-    paramA: query.data.paramA || '',
-    paramB: query.data.paramA || '',
+  initialParams: (route) => ({
+    paramA: String(route.query.data.paramA ?? ''),
+    paramB: String(route.query.data.paramB ?? ''),
   }),
-  checkOpened: ({ query }) => !!query.data.authModal,
-  open: (params, { query }) => {
-    if (query.data.authModal) {
-      query.update({ authModal: true, ...params });
-    }
+  checkOpened: (route) => Boolean(route.query.data.authModal),
+  open: (params, route) => {
+    route.query.update({ authModal: true, ...params });
   },
-  close: ({ query }) => {
-    query.update({ authModal: undefined });
+  close: (route) => {
+    route.query.update({ authModal: undefined });
   },
 });
 ```
@@ -60,9 +56,9 @@ export const authModal = createVirtualRoute();
 _using `localStorage`_  
 ```ts
 export const authModal = createVirtualRoute({
-  checkOpened: () => !!localStorage.getItem('authModal'),
+  checkOpened: () => Boolean(localStorage.getItem('authModal')),
   open: () => {
-    localStorage.setItem('authModal', true);
+    localStorage.setItem('authModal', 'true');
   },
   close: () => {
     localStorage.removeItem('authModal');

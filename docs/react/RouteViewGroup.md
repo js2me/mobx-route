@@ -1,12 +1,13 @@
 # RouteViewGroup
 
-`RouteViewGroup` renders **one child node** from the list:
+React route-switch component.  
+Renders **one child node** from the list:
 
 - first opened route child by default;
 - last opened route child when `useLastOpened` is enabled;
 - last non-route child (fallback content) when no routes are open.
 
-It is useful for route switching, not-found rendering, and grouped navigation layouts.
+Useful for route switching, not-found rendering, and grouped navigation layouts.
 
 ## Basic example
 

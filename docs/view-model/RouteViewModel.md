@@ -1,15 +1,12 @@
 # RouteViewModel
 
-Abstract class for integration with [`mobx-view-model` library](https://js2me.github.io/mobx-view-model)  
+Route-bound view model base class.  
+Extends `ViewModelBase` from [`mobx-view-model`](https://js2me.github.io/mobx-view-model) to expose `pathParams`/`query` and to keep the last params around during unmount so exit transitions can finish.
 
-`RouteViewModel` binds a route entity to a view model and gives a stable API for route data:
-- `pathParams` for path params
-- `query` for current query params
+## What it changes vs. `ViewModelBase`
 
-## Modifications
-
-- `payload` now keeps the latest known route params via `lastPayload` when the route is closed.
-- `isMounted` is `true` only when both `ViewModelBase.isMounted` and `route.isOpened` are `true`.
+- `payload` returns the current route params, or the last seen ones (`lastPayload`) after the route closes.
+- `isMounted` is `true` only when the view model is mounted **and** the route is open.
 
 ## API
 
@@ -25,7 +22,7 @@ Current path params for the route view model.
 
 Returns current query params:
 - route-specific query when supported by the route entity;
-- global query params from `routeConfig` otherwise.
+- global query params from `routeConfig.get()` otherwise.
 
 ### Example
 

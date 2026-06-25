@@ -9,7 +9,7 @@ import type {
 declare const process: { env: { NODE_ENV?: string } };
 
 const annotations: ObservableAnnotationsArray<RouteGroup<any>> = [
-  [computed, 'isOpened', 'indexRoute'],
+  [computed, 'isOpened', 'indexRoute', 'canNavigate'],
   [observable.shallow, 'routes'],
 ];
 
@@ -59,13 +59,30 @@ export class RouteGroup<TRoutesCollection extends RoutesCollection>
   }
 
   /**
+   * `true` if `open()` has a target to navigate to —
+   * either an own index route or a nested `RouteGroup` that itself can navigate.
+   *
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/groupRoutes.html#cannavigate)
+   */
+  get canNavigate(): boolean {
+    if (this.indexRoute) return true;
+
+    for (const routeName in this.routes) {
+      const route = this.routes[routeName];
+      if (route instanceof RouteGroup && route.canNavigate) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
    * Main navigation method for the group.
    *
    * [**Documentation**](https://js2me.github.io/mobx-route/core/groupRoutes.html#open)
    */
   open(...args: any[]) {
-    let lastGroupRoute: RouteGroup<any> | undefined;
-
     if (this.indexRoute && 'open' in this.indexRoute) {
       this.indexRoute.open(...args);
       return;
@@ -73,23 +90,20 @@ export class RouteGroup<TRoutesCollection extends RoutesCollection>
 
     for (const routeName in this.routes) {
       const route = this.routes[routeName];
-      if (route instanceof RouteGroup) {
-        lastGroupRoute = route;
+      if (route instanceof RouteGroup && route.canNavigate) {
+        route.open(...args);
+        return;
       }
     }
 
-    if (lastGroupRoute) {
-      lastGroupRoute.open(...args);
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn(
+        'Warning #1: RouteGroup.open() cannot navigate\n' +
+          'This group has no index route (`index: true` or `groupRoutes(routes, indexRoute)`) and no navigable nested RouteGroup, so open() does nothing.\n' +
+          'See docs: https://js2me.github.io/mobx-route/warnings/1',
+      );
     } else {
-      if (process.env.NODE_ENV !== 'production') {
-        console.warn(
-          'Warning #1: RouteGroup.open() cannot navigate\n' +
-            'This group has no index route (`index: true` or `groupRoutes(routes, indexRoute)`) and no nested RouteGroup, so open() does nothing.\n' +
-            'See docs: https://js2me.github.io/mobx-route/warnings/1',
-        );
-      } else {
-        console.warn('minified warning #1;see mobx-route docs');
-      }
+      console.warn('minified warning #1;see mobx-route docs');
     }
   }
 }

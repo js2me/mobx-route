@@ -1,10 +1,12 @@
-# Rest path params   
+# Rest path params
 
-Follow [documentation of the `path-to-regexp` npm package](https://www.npmjs.com/package/path-to-regexp)  
+Catch “the rest of the path” after a fixed prefix — useful for file-like URLs or proxy paths:
 
-Example:  
 ```ts
-import { createRoute } from "mobx-route";
+const serviceRoute = createRoute('/services/:serviceId{/*rest}');
 
-export const serviceRoute = createRoute('/services/:serviceId{/*rest}');
+serviceRoute.open({ serviceId: 'api', rest: ['v1', 'users'] });
+// → /services/api/v1/users
 ```
+
+Syntax follows [path-to-regexp](https://www.npmjs.com/package/path-to-regexp).

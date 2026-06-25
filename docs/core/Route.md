@@ -1,11 +1,9 @@
-# Route  
+# Route
 
-Class for creating path based route.   
-Routes are self-contained entities and do not require binding to a router.   
+Path-based route.  
+This class binds a URL pattern to reactive `isOpened` and `params`, and exposes `open()` for navigation. URL-less variant: [`VirtualRoute`](/core/VirtualRoute).
 
-You can track their open state using the `isOpened` property, and also "open" the route using the `open()` method.   
-
-## Constructor   
+## Usage
 ```ts
 createRoute(
   path: TPath,
@@ -55,9 +53,15 @@ First argument can be required based on path declaration (first argument)
 
 **API Signature**  
 ```ts
-open(params?, { query?, replace?, state?, mergeQuery? }): Promise<void>
+open(params?, opts?): Promise<void>
 open(params?, replace?, query?): Promise<void>
+open(url: string, opts?): Promise<void>
+open(url: string, replace?, query?): Promise<void>
 ```
+
+`opts`: `{ query?, replace?, state?, mergeQuery? }`.
+
+When the first argument is a string, navigation goes to that URL directly without compiling the path pattern.
 
 More about `mergeQuery` you can read [here](/core/routeConfig#mergequery)   
 
@@ -159,7 +163,7 @@ class AnalyticsRoute<TPath extends string> extends Route<TPath> {
 ```
 
 ### `extend()`  
-Allows to create child route based on this route with merging this route path and extending path.   
+Creates a child route by appending a path to this one's pattern.
 
 ::: info Extending route from parent will ignore parameters:
  `index`, `params` `exact`
@@ -169,34 +173,48 @@ Example:
 ```ts
 const stars = createRoute('/stars');
 const starDetails = stars.extend('/:starId');
-starDetails.path; // '/stars/:starId'
+starDetails.pathDeclaration; // '/stars/:starId'
 await starDetails.open({ starId: 1 });
 location.pathname; // /stars/1
+starDetails.path; // '/stars/1'
+```
+
+### `query`
+
+Query params (`IQueryParams` from [`mobx-location-history`](https://js2me.github.io/mobx-location-history)). Override per route via `queryParams` in config.
+
+```ts
+const route = createRoute('/search');
+route.query.update({ q: 'mobx' });
+route.query.data; // { q: 'mobx' }
 ```
 
 ### `isIndex`  
-Indicates if this route is an index route. Index routes activate when parent route path matches exactly.  
-Useful with groupping routes using [`groupRoutes`](/core/groupRoutes)   
+Indicates if this route is an index route. Set via `{ index: true }` in config.  
+Useful with [`groupRoutes`](/core/groupRoutes).
 
 ### `isHash`  
-Indicates if this route is an hash based route.  
-Hash based routes work with only `#hashstrings` in browser address URL. This is useful when you want to create routes that only affect the hash part of the URL, such as for client-side routing or for creating routes that don't affect the server-side routing.  
+Indicates if this route is a hash-based route. Set via `{ hash: true }` in config.  
+Matches `location.hash` (without `#`). Use with [`createHashHistory`](/recipes/hash-routing).  
 
 ### `isOpened` <Badge type="tip" text="computed" />   
 
 Defines the "open" state for this route.   
-Returns true when current URL matches this route's path pattern.
+Returns true when current URL matches this route's path pattern and the open lifecycle has been confirmed (i.e. `beforeOpen`/`params` checks passed).
 
 Example:  
 ```ts
 const stars = createRoute('/stars');
-stars.open();
+await stars.open();
 stars.isOpened; // true
 ```
 
+::: tip Always `await open()` if you check `isOpened` afterwards
+With an async `beforeOpen` or `params()` the route sits in `isOpening` first. Reading `isOpened` without `await` is only safe when no async gates are configured.
+:::
+
 ### `isOpening` <Badge type="tip" text="computed" />   
-Indicates if this route is currently in the process of opening.  
-Returns `true` when the route status is `'opening'`.
+`true` while an `open()` call is in flight (before `beforeOpen`/`params` resolve).
 
 ### `params`  <Badge type="tip" text="computed.struct" />  
 Current parsed path parameters. `null` if route isn't open.  
@@ -241,7 +259,7 @@ routeA.absolutePath; // '/app/foo/bar/1234'
 ```
 
 ### `pathDeclaration`  
-Route path pattern declaration (used for route matching, `path-to-regexp`)  
+Original pattern passed to `createRoute(...)`. For the currently matched URL segment use [`path`](#path) / [`absolutePath`](#absolutepath).
 
 Example:  
 ```ts
@@ -260,11 +278,13 @@ const routeA = createRoute('/a');
 const routeB = routeA.extend('/b');
 const routeC = routeB.extend('/c');
 
-history.pushState(null, '', '/a/b/c');
+await routeC.open();
+// location.pathname === '/a/b/c'
 
-routeA.isOpened; // false
-routeB.isOpened; // false;
-routeC.isOpened; // true;
+// All three match — default `exact: false` lets parents match too:
+routeA.isOpened; // true
+routeB.isOpened; // true
+routeC.isOpened; // true
 
 routeA.hasOpenedChildren; // true
 routeB.hasOpenedChildren; // true
@@ -337,14 +357,13 @@ Call this when route instance is no longer needed.
 
 ## Configuration   
 **Interface**: `RouteConfiguration`  
-This is specific object used to detailed configure route.  
-Here is list of configuration properties which can be helpful:  
+The second argument of `createRoute(...)` — fine-tunes matching, lifecycle, and URL building per route. Common knobs:
 
 ### `abortSignal`   
-`AbortSignal` used to destroy\cleanup route subscriptions  
+`AbortSignal` that destroys the route when fired.
 
 ### `meta`  
-Additional object which can contains meta information   
+Arbitrary metadata attached to the route. Also passed to `params()` as its second argument.
 
 ```ts
 const route = createRoute('/fruits/apples', {
@@ -387,9 +406,26 @@ projectsRoute.isOpened; // true
 projectRoute.isOpened; // true
 ```
 
+### `index`  
+Marks route as index. Sets `isIndex` to `true`. Used by [`groupRoutes`](/core/groupRoutes).
+
+### `hash`  
+Marks route as hash-based. Sets `isHash` to `true`. Requires [`createHashHistory`](/recipes/hash-routing).
+
+### `mergeQuery`  
+Per-route override for global [`mergeQuery`](/core/routeConfig#mergequery).
+
+### `fallbackPath`  
+Path when path compilation fails in `createUrl()`. Overrides global [`fallbackPath`](/core/routeConfig#fallbackpath).
+
+### `history` / `queryParams` / `baseUrl`  
+Per-route overrides for global [`routeConfig`](/core/routeConfig).
+
+### `parseOptions` / `matchOptions`  
+Options for [path-to-regexp](https://www.npmjs.com/package/path-to-regexp) `parse()` and `match()`.
 
 ### `params()`   
-A function that can be needed when it is necessary to cast parsed path parameters from route to a certain type.   
+Cast or validate parsed path parameters. Receives `params` and route `meta` as the second argument.
 
 ```ts
 const route = createRoute('/fruits/apples/:appleId', {
@@ -427,9 +463,9 @@ route.isOpened; // false
 ```
 
 ### `checkOpened()`   
-Function allows you to add custom logic for "opened" statement   
+Extra predicate for `isOpened`. The route opens only when the URL matches **and** this returns `true`.
 
-::: info This check will only be called AFTER if this route is valid by `pathname`
+::: info Only runs after the path matches
 :::
 
 ```ts
@@ -446,33 +482,26 @@ route.isOpened; // false
 
 
 ### `beforeOpen`  
-Event handler "before opening" a route, required for various checks before the route itself is opened.   
-With this handler, we can prevent the route from opening by returning `false`,  
-or override the navigation to another one by returning   
-```ts
-{
-  url: string;
-  state?: any;
-  replace?: boolean;
-}
-```
+Called before the URL changes (from `open()` or path-match sync). Receives `NavigationTrx`: `url`, `params`, `query`, `state`, `replace`, `preferSkipHistoryUpdate`.  
+Return `false` to cancel, or `{ url, state?, replace? }` to redirect.
 
-Example:   
 ```ts
 const route = createRoute('/foo/bar', {
-  beforeOpen: () => {
+  beforeOpen: (trx) => {
     if (!auth.isAuth) {
       return false;
     }
-  }
-})
+  },
+});
 ```
 
-### `afterClose()`  
-Calls after close route.   
+See [Protected routes](/recipes/protected-routes).
 
-### `afterOpen()`  
-Calls after open route.   
+### `afterClose()`  
+Called after the route closes.
+
+### `afterOpen(data, route)`  
+Called after successful open. Receives parsed path data and the route instance.
 
 ### `createUrl()`   
 Ability to customize path or query params before create route url.   
@@ -501,4 +530,4 @@ await route.open(); // /foo/bar/baz?openModal=true
 
 ## Warnings ⚠️
 
-- [Warning #1: `RouteGroup.open()` has nothing to open](/warnings/1) (`minified warning #1` in production, full message otherwise) — [`groupRoutes` → `open()`](/core/groupRoutes#open)
+- [Warning #1: `RouteGroup.open()` cannot navigate](/warnings/1) (`minified warning #1` in production) — [`groupRoutes` → `open()`](/core/groupRoutes#open)

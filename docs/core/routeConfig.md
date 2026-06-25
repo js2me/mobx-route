@@ -1,8 +1,7 @@
 # routeConfig
 
 Global route configuration.  
-This object contains all global options for some behaviour of route and router instances.  
-Its shape is described by the **`RouteGlobalConfig`** interface.  
+This object holds options shared by all `Route` and `Router` instances. Shape: **`RouteGlobalConfig`**.
 
 ## Basic example
 
@@ -16,15 +15,41 @@ routeConfig.update({
   baseUrl: '/',
   mergeQuery: false,
 });
-
-routeConfig.get();
 ```
+
+## Methods
+
+### `get()`
+Returns the resolved config. On first access lazily creates defaults: a browser `history` and a `queryParams` instance bound to it.
+
+```ts
+routeConfig.get(); // { history, queryParams, ... }
+```
+
+### `update(partial)`
+Merges a partial config into the current one. Pass only the fields you want to change.
+
+```ts
+routeConfig.update({
+  baseUrl: '/app',
+  mergeQuery: true,
+});
+```
+
+Notes:
+- Passing a new `history` replaces the previous one. If the previous `history` was an observable `mobx-location-history` instance, it is destroyed.
+- Omitted `queryParams` are auto-created from the current `history`.
+
+### `set(value)`
+Replaces the entire stored config object — bypasses the merging logic of `update()`. Use when you want full control over the final value.
+
+### `unset()`
+Drops the stored config. The next `get()`/`update()` call will recreate defaults.
 
 ## Fields   
 
 ### `history`  
-This is interface `History` from [`mobx-location-history` package](https://github.com/js2me/mobx-location-history).  
-API is identical with [`history` NPM package](https://www.npmjs.com/package/history)  
+`History` from [`mobx-location-history`](https://js2me.github.io/mobx-location-history). API matches the [`history`](https://www.npmjs.com/package/history) NPM package.
 
 Example:  
 
@@ -33,47 +58,24 @@ import {
   createHashHistory,
   createBrowserHistory,
   createMemoryHistory,
-} from "mobx-location-history";
-
-routeConfig.update({
-  history: createHashHistory(),
-  history: createBrowserHistory(),
-  history: createMemoryHistory(),
-})
-```
-
-::: tip 
-Factory functions for this property is also can be exported from `mobx-route` package.  
-:::
-
-```ts
-import {
-  createHashHistory,
-  createBrowserHistory,
-  createMemoryHistory,
 } from "mobx-route";
 
-routeConfig.update({
-  history: createHashHistory(),
-  history: createBrowserHistory(),
-  history: createMemoryHistory(),
-})
+routeConfig.update({ history: createBrowserHistory() });
+// routeConfig.update({ history: createHashHistory() });
+// routeConfig.update({ history: createMemoryHistory() });
 ```
 
 ### `queryParams`  
-This is instance of the `QueryParams` class from [`mobx-location-history` package](https://github.com/js2me/mobx-location-history)  
-This class is also can be exported from `mobx-route` package.  
+`QueryParams` instance from [`mobx-location-history`](https://js2me.github.io/mobx-location-history) (also re-exported from `mobx-route`).
 
 ### `baseUrl`
 
-Specifies the base URL for all routes. This is used as a prefix for every route path and helps in forming complete URLs relative to this base. It's particularly useful when your application is not hosted at the root of a domain and you need consistent URL structures.  
+URL prefix added in front of every route path — for apps not hosted at domain root.
 
 ### `mergeQuery`   
-Unique mechanism for working with query parameters in the router.
-This mechanism combines the current query parameters with the new ones when switching between routes.
-
-If `true` - then when switching between routes, the query parameters will be merged.
-If `false` - then when switching between routes, the query parameters will be rewritten.  
+How query params behave when switching routes:
+- `true` — current query is merged with the next one.
+- `false` — current query is replaced by the next one.
 
 Example:   
 
@@ -116,11 +118,11 @@ await route2.open(null, { query: { c: 4, d: 4, e: 5, f: 6 } });
 
 ### `createUrl`
 
-Optional global function to customize how URLs are built for all routes. Same signature as per-route `createUrl` in [Route configuration](/core/Route#createurl): receives `{ baseUrl, params, query }` and current query data, returns the same shape. Used when a route has no own `createUrl` in its config.
+Global fallback for URL building. Same signature as per-route [`createUrl`](/core/Route#createurl); used when a route has no own one.
 
 ### `formatLinkHref`
 
-Optional function that transforms the final `href` string before it is set on the `<a>` element in the React [`Link`](/react/Link) component. Useful for adding a base path, domain, or other prefix/suffix to all link URLs (e.g. for static export or proxy).
+Transforms the final `href` before it lands on the `<a>` rendered by [`Link`](/react/Link). Use for global prefixes/domains (static export, proxy paths).
 
 Example:
 
@@ -132,5 +134,5 @@ routeConfig.update({
 
 ### `fallbackPath`
 
-Path string used when route path compilation fails (e.g. invalid or missing params). Defaults to `'/'` if not set. Applied globally from `routeConfig` or can be overridden per route in `RouteConfiguration`.
+URL used when `createUrl()` fails to compile a path (missing/invalid params). Defaults to `'/'`. Overridable per route via `RouteConfiguration.fallbackPath`.
 

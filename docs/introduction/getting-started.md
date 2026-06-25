@@ -4,6 +4,8 @@ title: Getting started
 
 # Getting started
 
+MobX-powered routes: declare paths as objects, open them programmatically, bind React views with `RouteView`. No route config arrays — routes are values you import and call.
+
 ## Installation
 
 ::: code-group
@@ -84,9 +86,30 @@ const UserDetailsPage = observer(() => {
 export const App = () => {
   return (
     <div>
-      <RouteView route={routes.userDetails} view={AllUsersPage} />
-      <RouteView route={routes.users} view={UserDetailsPage} />
+      <RouteView route={routes.users} view={AllUsersPage} />
+      <RouteView route={routes.userDetails} view={UserDetailsPage} />
     </div>
   );
 };
 ```
+
+## Custom History <Badge type="info" text="optional" />
+
+`routeConfig` creates a browser history on its own — you don't need to set anything up.
+Only override when you need a different history type:
+
+```ts
+import {
+  createBrowserHistory,
+  createHashHistory,
+  createMemoryHistory,
+} from "mobx-route";
+
+routeConfig.update({ history: createHashHistory() });
+```
+
+- [`createBrowserHistory()`](/core/history#createbrowserhistory) — web app (default)
+- [`createHashHistory()`](/core/history#createhashhistory) — hash routing, see [Hash routing](/recipes/hash-routing)
+- [`createMemoryHistory()`](/core/history#creatememoryhistory) — tests, React Native
+
+More details — [History](/core/history) and [`mobx-location-history` docs](https://js2me.github.io/mobx-location-history).

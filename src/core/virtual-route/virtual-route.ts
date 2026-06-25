@@ -236,6 +236,8 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
       this.params = null;
     });
 
+    this.config.afterClose?.();
+
     return true;
   }
 

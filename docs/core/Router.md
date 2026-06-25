@@ -1,9 +1,9 @@
 # Router
 
-Class for centralized routing management.  
-Provides a common interface for working with history, location, and route collections.  
+Centralized routing container.  
+This class bundles a route collection together with `history` and `query` into a single value. Optional — most apps just use [`routeConfig`](/core/routeConfig).
 
-## Constructor
+## Usage
 
 ```ts
 createRouter(config: RouterConfiguration)
@@ -57,7 +57,7 @@ router.history.back();
 
 ### `routes`  
 
-Root collection of application routes. Can contain nested `RouteGroups`.  
+Root route collection. May contain nested `RouteGroup`s.
 
 Example:   
 ```ts
@@ -66,8 +66,7 @@ router.routes.admin.routes.dashboard.isOpened;
 ```
 
 ### `history`  
-Interface for managing browser history from [`mobx-location-history` package](https://github.com/js2me/mobx-location-history).  
-Handles navigation operations.   
+`History` instance from [`mobx-location-history`](https://js2me.github.io/mobx-location-history).
 
 Example:  
 ```ts
@@ -75,7 +74,7 @@ router.history.back();
 ```
 
 ### `location`  
-Reactive object with browser location from [`mobx-location-history` package](https://github.com/js2me/mobx-location-history).  
+Reactive `location` from [`mobx-location-history`](https://js2me.github.io/mobx-location-history).
 
 Example:
 ```ts
@@ -85,8 +84,7 @@ autorun(() => {
 ```
 
 ### `query`  
-Interface for managing query parameters from [`mobx-location-history` package](https://github.com/js2me/mobx-location-history).  
-Automatically synchronized with current url.  
+`QueryParams` from [`mobx-location-history`](https://js2me.github.io/mobx-location-history), kept in sync with `location.search`.
 
 Example:  
 ```ts
@@ -97,7 +95,7 @@ router.query.data; // { q: 'test', bar: '1' }
 
 ### `navigate()` <Badge type="info" text="action" />   
 
-Universal method for URL navigation.  
+Pushes (or replaces) the URL, optionally merging query.
 
 Examples:  
 ```ts
@@ -107,7 +105,8 @@ router.navigate('/about');
 // With query parameters
 router.navigate('/search', {
   query: { q: 'test' },
-  replace: true
+  replace: true,
+  mergeQuery: true,
 });
 
 // Using generated URL

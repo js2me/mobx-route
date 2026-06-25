@@ -46,9 +46,9 @@
     "url": "https://github.com/js2me/mobx-route"
   },
   "dependencies": {
-    "mobx-location-history": "^9.4.0",
+    "mobx-location-history": "^9.4.1",
     "path-to-regexp": "^8.4.2",
-    "yummies": "^7.19.4"
+    "yummies": "^7.20.1"
   },
   "peerDependencies": {
     "mobx": "^6.12.4",

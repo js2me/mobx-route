@@ -1444,4 +1444,73 @@ describe('route', () => {
 
     vi.useRealTimers();
   });
+
+  it('protected route: redirect to /login when user is not authorized (sync)', async () => {
+    const isAuthorized = observable.box(false);
+
+    const loginRoute = createRoute('/login');
+    const dashboardRoute = createRoute('/dashboard', {
+      beforeOpen: () => {
+        if (!isAuthorized.get()) {
+          return {
+            url: '/login',
+            replace: true,
+          };
+        }
+      },
+    });
+
+    // User is not authorized → navigating to /dashboard redirects to /login
+    history.push('/dashboard');
+
+    await when(() => loginRoute.isOpened);
+
+    expect(dashboardRoute.isOpened).toBe(false);
+    expect(loginRoute.isOpened).toBe(true);
+    expect(history.location.pathname).toBe('/login');
+
+    // After authorization, user can open /dashboard
+    isAuthorized.set(true);
+
+    history.push('/dashboard');
+
+    await when(() => dashboardRoute.isOpened);
+    expect(dashboardRoute.isOpened).toBe(true);
+    expect(history.location.pathname).toBe('/dashboard');
+  });
+
+  it('protected route: redirect to /login after async authorization check', async () => {
+    vi.useFakeTimers();
+
+    const loginRoute = createRoute('/login');
+    const dashboardRoute = createRoute('/dashboard', {
+      beforeOpen: async () => {
+        await sleep(100);
+        const isAuthorized = false;
+
+        if (!isAuthorized) {
+          return {
+            url: '/login',
+            replace: true,
+          };
+        }
+      },
+      abortSignal: AbortSignal.timeout(5000),
+    });
+
+    history.push('/dashboard');
+
+    // While async check is in flight
+    expect(dashboardRoute.isOpening).toBe(true);
+    expect(dashboardRoute.isOpened).toBe(false);
+
+    await vi.runAllTimersAsync();
+
+    // After async check resolves → redirect to /login
+    expect(dashboardRoute.isOpened).toBe(false);
+    expect(loginRoute.isOpened).toBe(true);
+    expect(history.location.pathname).toBe('/login');
+
+    vi.useRealTimers();
+  });
 });

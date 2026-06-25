@@ -39,6 +39,8 @@ export default defineDocsVitepressConfig(configs, {
           { text: 'groupRoutes', link: '/core/groupRoutes' },
           { text: 'isRouteEntity', link: '/core/isRouteEntity' },
           { text: 'routeConfig', link: '/core/routeConfig' },
+          { text: 'History', link: '/core/history' },
+          { text: 'Query', link: '/core/query' },
         ],
       },
       {
@@ -69,6 +71,13 @@ export default defineDocsVitepressConfig(configs, {
         ],
       },
       {
+        text: 'Other 🛸',
+        link: '/other/project-examples',
+        items: [
+          { text: 'Project examples', link: '/other/project-examples' },
+        ],
+      },
+      {
         text: 'Errors 🚨',
         items: [
           {
@@ -81,7 +90,7 @@ export default defineDocsVitepressConfig(configs, {
         text: 'Warnings ⚠️',
         items: [
           {
-            text: '#1: RouteGroup.open() has nothing to open',
+            text: '#1: RouteGroup.open() cannot navigate',
             link: '/warnings/1',
           },
         ],

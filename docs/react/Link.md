@@ -1,7 +1,7 @@
 # Link
 
-Navigates on click using `routeConfig.history`.
-Supports route entities, plain string paths, and direct `href`.
+React link component.  
+Renders an `<a>` bound to a route entity or URL. Click navigates via the configured `history` without a page reload; modifier/middle clicks and `target="_blank"` keep native behaviour.
 
 ## Props
 

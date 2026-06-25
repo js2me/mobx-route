@@ -138,6 +138,22 @@ describe('VirtualRoute', () => {
     expect(openFn).toBeCalledTimes(1);
 
     expect(lifecycle).toEqual(['beforeOpen', 'open', 'afterOpen']);
+
+    await route.close();
+
+    expect(route.isOpening).toBe(false);
+    expect(route.isOpened).toBe(false);
+    expect(route.params).toBeNull();
+    expect(beforeCloseFn).toBeCalledTimes(1);
+    expect(afterCloseFn).toBeCalledTimes(1);
+
+    expect(lifecycle).toEqual([
+      'beforeOpen',
+      'open',
+      'afterOpen',
+      'beforeClose',
+      'afterClose',
+    ]);
   });
 
   it('route should complete full lyfecicle of open (with checkOpened + manual open)', async () => {
@@ -195,6 +211,20 @@ describe('VirtualRoute', () => {
     expect(lifecycleHistory).toEqual(['beforeOpen', 'open', 'afterOpen']);
 
     expect(checkOpenedFn).toBeCalledTimes(3);
+
+    await route.close();
+
+    expect(route.isOpened).toBe(false);
+    expect(beforeCloseFn).toBeCalledTimes(1);
+    expect(afterCloseFn).toBeCalledTimes(1);
+
+    expect(lifecycleHistory).toEqual([
+      'beforeOpen',
+      'open',
+      'afterOpen',
+      'beforeClose',
+      'afterClose',
+    ]);
   });
 
   it('route should complete full lyfecicle of open (with checkOpened + auto open)', async () => {
@@ -253,6 +283,20 @@ describe('VirtualRoute', () => {
 
     expect(checkOpenedFn).toBeCalledTimes(3);
     expect(checkOpenedFn).toHaveBeenNthCalledWith(1, route);
+
+    await route.close();
+
+    expect(route.isOpened).toBe(false);
+    expect(beforeCloseFn).toBeCalledTimes(1);
+    expect(afterCloseFn).toBeCalledTimes(1);
+
+    expect(lifecycleHistory).toEqual([
+      'beforeOpen',
+      'open',
+      'afterOpen',
+      'beforeClose',
+      'afterClose',
+    ]);
   });
 
   it('should handle route rejection in beforeOpen callback', async () => {

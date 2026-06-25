@@ -86,7 +86,7 @@ describe('route-group', () => {
     expect(openSpy).toHaveBeenCalledWith({ id: 42 }, { replace: true });
   });
 
-  it('open should delegate to last nested group when index route is missing', () => {
+  it('open should delegate to the first navigable nested group when index route is missing', () => {
     const firstGroup = groupRoutes({
       index: createRoute('/a', { index: true }),
     });
@@ -107,12 +107,38 @@ describe('route-group', () => {
 
     parentGroup.open('foo');
 
-    expect(firstGroupOpenSpy).not.toHaveBeenCalled();
-    expect(secondGroupOpenSpy).toHaveBeenCalledTimes(1);
-    expect(secondGroupOpenSpy).toHaveBeenCalledWith('foo');
+    expect(firstGroupOpenSpy).toHaveBeenCalledTimes(1);
+    expect(firstGroupOpenSpy).toHaveBeenCalledWith('foo');
+    expect(secondGroupOpenSpy).not.toHaveBeenCalled();
   });
 
-  it('open should warn with detailed message when not in production and no index route and no nested groups exist', () => {
+  it('open should skip non-navigable nested groups and pick the next navigable one', () => {
+    const emptyGroup = groupRoutes({
+      foo: createRoute('/foo'),
+      bar: createRoute('/bar'),
+    });
+    const navigableGroup = groupRoutes({
+      index: createRoute('/dashboard', { index: true }),
+    });
+    const emptyGroupOpenSpy = vi
+      .spyOn(emptyGroup, 'open')
+      .mockImplementation(() => {});
+    const navigableGroupOpenSpy = vi
+      .spyOn(navigableGroup, 'open')
+      .mockImplementation(() => {});
+
+    const parentGroup = groupRoutes({
+      emptyGroup,
+      navigableGroup,
+    });
+
+    parentGroup.open();
+
+    expect(emptyGroupOpenSpy).not.toHaveBeenCalled();
+    expect(navigableGroupOpenSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('open should warn with detailed message when not in production and no index route and no navigable nested group exists', () => {
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const group = groupRoutes({
       foo: createVirtualRoute(),
@@ -124,7 +150,7 @@ describe('route-group', () => {
     expect(warnSpy).toHaveBeenCalledTimes(1);
     expect(warnSpy).toHaveBeenCalledWith(
       'Warning #1: RouteGroup.open() cannot navigate\n' +
-        'This group has no index route (`index: true` or `groupRoutes(routes, indexRoute)`) and no nested RouteGroup, so open() does nothing.\n' +
+        'This group has no index route (`index: true` or `groupRoutes(routes, indexRoute)`) and no navigable nested RouteGroup, so open() does nothing.\n' +
         'See docs: https://js2me.github.io/mobx-route/warnings/1',
     );
   });
