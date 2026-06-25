@@ -1,5 +1,17 @@
 # mobx-route
 
+## 1.2.0
+
+### Minor Changes
+
+- [`0f852c3`](https://github.com/js2me/mobx-route/commit/0f852c34ff8f1c9334a1ab51bf90bfdb76d2e6fe) Thanks [@js2me](https://github.com/js2me)! - all documentation update (fixed typos and mistakes)
+
+### Patch Changes
+
+- [`0f852c3`](https://github.com/js2me/mobx-route/commit/0f852c34ff8f1c9334a1ab51bf90bfdb76d2e6fe) Thanks [@js2me](https://github.com/js2me)! - added `canNavigate` property for `RouteGroup`
+
+- [`0f852c3`](https://github.com/js2me/mobx-route/commit/0f852c34ff8f1c9334a1ab51bf90bfdb76d2e6fe) Thanks [@js2me](https://github.com/js2me)! - fixed `afterClose` callback call for `VirtualRoute`
+
 ## 1.1.1
 
 ### Patch Changes
