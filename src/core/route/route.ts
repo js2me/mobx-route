@@ -306,7 +306,6 @@ export class Route<
   ) {
     type ExtendedRoutePath = `${TPath}${TExtendedPath}`;
     type ParentRoute = this;
-    // biome-ignore lint/correctness/noUnusedVariables: this is need to extract unused fields
     const { index, params, exact, ...configFromCurrentRoute } = this.config;
 
     const extendedChild = new Route<
