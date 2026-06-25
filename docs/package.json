@@ -2,8 +2,8 @@
   "private": true,
   "type": "module",
   "devDependencies": {
-    "@iconify-json/logos": "^1.1.44",
-    "sborshik": "^1.8.0",
+    "@iconify-json/logos": "^1.2.11",
+    "sborshik": "^3.5.0",
     "vitepress": "^1.6.4"
   },
   "scripts": {
@@ -11,5 +11,5 @@
     "build": "vitepress build",
     "preview": "vitepress preview"
   },
-  "packageManager": "pnpm@9.5.0+sha512.140036830124618d624a2187b50d04289d5a087f326c9edfc0ccd733d76c4f52c3a313d4fc148794a2a9d81553016004e6742e8cf850670268a7387fc220c903"
+  "packageManager": "pnpm@11.8.0"
 }
