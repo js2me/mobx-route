@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { createBrowserHistory, type History } from 'mobx-location-history';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { sleep } from 'yummies/async';
 import { createRoute, routeConfig } from '../../core/index.js';
 
 const { loadableMock } = vi.hoisted(() => ({
@@ -120,5 +121,36 @@ describe('<RouteView />', () => {
 
     expect(children).toHaveBeenCalledWith(route.params, route);
     expect(screen.getByText('5:true')).toBeDefined();
+  });
+
+  it('should render view while route isOpening (async beforeOpen)', async () => {
+    vi.useFakeTimers();
+
+    const route = createRoute('/opening-view/:id', {
+      beforeOpen: async () => {
+        await sleep(50);
+      },
+    });
+
+    history.push('/opening-view/7');
+    expect(route.isOpening).toBe(true);
+    expect(route.isOpened).toBe(false);
+
+    render(
+      <RouteView
+        route={route}
+        fallback={<div>fallback</div>}
+        view={({ params }: any) => <div>{`opening:${params.id}`}</div>}
+      />,
+    );
+
+    expect(screen.getByText('opening:7')).toBeDefined();
+    expect(screen.queryByText('fallback')).toBeNull();
+
+    await vi.runAllTimersAsync();
+    expect(route.isOpened).toBe(true);
+    expect(screen.getByText('opening:7')).toBeDefined();
+
+    vi.useRealTimers();
   });
 });

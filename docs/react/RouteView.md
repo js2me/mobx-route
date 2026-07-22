@@ -45,8 +45,8 @@ function Routing() {
 
 Route entity (`Route` or `VirtualRoute`) to observe.
 
-- When `route.isOpened === true`, `RouteView` renders `view` or `children`.
-- When `route.isOpened === false`, `RouteView` renders `fallback` (or `null` if `fallback` is not provided).
+- When the route is open or transitioning to open (`isOpened` or `isOpening`), `RouteView` renders `view` or `children`. This keeps content mounted throughout transitions — no unmount/remount flicker.
+- When the route is fully closed (neither `isOpened` nor `isOpening`), `RouteView` renders `fallback` (or `null` if `fallback` is not provided).
 
 ### `view`
 

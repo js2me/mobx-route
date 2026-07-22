@@ -3,9 +3,9 @@
 React route-switch component.  
 Renders **one child node** from the list:
 
-- first opened route child by default;
-- last opened route child when `useLastOpened` is enabled;
-- last non-route child (fallback content) when no routes are open.
+- first opened or transitioning route child by default;
+- last opened or transitioning route child when `useLastOpened` is enabled;
+- last non-route child (fallback content) when no route is active.
 
 Useful for route switching, not-found rendering, and grouped navigation layouts.
 
@@ -35,11 +35,11 @@ function Routing() {
 
 `RouteViewGroup` inspects children from top to bottom:
 
-1. Finds opened route children.
+1. Finds route children that are opened or transitioning to open.
 2. Chooses one of them:
-   - first opened route (`useLastOpened={false}`, default),
-   - last opened route (`useLastOpened`).
-3. If no route child is opened, renders the last non-route child (if present).
+   - first opened route (`useLastOpened={false}`, default) — routes in transition are shown to prevent flicker;
+   - last opened or transitioning route (`useLastOpened`).
+3. If no route child is active, renders the last non-route child (if present).
 4. If `otherwise` is set and no route is active, performs navigation and renders `null`.
 
 ## Props

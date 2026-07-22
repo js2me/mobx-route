@@ -57,7 +57,11 @@ function RouteViewBase<TRoute extends AnyAbstractRouteEntity>(
       : props.children;
   }
 
-  if (!props.route.isOpened) {
+  const isOpening =
+    'isOpening' in props.route &&
+    Boolean((props.route as { isOpening?: boolean }).isOpening);
+
+  if (!props.route.isOpened && !isOpening) {
     return props.fallback ?? null;
   }
 

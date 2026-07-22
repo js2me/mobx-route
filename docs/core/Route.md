@@ -214,7 +214,7 @@ With an async `beforeOpen` or `params()` the route sits in `isOpening` first. Re
 :::
 
 ### `isOpening` <Badge type="tip" text="computed" />   
-`true` while an `open()` call is in flight (before `beforeOpen`/`params` resolve).
+`true` while the route is transitioning to open — during an `open()` call and also during URL-match transitions (like browser Back). This means the route never looks "closed" between URL match and full confirmation, so mounted components don't flicker.
 
 ### `params`  <Badge type="tip" text="computed.struct" />  
 Current parsed path parameters. `null` if route isn't open.  

@@ -19,6 +19,7 @@ export interface AbstractVirtualRoute<
   TParams extends AnyObject | EmptyObject = EmptyObject,
 > {
   isOpened: boolean;
+  isOpening: boolean;
   params: TParams | null;
 
   /**

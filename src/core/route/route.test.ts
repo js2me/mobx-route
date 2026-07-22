@@ -1018,6 +1018,63 @@ describe('route', () => {
     vi.useRealTimers();
   });
 
+  it('on history Back target isOpening immediately (no all-closed gap)', async () => {
+    let resolveProductOpen!: () => void;
+    const product = new Route('/products/:id', {
+      exact: true,
+      beforeOpen: () =>
+        new Promise<void>((resolve) => {
+          resolveProductOpen = resolve;
+        }),
+    });
+    const cart = new Route('/cart', { exact: true });
+
+    history.push('/products/1');
+    await when(() => product.isOpening);
+    resolveProductOpen();
+    await when(() => product.isOpened);
+
+    history.push('/cart');
+    await when(() => cart.isOpened);
+    expect(product.isOpened).toBe(false);
+    expect(product.isOpening).toBe(false);
+
+    history.back();
+    await when(() => product.isOpening);
+
+    expect(history.location.pathname).toBe('/products/1');
+    expect(cart.isOpened).toBe(false);
+    expect(product.isOpened).toBe(false);
+    expect(product.isOpening).toBe(true);
+
+    resolveProductOpen();
+    await when(() => product.isOpened);
+    expect(product.isOpening).toBe(false);
+  });
+
+  it('isOpening is false after beforeOpen rejects even if path still matches', async () => {
+    const route = new Route('/private', {
+      beforeOpen: async () => false,
+    });
+
+    history.push('/private');
+    await when(() => !route.isOpening);
+
+    expect(route.isOpened).toBe(false);
+    expect(route.isOpening).toBe(false);
+  });
+
+  it('isOpening is false when custom params() rejects the match', async () => {
+    const route = new Route('/item/:id', {
+      params: () => null,
+    });
+
+    history.push('/item/1');
+
+    expect(route.isOpened).toBe(false);
+    expect(route.isOpening).toBe(false);
+  });
+
   it('two routes opens should not affect each other', async () => {
     const rout1 = createRoute('/foo');
     const rout2 = createRoute('/bar');

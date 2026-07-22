@@ -3,8 +3,8 @@
 layout: home
 
 hero:
-  name: '{packageJson.name}'
-  text: '{packageJson.description}'
+  name: '@{packageJson.name}'
+  text: '@{packageJson.description}'
   tagline: with MobX power charged
   image:
     src: /logo.png
@@ -14,11 +14,11 @@ hero:
       link: /introduction/getting-started.md
     - theme: alt
       text: View on GitHub
-      link: https://github.com/{packageJson.author}/{packageJson.name}
+      link: https://github.com/@{packageJson.author}/@{packageJson.name}
 
 features:
   - title: MobX-based
-    icon: <span class="i-logos:mobx-icon"></span>
+    icon: <span class="i-logos:mobx"></span>
     details: Experience the power of MobX
   - title: TypeScript
     icon: <span class="i-logos:typescript-icon"></span>

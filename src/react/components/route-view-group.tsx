@@ -70,15 +70,17 @@ export const RouteViewGroup = observer(
       if (isRouteChild) {
         const route = (childNode.props as any).route as AnyRoute;
 
-        if (route.isOpened) {
+        // Keep the matched/opening route selected during confirmOpening and the
+        // pre-reaction Back gap (isOpening covers path-matched + not confirmed).
+        if (route.isOpened || route.isOpening) {
           activeChildRouteNode = childNode;
-          if (!useLastOpened) {
-            break;
-          }
-        } else {
           if (route.isOpening) {
             hasRoutesInOpening = true;
           }
+          if (!useLastOpened && route.isOpened) {
+            break;
+          }
+        } else {
           lastInactiveChildNode = childNode;
         }
       } else {

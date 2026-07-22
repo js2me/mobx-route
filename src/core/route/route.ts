@@ -199,9 +199,27 @@ export class Route<
 
   /**
    * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#isopening)
+   *
+   * Also true in the short gap after history already matches this route but
+   * `confirmOpening` has not started yet (e.g. browser Back) — otherwise every
+   * route looks closed for one tick and RouteViewGroup unmounts the page.
    */
   get isOpening() {
-    return this.status === 'opening';
+    if (this.status === 'opening') {
+      return true;
+    }
+
+    if (
+      this.isDestroyed ||
+      !this.isPathMatched ||
+      this.params === null ||
+      this.status === 'open-confirmed' ||
+      this.status === 'open-rejected'
+    ) {
+      return false;
+    }
+
+    return this.status === 'closed' || this.status === 'unknown';
   }
 
   /**
@@ -598,6 +616,14 @@ export class Route<
           this.config.afterOpen?.(this.parsedPathData, this);
         }
         return;
+      }
+
+      // Sync before any await — closes the Back gap where isOpened/isOpening
+      // were both false until confirmOpening's first runInAction ran.
+      if (this.status !== 'opening' && this.status !== 'open-confirmed') {
+        runInAction(() => {
+          this.status = 'opening';
+        });
       }
 
       const trx: NavigationTrx<TInputParams> = {

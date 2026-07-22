@@ -3,6 +3,7 @@ import { when } from 'mobx';
 import { createBrowserHistory } from 'mobx-location-history';
 import { withViewModel } from 'mobx-view-model';
 import { describe, expect, it, vi } from 'vitest';
+import { sleep } from 'yummies/async';
 import { Route, routeConfig } from '../../core/index.js';
 import { mockHistory } from '../../core/route/route.test.js';
 import { RouteViewModel } from '../../view-model/route-view-model.js';
@@ -427,5 +428,102 @@ describe('<RouteViewGroup />', () => {
 
     expect(screen.getByTestId('layout')).toBeDefined();
     expect(screen.getByText('fallback-content')).toBeDefined();
+  });
+
+  it('keeps opening route selected instead of last inactive (Back / async open gap)', async () => {
+    const history = mockHistory(createBrowserHistory());
+    routeConfig.update({ history });
+
+    let resolveProductOpen!: () => void;
+    const product = new Route('/products/:id', {
+      exact: true,
+      beforeOpen: () =>
+        new Promise<void>((resolve) => {
+          resolveProductOpen = resolve;
+        }),
+    });
+    const cart = new Route('/cart', { exact: true });
+
+    history.push('/products/1');
+    await when(() => product.isOpening);
+    resolveProductOpen();
+    await when(() => product.isOpened);
+
+    history.push('/cart');
+    await when(() => cart.isOpened);
+
+    const App = () => (
+      <RouteViewGroup>
+        <RouteView
+          route={product}
+          view={({ params }: any) => <div>{`product:${params.id}`}</div>}
+        />
+        <RouteView route={cart} view={() => <div>cart</div>} />
+        <div>not_found</div>
+      </RouteViewGroup>
+    );
+
+    let screen!: ReturnType<typeof render>;
+    await act(async () => {
+      screen = render(<App />);
+    });
+    expect(screen.getByText('cart')).toBeDefined();
+
+    await act(async () => {
+      history.back();
+    });
+    await when(() => product.isOpening);
+    await act(async () => {});
+
+    expect(product.isOpened).toBe(false);
+    expect(screen.getByText('product:1')).toBeDefined();
+    expect(screen.queryByText('not_found')).toBeNull();
+    expect(screen.queryByText('cart')).toBeNull();
+
+    await act(async () => {
+      resolveProductOpen();
+    });
+    await when(() => product.isOpened);
+    await act(async () => {});
+
+    expect(screen.getByText('product:1')).toBeDefined();
+  });
+
+  it('does not open otherwise while a route isOpening', async () => {
+    vi.useFakeTimers();
+
+    const history = mockHistory(createBrowserHistory());
+    routeConfig.update({ history });
+
+    const page = new Route('/page', {
+      beforeOpen: async () => {
+        await sleep(50);
+      },
+    });
+    const otherwiseRoute = new Route('/fallback');
+    const otherwiseSpy = vi.spyOn(otherwiseRoute, 'open');
+
+    history.push('/page');
+    expect(page.isOpening).toBe(true);
+
+    await act(async () => {
+      render(
+        <RouteViewGroup otherwise={otherwiseRoute}>
+          <RouteView route={page} view={() => <div>page</div>} />
+        </RouteViewGroup>,
+      );
+    });
+
+    expect(otherwiseSpy).not.toHaveBeenCalled();
+    expect(page.isOpening).toBe(true);
+
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
+
+    expect(page.isOpened).toBe(true);
+    expect(otherwiseSpy).not.toHaveBeenCalled();
+
+    vi.useRealTimers();
   });
 });

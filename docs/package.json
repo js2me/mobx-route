@@ -3,14 +3,12 @@
   "private": true,
   "type": "module",
   "devDependencies": {
-    "@iconify-json/logos": "^1.2.11",
-    "sborshik": "^3.5.0",
-    "vitepress": "^1.6.4"
+    "docusite": "^0.1.6"
   },
   "scripts": {
-    "dev": "vitepress dev",
-    "build": "vitepress build",
-    "preview": "vitepress preview"
+    "dev": "docusite dev",
+    "build": "docusite build",
+    "preview": "docusite preview"
   },
   "packageManager": "pnpm@11.8.0"
 }

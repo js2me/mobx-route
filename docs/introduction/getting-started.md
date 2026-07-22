@@ -11,15 +11,15 @@ MobX-powered routes: declare paths as objects, open them programmatically, bind 
 ::: code-group
 
 ```bash [npm]
-npm install {packageJson.name}
+npm install @{packageJson.name}
 ```
 
 ```bash [yarn]
-yarn add {packageJson.name}
+yarn add @{packageJson.name}
 ```
 
 ```bash [pnpm]
-pnpm add {packageJson.name}
+pnpm add @{packageJson.name}
 ```
 
 :::
