@@ -1,5 +1,11 @@
 # mobx-route
 
+## 1.2.1
+
+### Patch Changes
+
+- [`86d653e`](https://github.com/js2me/mobx-route/commit/86d653e73d5cdb2eae5200cbd38b2fbccf6c09c0) Thanks [@js2me](https://github.com/js2me)! - fixed flicks not found route in <RouteViewGroup /> based on all falsy isOpened\isOpening routes
+
 ## 1.2.0
 
 ### Minor Changes
