@@ -1,5 +1,11 @@
 # mobx-route
 
+## 1.2.2
+
+### Patch Changes
+
+- [`20acaac`](https://github.com/js2me/mobx-route/commit/20acaac16098673cb7b97b4201aa9b074362e093) Thanks [@js2me](https://github.com/js2me)! - fixed route view group work (otherwise should not block opening other routes)
+
 ## 1.2.1
 
 ### Patch Changes
