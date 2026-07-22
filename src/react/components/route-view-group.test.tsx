@@ -655,7 +655,7 @@ describe('<RouteViewGroup />', () => {
     expect(screen.getByText('not_found')).toBeDefined();
     expect(() => screen.getByText('home')).toThrowError();
 
-    notFound.open();
+    void notFound.open();
     await act(async () => {
       await vi.runAllTimersAsync();
     });
