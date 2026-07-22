@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { sleep } from 'yummies/async';
 import { Route, routeConfig } from '../../core/index.js';
 import { mockHistory } from '../../core/route/route.test.js';
+import { createVirtualRoute } from '../../core/virtual-route/virtual-route.js';
 import { RouteViewModel } from '../../view-model/route-view-model.js';
 import { RouteView } from './route-view.js';
 import { RouteViewGroup } from './route-view-group.js';
@@ -523,6 +524,145 @@ describe('<RouteViewGroup />', () => {
 
     expect(page.isOpened).toBe(true);
     expect(otherwiseSpy).not.toHaveBeenCalled();
+
+    vi.useRealTimers();
+  });
+
+  it('keeps opening path route over already opened otherwise (notFound)', async () => {
+    vi.useFakeTimers();
+
+    const history = mockHistory(createBrowserHistory());
+    routeConfig.update({ history });
+
+    const home = new Route('/', {
+      exact: true,
+      beforeOpen: async () => {
+        await sleep(50);
+      },
+    });
+    const notFound = createVirtualRoute();
+
+    history.push('/');
+    expect(home.isOpening).toBe(true);
+
+    await act(async () => {
+      await notFound.open();
+    });
+    expect(notFound.isOpened).toBe(true);
+
+    let screen!: ReturnType<typeof render>;
+    await act(async () => {
+      screen = render(
+        <RouteViewGroup otherwise={notFound}>
+          <RouteView route={home} view={() => <div>home</div>} />
+          <RouteView route={notFound} view={() => <div>not_found</div>} />
+        </RouteViewGroup>,
+      );
+    });
+
+    expect(screen.getByText('home')).toBeDefined();
+    expect(() => screen.getByText('not_found')).toThrowError();
+
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
+    await when(() => home.isOpened);
+
+    expect(screen.getByText('home')).toBeDefined();
+    expect(() => screen.getByText('not_found')).toThrowError();
+
+    vi.useRealTimers();
+  });
+
+  it('keeps opening path route over already opened notFound (without useLastOpened)', async () => {
+    vi.useFakeTimers();
+
+    const history = mockHistory(createBrowserHistory());
+    routeConfig.update({ history });
+
+    const home = new Route('/', {
+      exact: true,
+      beforeOpen: async () => {
+        await sleep(50);
+      },
+    });
+    const notFound = createVirtualRoute();
+
+    history.push('/');
+    expect(home.isOpening).toBe(true);
+
+    await act(async () => {
+      await notFound.open();
+    });
+    expect(notFound.isOpened).toBe(true);
+
+    let screen!: ReturnType<typeof render>;
+    await act(async () => {
+      screen = render(
+        <RouteViewGroup>
+          <RouteView route={home} view={() => <div>home</div>} />
+          <RouteView route={notFound} view={() => <div>not_found</div>} />
+        </RouteViewGroup>,
+      );
+    });
+
+    expect(screen.getByText('home')).toBeDefined();
+    expect(() => screen.getByText('not_found')).toThrowError();
+
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
+    await when(() => home.isOpened);
+
+    expect(screen.getByText('home')).toBeDefined();
+    expect(() => screen.getByText('not_found')).toThrowError();
+
+    vi.useRealTimers();
+  });
+
+  it('keeps opening path route over already opened notFound (with useLastOpened)', async () => {
+    vi.useFakeTimers();
+
+    const history = mockHistory(createBrowserHistory());
+    routeConfig.update({ history });
+
+    const home = new Route('/', {
+      exact: true,
+      beforeOpen: async () => {
+        await sleep(50);
+      },
+    });
+    const notFound = createVirtualRoute();
+
+    history.push('/');
+    expect(home.isOpening).toBe(true);
+
+    await act(async () => {
+      await notFound.open();
+    });
+    expect(notFound.isOpened).toBe(true);
+
+    let screen!: ReturnType<typeof render>;
+    await act(async () => {
+      screen = render(
+        <RouteViewGroup useLastOpened>
+          <RouteView route={home} view={() => <div>home</div>} />
+          <RouteView route={notFound} view={() => <div>not_found</div>} />
+        </RouteViewGroup>,
+      );
+    });
+
+    expect(screen.getByText('not_found')).toBeDefined();
+    expect(() => screen.getByText('home')).toThrowError();
+
+    notFound.open();
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
+    await when(() => notFound.isOpened);
+
+    expect(screen.getByText('not_found')).toBeDefined();
+    expect(() => screen.getByText('home')).toThrowError();
 
     vi.useRealTimers();
   });

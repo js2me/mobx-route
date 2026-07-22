@@ -72,12 +72,14 @@ export const RouteViewGroup = observer(
 
         // Keep the matched/opening route selected during confirmOpening and the
         // pre-reaction Back gap (isOpening covers path-matched + not confirmed).
+        // Break on the first active child — otherwise a later opened virtual
+        // `otherwise` (notFound) steals the slot while a path route is still opening.
         if (route.isOpened || route.isOpening) {
           activeChildRouteNode = childNode;
           if (route.isOpening) {
             hasRoutesInOpening = true;
           }
-          if (!useLastOpened && route.isOpened) {
+          if (!useLastOpened) {
             break;
           }
         } else {
