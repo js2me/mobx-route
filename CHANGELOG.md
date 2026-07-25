@@ -1,5 +1,11 @@
 # mobx-route
 
+## 1.2.3
+
+### Patch Changes
+
+- [`13d0143`](https://github.com/js2me/mobx-route/commit/13d014342a4b5874a9910395a24c70a987e66d2d) Thanks [@js2me](https://github.com/js2me)! - better SSR support for RouteViewGroup
+
 ## 1.2.2
 
 ### Patch Changes
