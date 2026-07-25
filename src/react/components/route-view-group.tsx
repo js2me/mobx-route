@@ -8,7 +8,7 @@ import {
   type RouteParams,
   routeConfig,
 } from 'mobx-route';
-import { isValidElement, useEffect } from 'react';
+import { isValidElement, useEffect, useLayoutEffect } from 'react';
 import type { IsPartial, Maybe } from 'yummies/types';
 
 type LayoutComponent =
@@ -43,6 +43,9 @@ type RouteViewGroupComponent = <TRoute extends AnyRouteEntity>(
   props: RouteViewGroupProps<TRoute>,
 ) => React.ReactNode;
 
+const useOtherwiseEffect =
+  typeof window === 'undefined' ? useEffect : useLayoutEffect;
+
 export const RouteViewGroup = observer(
   <TRoute extends AnyRouteEntity>({
     children,
@@ -64,16 +67,14 @@ export const RouteViewGroup = observer(
     for (const childNode of childNodes) {
       const isRouteChild =
         isValidElement(childNode) &&
-        // @ts-expect-error redundand checks better to wrap in this directive
+        // @ts-expect-error redundant checks better to wrap in this directive
         isRouteEntity(childNode.props?.route);
 
       if (isRouteChild) {
         const route = (childNode.props as any).route as AnyRoute;
 
-        // Keep the matched/opening route selected during confirmOpening and the
-        // pre-reaction Back gap (isOpening covers path-matched + not confirmed).
-        // Break on the first active child — otherwise a later opened virtual
-        // `otherwise` (notFound) steals the slot while a path route is still opening.
+        // isOpening covers confirmOpening and the Back gap — break early so
+        // a later-opening virtual route (e.g. notFound) doesn't steal the slot.
         if (route.isOpened || route.isOpening) {
           activeChildRouteNode = childNode;
           if (route.isOpening) {
@@ -92,9 +93,12 @@ export const RouteViewGroup = observer(
 
     const hasActiveChildNode = !!activeChildRouteNode;
 
-    useEffect(() => {
+    const otherwiseIsString = typeof otherwiseNavigation === 'string';
+    const otherwiseRoute = !otherwiseIsString ? otherwiseNavigation : undefined;
+
+    useOtherwiseEffect(() => {
       if (!hasActiveChildNode && !hasRoutesInOpening && otherwiseNavigation) {
-        if (typeof otherwiseNavigation === 'string') {
+        if (otherwiseIsString) {
           const history = routeConfig.get().history;
           const url = `${otherwiseNavigation}${buildSearchString(navigateParams.query || {})}`;
 
@@ -103,13 +107,24 @@ export const RouteViewGroup = observer(
           } else {
             history.push(url, navigateParams.state);
           }
-        } else if (!otherwiseNavigation.isOpened) {
-          otherwiseNavigation.open(params, navigateParams);
+        } else if (otherwiseRoute && !otherwiseRoute.isOpened) {
+          otherwiseRoute.open(params, navigateParams);
         }
       }
-    }, [hasActiveChildNode, hasRoutesInOpening, otherwiseNavigation]);
+    }, [
+      hasActiveChildNode,
+      hasRoutesInOpening,
+      otherwiseIsString,
+      otherwiseRoute,
+    ]);
 
-    if (otherwiseNavigation && !activeChildRouteNode) {
+    // For string otherwise: return null — effect will navigate and route opens next tick.
+    // For route otherwise: don't return null — useLayoutEffect opens it synchronously,
+    // returning null would unmount Layout and break withViewModel auto-id VMs.
+    const shouldRenderNullOtherwise =
+      otherwiseNavigation && !activeChildRouteNode && otherwiseIsString;
+
+    if (shouldRenderNullOtherwise) {
       return null;
     }
 
