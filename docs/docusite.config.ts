@@ -7,7 +7,7 @@ export default defineConfig({
   description: '@{packageJson.description}',
   search: 'local',
   changelog: {
-    src: '../packages/core/CHANGELOG.md',
+    src: '../CHANGELOG.md',
   },
   github: 'https://github.com/@{packageJson.author}/@{packageJson.name}',
   colors: {
