@@ -1809,4 +1809,131 @@ describe('route', () => {
 
     vi.useRealTimers();
   });
+
+  it('beforeOpen: auto-fill params from query — mutation works accidentally via shared reference (path-based open)', async () => {
+    const beforeOpenFn = vi.fn((trx) => {
+      if (
+        trx.params &&
+        trx.query?.tab &&
+        (!trx.params.tab || trx.params.tab !== trx.query.tab)
+      ) {
+        trx.params.tab = trx.query.tab;
+      }
+      return trx;
+    });
+
+    const route = new Route('/service{/:tab}', {
+      beforeOpen: beforeOpenFn,
+    });
+
+    // Navigate via history with tab in query but not in path
+    history.push('/service?tab=settings');
+
+    await when(() => route.isOpened);
+
+    expect(route.isOpened).toBe(true);
+    expect(beforeOpenFn).toHaveBeenCalledTimes(1);
+
+    const trx = beforeOpenFn.mock.calls[0]![0];
+    expect(trx.query).toEqual({ tab: 'settings' });
+
+    // trx.params shares the SAME reference as parsedPathData.params
+    // (checkPathMatch sets: trx.params = this.parsedPathData!.params)
+    // so mutation of trx.params also mutates parsedPathData.params
+    expect(trx.params).toEqual({ tab: 'settings' });
+
+    // route.params reads from parsedPathData.params — same object, mutation "works"
+    // BUT this is accidental: relies on shared object reference, not intentional design
+    expect(route.params).toEqual({ tab: 'settings' });
+
+    // return trx → typeof feedback === 'object' → skipHistoryUpdate = false
+    // trx.url now includes query params (fix: buildSearchString in checkPathMatch)
+    // so history.push(trx.url) preserves query params
+    expect(history.location.pathname).toBe('/service/settings');
+    expect(history.location.search).toBe('?tab=settings');
+  });
+
+  it('beforeOpen: auto-fill params from query — mutation does NOT work for manual open (separate object)', async () => {
+    const beforeOpenFn = vi.fn((trx) => {
+      if (
+        trx.params &&
+        trx.query?.tab &&
+        (!trx.params.tab || trx.params.tab !== trx.query.tab)
+      ) {
+        trx.params.tab = trx.query.tab;
+      }
+      return trx;
+    });
+
+    const route = new Route('/service', {
+      beforeOpen: beforeOpenFn,
+    });
+
+    // Manual open: trx.params is a NEW object, not shared with parsedPathData.params
+    await route.open({}, { query: { tab: 'settings' } });
+
+    expect(route.isOpened).toBe(true);
+    expect(beforeOpenFn).toHaveBeenCalledTimes(1);
+
+    const trx = beforeOpenFn.mock.calls[0]![0];
+    expect(trx.params).toEqual({ tab: 'settings' }); // mutation happened on trx object
+
+    // route.params reads from parsedPathData.params — DIFFERENT object from trx.params
+    // mutation of trx.params has no effect on route.params
+    expect(route.params).toEqual({});
+  });
+
+  it('beforeOpen: auto-fill params from query — condition fails when trx.params is undefined', async () => {
+    const beforeOpenFn = vi.fn((trx) => {
+      if (
+        trx.params &&
+        trx.query?.tab &&
+        (!trx.params.tab || trx.params.tab !== trx.query.tab)
+      ) {
+        trx.params.tab = trx.query.tab;
+      }
+      return trx;
+    });
+
+    const route = new Route('/service', {
+      beforeOpen: beforeOpenFn,
+    });
+
+    // route.open(undefined, ...) → trx.params is undefined
+    // condition `trx.params &&` fails immediately — no auto-fill happens
+    await route.open(undefined, { query: { tab: 'settings' } });
+
+    expect(route.isOpened).toBe(true);
+    expect(beforeOpenFn).toHaveBeenCalledTimes(1);
+
+    const trx = beforeOpenFn.mock.calls[0]![0];
+    expect(trx.params).toBe(undefined); // no mutation happened
+    expect(route.params).toEqual({}); // empty, no tab
+  });
+
+  it('beforeOpen: redirect to correct URL with tab in path (works correctly)', async () => {
+    const route = new Route('/service{/:tab}', {
+      beforeOpen: (trx) => {
+        if (
+          trx.params &&
+          trx.query?.tab &&
+          (!trx.params.tab || trx.params.tab !== trx.query.tab)
+        ) {
+          return {
+            url: `/service/${trx.query.tab}`,
+            replace: true,
+          };
+        }
+      },
+    });
+
+    // Navigate with tab in query but not in path → beforeOpen redirects to URL with tab in path
+    history.push('/service?tab=settings');
+
+    await when(() => route.isOpened);
+
+    expect(route.isOpened).toBe(true);
+    expect(route.params).toEqual({ tab: 'settings' });
+    expect(history.location.pathname).toBe('/service/settings');
+  });
 });

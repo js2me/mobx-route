@@ -643,6 +643,17 @@ export class Route<
         return;
       }
 
+      // Rebuild URL from updated trx.params if beforeOpen changed them
+      // This ensures that mutations to trx.params are reflected in the URL
+      const newUrl = this.createUrl(
+        trx.params as TInputParams,
+        trx.query as AnyObject,
+      );
+      if (newUrl !== trx.url) {
+        trx.url = newUrl;
+        skipHistoryUpdate = false;
+      }
+
       if (typeof feedback === 'object') {
         skipHistoryUpdate = false;
         Object.assign(trx, feedback);
@@ -727,7 +738,7 @@ export class Route<
       }
 
       const trx: NavigationTrx<TInputParams> = {
-        url: this.parsedPathData!.path,
+        url: `${this.parsedPathData!.path}${buildSearchString(this.query.data)}`,
         params: this.parsedPathData!.params as TInputParams,
         state: this.history.location.state,
         query: this.query.data,
