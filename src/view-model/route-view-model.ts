@@ -1,6 +1,10 @@
 import { computed } from 'mobx';
 import type { IQueryParams } from 'mobx-location-history';
-import { applyObservable, ViewModelBase } from 'mobx-view-model';
+import {
+  applyObservable,
+  type ViewModel,
+  ViewModelBase,
+} from 'mobx-view-model';
 import type { ObservableAnnotationsArray } from 'yummies/mobx';
 import type { Class } from 'yummies/types';
 import {
@@ -46,7 +50,7 @@ type RouteViewModelMixinPublic<TRoute extends AnyAbstractRouteEntity> = {
 export function withRoute<TRoute extends AnyAbstractRouteEntity>(
   route: TRoute,
 ) {
-  return <TBase extends Class<ViewModelBase<any, any, any>>>(
+  return <TBase extends Class<ViewModel<any, any>>>(
     Base: TBase,
   ): TBase & Class<InstanceType<TBase> & RouteViewModelMixinPublic<TRoute>> => {
     class RouteViewModelMixin extends Base {
