@@ -1,5 +1,19 @@
 # mobx-route
 
+## 1.3.0
+
+### Minor Changes
+
+- [`7e7641b`](https://github.com/js2me/mobx-route/commit/7e7641b7c55ad6894da3a6059799ee2a3bd0a532) Thanks [@js2me](https://github.com/js2me)! - `update()` method for `Route`
+
+- [`7e7641b`](https://github.com/js2me/mobx-route/commit/7e7641b7c55ad6894da3a6059799ee2a3bd0a532) Thanks [@js2me](https://github.com/js2me)! - aded `afterUpdate` callback both for `Route` and `VirtualRoute` entities
+
+- [`f9ddde6`](https://github.com/js2me/mobx-route/commit/f9ddde643d6f93db3811667e6056bb698711cb9b) Thanks [@js2me](https://github.com/js2me)! - add `withRoute` mixin for reaching your view models
+
+### Patch Changes
+
+- [`857dd24`](https://github.com/js2me/mobx-route/commit/857dd249321a136415c92e09f3c95f703d6daf17) Thanks [@js2me](https://github.com/js2me)! - fixed problem with mutation params in navigation transaction (beforeOpen scenario)
+
 ## 1.2.3
 
 ### Patch Changes
