@@ -487,6 +487,109 @@ describe('VirtualRoute', () => {
     expect(route.params).toEqual({ id: '456' });
   });
 
+  it('afterUpdate should fire when open() is called while route is already opened', async () => {
+    const afterOpenFn = vi.fn();
+    const afterUpdateFn = vi.fn();
+
+    const route = new VirtualRoute<{ id: string }>({
+      afterOpen: afterOpenFn,
+      afterUpdate: afterUpdateFn,
+    });
+
+    await route.open({ id: '1' });
+
+    expect(route.isOpened).toBe(true);
+    expect(afterOpenFn).toBeCalledTimes(1);
+    expect(afterUpdateFn).toBeCalledTimes(0);
+
+    await route.open({ id: '2' });
+
+    expect(route.isOpened).toBe(true);
+    expect(afterOpenFn).toBeCalledTimes(1);
+    expect(afterUpdateFn).toBeCalledTimes(1);
+    expect(afterUpdateFn).toBeCalledWith({ id: '2' }, route);
+  });
+
+  it('afterUpdate should fire when query params change while route is opened', async () => {
+    const afterOpenFn = vi.fn();
+    const afterUpdateFn = vi.fn();
+
+    const route = new VirtualRoute<{}>({
+      afterOpen: afterOpenFn,
+      afterUpdate: afterUpdateFn,
+    });
+
+    await route.open();
+    await sleep(10);
+
+    expect(route.isOpened).toBe(true);
+    expect(afterOpenFn).toBeCalledTimes(1);
+    expect(afterUpdateFn).toBeCalledTimes(0);
+
+    route.query.update({ tab: 'profile' });
+    await sleep(10);
+
+    expect(afterOpenFn).toBeCalledTimes(1);
+    expect(afterUpdateFn).toBeCalledTimes(1);
+  });
+
+  it('afterUpdate should NOT fire when route is closed', async () => {
+    const afterUpdateFn = vi.fn();
+
+    const route = new VirtualRoute<{}>({
+      afterUpdate: afterUpdateFn,
+    });
+
+    expect(route.isOpened).toBe(false);
+    expect(afterUpdateFn).toBeCalledTimes(0);
+  });
+
+  it('afterUpdate should not double-fire when open() is called while already opened', async () => {
+    const afterUpdateFn = vi.fn();
+
+    const route = new VirtualRoute<{ id: string }>({
+      afterUpdate: afterUpdateFn,
+    });
+
+    await route.open({ id: '1' });
+    await sleep(10);
+
+    expect(afterUpdateFn).toBeCalledTimes(0);
+
+    await route.open({ id: '2' });
+    await sleep(10);
+
+    expect(afterUpdateFn).toBeCalledTimes(1);
+  });
+
+  it('afterOpen should only fire on initial open, afterUpdate on subsequent changes', async () => {
+    const afterOpenFn = vi.fn();
+    const afterUpdateFn = vi.fn();
+
+    const route = new VirtualRoute<{ id: string }>({
+      afterOpen: afterOpenFn,
+      afterUpdate: afterUpdateFn,
+    });
+
+    // Initial open
+    await route.open({ id: '1' });
+    expect(afterOpenFn).toBeCalledTimes(1);
+    expect(afterUpdateFn).toBeCalledTimes(0);
+
+    // Update via open()
+    await route.open({ id: '2' });
+    expect(afterOpenFn).toBeCalledTimes(1);
+    expect(afterUpdateFn).toBeCalledTimes(1);
+
+    // Close and re-open
+    await route.close();
+    expect(route.isOpened).toBe(false);
+
+    await route.open({ id: '3' });
+    expect(afterOpenFn).toBeCalledTimes(2);
+    expect(afterUpdateFn).toBeCalledTimes(1);
+  });
+
   it('should properly handle route destruction', async () => {
     const route = new VirtualRoute<{}>();
 

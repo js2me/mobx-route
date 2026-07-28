@@ -1240,6 +1240,245 @@ describe('route', () => {
     });
   });
 
+  it('afterUpdate should fire when open() is called while route is already open', async () => {
+    const afterOpenFn = vi.fn();
+    const afterUpdateFn = vi.fn();
+
+    const route = new Route('/users/:id', {
+      afterOpen: afterOpenFn,
+      afterUpdate: afterUpdateFn,
+    });
+
+    await route.open({ id: '1' });
+
+    expect(route.isOpened).toBe(true);
+    expect(afterOpenFn).toBeCalledTimes(1);
+    expect(afterUpdateFn).toBeCalledTimes(0);
+
+    await route.open({ id: '2' });
+
+    expect(route.isOpened).toBe(true);
+    expect(afterOpenFn).toBeCalledTimes(1);
+    expect(afterUpdateFn).toBeCalledTimes(1);
+    expect(afterUpdateFn).toBeCalledWith(
+      expect.objectContaining({ params: { id: '2' } }),
+      route,
+    );
+  });
+
+  it('afterUpdate should fire when path params change via browser navigation while route is open', async () => {
+    const afterOpenFn = vi.fn();
+    const afterUpdateFn = vi.fn();
+
+    const route = new Route('/users/:id', {
+      afterOpen: afterOpenFn,
+      afterUpdate: afterUpdateFn,
+    });
+
+    history.push('/users/1');
+    await sleep(10);
+
+    expect(route.isOpened).toBe(true);
+    expect(afterOpenFn).toBeCalledTimes(1);
+    expect(afterUpdateFn).toBeCalledTimes(0);
+
+    history.push('/users/2');
+    await sleep(10);
+
+    expect(route.isOpened).toBe(true);
+    expect(afterOpenFn).toBeCalledTimes(1);
+    expect(afterUpdateFn).toBeCalledTimes(1);
+    expect(afterUpdateFn).toBeCalledWith(
+      expect.objectContaining({ params: { id: '2' } }),
+      route,
+    );
+  });
+
+  it('afterUpdate should fire when query params change while route is open', async () => {
+    const afterOpenFn = vi.fn();
+    const afterUpdateFn = vi.fn();
+
+    const route = new Route('/users/:id', {
+      afterOpen: afterOpenFn,
+      afterUpdate: afterUpdateFn,
+    });
+
+    await route.open({ id: '1' });
+    await sleep(10);
+
+    expect(route.isOpened).toBe(true);
+    expect(afterOpenFn).toBeCalledTimes(1);
+    expect(afterUpdateFn).toBeCalledTimes(0);
+
+    route.query.update({ tab: 'profile' });
+    await sleep(10);
+
+    expect(afterOpenFn).toBeCalledTimes(1);
+    expect(afterUpdateFn).toBeCalledTimes(1);
+  });
+
+  it('afterUpdate should NOT fire when route is closed', async () => {
+    const afterUpdateFn = vi.fn();
+
+    const route = new Route('/users/:id', {
+      afterUpdate: afterUpdateFn,
+    });
+
+    history.push('/other');
+    await sleep(10);
+
+    expect(route.isOpened).toBe(false);
+    expect(afterUpdateFn).toBeCalledTimes(0);
+  });
+
+  it('update() should be a no-op when route is not open', async () => {
+    const afterUpdateFn = vi.fn();
+
+    const route = new Route('/users/:id', {
+      afterUpdate: afterUpdateFn,
+    });
+
+    history.push('/other');
+    await sleep(10);
+
+    expect(route.isOpened).toBe(false);
+
+    await route.update({ id: '1' });
+
+    expect(route.isOpened).toBe(false);
+    expect(afterUpdateFn).toBeCalledTimes(0);
+  });
+
+  it('update() should work like open with replace: true default', async () => {
+    const afterOpenFn = vi.fn();
+    const afterUpdateFn = vi.fn();
+
+    const route = new Route('/users/:id', {
+      afterOpen: afterOpenFn,
+      afterUpdate: afterUpdateFn,
+    });
+
+    await route.open({ id: '1' });
+    await sleep(10);
+
+    expect(route.isOpened).toBe(true);
+    expect(afterOpenFn).toBeCalledTimes(1);
+    history.resetMock();
+
+    await route.update({ id: '2' });
+
+    expect(route.isOpened).toBe(true);
+    expect(history.replace).toBeCalledWith('/users/2', null);
+    expect(afterOpenFn).toBeCalledTimes(1);
+    expect(afterUpdateFn).toBeCalledTimes(1);
+  });
+
+  it('update() should allow explicit replace: false override', async () => {
+    const route = new Route('/users/:id');
+
+    await route.open({ id: '1' });
+    await sleep(10);
+
+    expect(route.isOpened).toBe(true);
+    history.resetMock();
+
+    await route.update({ id: '2' }, { replace: false });
+
+    expect(route.isOpened).toBe(true);
+    expect(history.push).toBeCalledWith('/users/2', null);
+  });
+
+  it('update() should call afterUpdate, not afterOpen', async () => {
+    const afterOpenFn = vi.fn();
+    const afterUpdateFn = vi.fn();
+
+    const route = new Route('/users/:id', {
+      afterOpen: afterOpenFn,
+      afterUpdate: afterUpdateFn,
+    });
+
+    await route.open({ id: '1' });
+    await sleep(10);
+
+    expect(afterOpenFn).toBeCalledTimes(1);
+    expect(afterUpdateFn).toBeCalledTimes(0);
+
+    await route.update({ id: '2' });
+
+    expect(afterOpenFn).toBeCalledTimes(1);
+    expect(afterUpdateFn).toBeCalledTimes(1);
+  });
+
+  it('afterUpdate should not double-fire when open() is called while already open', async () => {
+    const afterUpdateFn = vi.fn();
+
+    const route = new Route('/users/:id', {
+      afterUpdate: afterUpdateFn,
+    });
+
+    await route.open({ id: '1' });
+    await sleep(10);
+
+    expect(afterUpdateFn).toBeCalledTimes(0);
+
+    await route.open({ id: '2' });
+    await sleep(10);
+
+    expect(afterUpdateFn).toBeCalledTimes(1);
+  });
+
+  it('afterUpdate should not double-fire when update() is called', async () => {
+    const afterUpdateFn = vi.fn();
+
+    const route = new Route('/users/:id', {
+      afterUpdate: afterUpdateFn,
+    });
+
+    await route.open({ id: '1' });
+    await sleep(10);
+
+    expect(afterUpdateFn).toBeCalledTimes(0);
+
+    await route.update({ id: '2' });
+    await sleep(10);
+
+    expect(afterUpdateFn).toBeCalledTimes(1);
+  });
+
+  it('afterOpen should only fire on initial open, afterUpdate on subsequent changes', async () => {
+    const afterOpenFn = vi.fn();
+    const afterUpdateFn = vi.fn();
+
+    const route = new Route('/users/:id', {
+      afterOpen: afterOpenFn,
+      afterUpdate: afterUpdateFn,
+    });
+
+    // Initial open
+    await route.open({ id: '1' });
+    expect(afterOpenFn).toBeCalledTimes(1);
+    expect(afterUpdateFn).toBeCalledTimes(0);
+
+    // Update via open()
+    await route.open({ id: '2' });
+    expect(afterOpenFn).toBeCalledTimes(1);
+    expect(afterUpdateFn).toBeCalledTimes(1);
+
+    // Update via update()
+    await route.update({ id: '3' });
+    expect(afterOpenFn).toBeCalledTimes(1);
+    expect(afterUpdateFn).toBeCalledTimes(2);
+
+    // Close and re-open
+    history.push('/other');
+    await sleep(10);
+    expect(route.isOpened).toBe(false);
+
+    await route.open({ id: '4' });
+    expect(afterOpenFn).toBeCalledTimes(2);
+    expect(afterUpdateFn).toBeCalledTimes(2);
+  });
+
   it('matchPath should return null when path does not match baseUrl', () => {
     const route = new Route('/users/:id', {
       baseUrl: '/app',

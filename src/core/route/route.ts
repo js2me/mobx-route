@@ -1,4 +1,4 @@
-import { computed, observable, reaction, runInAction } from 'mobx';
+import { comparer, computed, observable, reaction, runInAction } from 'mobx';
 import {
   buildSearchString,
   type History,
@@ -74,6 +74,8 @@ export class Route<
   private _matcher?: ReturnType<typeof match>;
   private _compiler?: ReturnType<typeof compile>;
   private ignoreOpenByPathMatch = false;
+  private isUpdate = false;
+  private updateDisposer?: VoidFunction;
 
   protected status:
     | 'opening'
@@ -138,6 +140,23 @@ export class Route<
       this.disposer = reaction(() => this.isPathMatched, this.checkPathMatch, {
         fireImmediately: true,
       });
+      this.updateDisposer = reaction(
+        () => {
+          if (this.status !== 'open-confirmed') return undefined;
+          return [this.parsedPathData, this.query.data] as const;
+        },
+        (value, prevValue) => {
+          if (prevValue === undefined) return;
+          if (value === undefined) return;
+          if (!this.parsedPathData) return;
+          this.config.afterUpdate?.(this.parsedPathData, this);
+        },
+        {
+          fireImmediately: false,
+          signal: this.config.abortSignal,
+          equals: comparer.structural,
+        },
+      );
       this.config.abortSignal?.addEventListener('abort', () => this.destroy(), {
         once: true,
       });
@@ -521,12 +540,78 @@ export class Route<
       query,
     };
 
+    this.isUpdate = this.status === 'open-confirmed';
     this.ignoreOpenByPathMatch = true;
     const isConfirmed = await this.confirmOpening(trx);
 
     if (isConfirmed !== true) {
       this.ignoreOpenByPathMatch = false;
+      this.isUpdate = false;
     }
+  }
+
+  /**
+   * Updates the current route if it is already open.
+   * Unlike `open`, this is a no-op if the route is not open,
+   * and defaults to `replace: true` instead of push.
+   *
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#update)
+   */
+  update(
+    ...args: IsPartial<TInputParams> extends true
+      ? [
+          params?: TInputParams | null | undefined,
+          navigateParams?: RouteNavigateParams,
+        ]
+      : [params: TInputParams, navigateParams?: RouteNavigateParams]
+  ): Promise<void>;
+  update(
+    ...args: IsPartial<TInputParams> extends true
+      ? [
+          params?: TInputParams | null | undefined,
+          replace?: RouteNavigateParams['replace'],
+          query?: RouteNavigateParams['query'],
+        ]
+      : [
+          params: TInputParams,
+          replace?: RouteNavigateParams['replace'],
+          query?: RouteNavigateParams['query'],
+        ]
+  ): Promise<void>;
+  update(url: string, navigateParams?: RouteNavigateParams): Promise<void>;
+  update(
+    url: string,
+    replace?: RouteNavigateParams['replace'],
+    query?: RouteNavigateParams['query'],
+  ): Promise<void>;
+
+  /**
+   * Updates the current route if it is already open.
+   * Unlike `open`, this is a no-op if the route is not open,
+   * and defaults to `replace: true` instead of push.
+   *
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#update)
+   */
+  async update(...args: any[]) {
+    if (this.status !== 'open-confirmed') {
+      return;
+    }
+
+    // Default replace to true for update method
+    const isObjectNavigateParams =
+      args.length > 1 && typeof args[1] === 'object' && args[1] !== null;
+    const isPositionalReplace = args.length > 1 && typeof args[1] === 'boolean';
+
+    if (isObjectNavigateParams) {
+      args[1] = { replace: true, ...args[1] };
+    } else if (isPositionalReplace) {
+      // User explicitly passed boolean replace -- leave as-is
+    } else if (args.length === 1) {
+      // Only params/url provided, no second arg -- add default replace
+      args[1] = { replace: true };
+    }
+
+    return (this.open as (...args: any[]) => Promise<void>)(...args);
   }
 
   protected get tokenData() {
@@ -577,11 +662,21 @@ export class Route<
     }
 
     if (this.isPathMatched) {
+      const wasAlreadyConfirmed = this.status === 'open-confirmed';
       runInAction(() => {
         this.status = 'open-confirmed';
       });
 
-      this.config.afterOpen?.(this.parsedPathData!, this);
+      if (!wasAlreadyConfirmed) {
+        if (this.isUpdate) {
+          this.isUpdate = false;
+          this.config.afterUpdate?.(this.parsedPathData!, this);
+        } else {
+          this.config.afterOpen?.(this.parsedPathData!, this);
+        }
+      } else {
+        this.isUpdate = false;
+      }
     }
 
     return true;
@@ -613,7 +708,12 @@ export class Route<
           runInAction(() => {
             this.status = 'open-confirmed';
           });
-          this.config.afterOpen?.(this.parsedPathData, this);
+          if (this.isUpdate) {
+            this.isUpdate = false;
+            this.config.afterUpdate?.(this.parsedPathData, this);
+          } else {
+            this.config.afterOpen?.(this.parsedPathData, this);
+          }
         }
         return;
       }
@@ -659,6 +759,8 @@ export class Route<
     this.isDestroyed = true;
     this.disposer?.();
     this.disposer = undefined;
+    this.updateDisposer?.();
+    this.updateDisposer = undefined;
   }
 }
 

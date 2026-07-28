@@ -256,6 +256,30 @@ const route = createVirtualRoute({
 });
 ```
 
+### `afterUpdate`
+Hook called when the route is already open and its params or query params change. Receives the current params and the route instance — same signature as `afterOpen`.
+
+Triggers include:
+- `open()` called while the route is already open
+- Query params change while the route is open
+
+```ts
+const modalRoute = createVirtualRoute<{ tab: string }>({
+  afterOpen: (params) => {
+    console.log('Modal opened, tab:', params?.tab);
+  },
+  afterUpdate: (params) => {
+    console.log('Modal updated, tab:', params?.tab);
+  },
+});
+
+await modalRoute.open({ tab: 'info' });
+// Log: "Modal opened, tab: info"
+
+await modalRoute.open({ tab: 'settings' });
+// Log: "Modal updated, tab: settings" (afterUpdate, not afterOpen)
+```
+
 ### `beforeClose`
 Hook `() => void | boolean | Promise<void | boolean>`.
 Return `false` to reject closing.

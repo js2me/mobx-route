@@ -1,4 +1,11 @@
-import { action, computed, observable, reaction, runInAction } from 'mobx';
+import {
+  action,
+  comparer,
+  computed,
+  observable,
+  reaction,
+  runInAction,
+} from 'mobx';
 import type { IQueryParams } from 'mobx-location-history';
 import { callFunction } from 'yummies/common';
 import { applyObservable, type ObservableAnnotationsArray } from 'yummies/mobx';
@@ -45,6 +52,10 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
   private trx: Maybe<VirtualRouteTrx>;
 
   private skipAutoOpenClose: boolean;
+
+  private isUpdate = false;
+
+  private updateDisposer?: VoidFunction;
 
   /**
    * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#isouteropened)
@@ -93,6 +104,22 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
           }
         }),
         { signal: this.config.abortSignal, fireImmediately: true },
+      );
+      this.updateDisposer = reaction(
+        () => {
+          if (this.status !== 'opened') return undefined;
+          return this.query.data;
+        },
+        (value, prevValue) => {
+          if (prevValue === undefined) return;
+          if (value === undefined) return;
+          this.config.afterUpdate?.(this.params, this);
+        },
+        {
+          fireImmediately: false,
+          signal: this.config.abortSignal,
+          equals: comparer.structural,
+        },
       );
     }
 
@@ -147,6 +174,7 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
     const params = (args[0] ?? null) as unknown as TParams;
     const extra: Maybe<VirtualOpenExtraParams> = args[1];
 
+    this.isUpdate = this.status === 'opened';
     this.skipAutoOpenClose = true;
 
     this.trx = {
@@ -200,7 +228,13 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
       this.trx = undefined;
       this.params = trx.params;
       this.status = 'opened';
-      this.config.afterOpen?.(this.params!, this);
+
+      if (this.isUpdate) {
+        this.isUpdate = false;
+        this.config.afterUpdate?.(this.params!, this);
+      } else {
+        this.config.afterOpen?.(this.params!, this);
+      }
     });
 
     return true;
@@ -245,6 +279,7 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
     this.isDestroyed = true;
     this.status = 'unknown';
     this.disposer?.();
+    this.updateDisposer?.();
   }
 }
 

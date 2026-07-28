@@ -114,6 +114,18 @@ export interface RouteConfiguration<
     >,
   ) => void;
   /**
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#afterupdate)
+   */
+  afterUpdate?: (
+    data: ParsedPathData<NoInfer<TPath>>,
+    route: Route<
+      NoInfer<TPath>,
+      NoInfer<TInputParams>,
+      NoInfer<TOutputParams>,
+      NoInfer<TParentRoute>
+    >,
+  ) => void;
+  /**
    * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#createurl)
    */
   createUrl?: UrlCreateParamsFn<TInputParams>;

@@ -46,12 +46,12 @@ route.open({
 
 ## Methods and properties  
 
-### `open()`   
+### `open()`
 
-Navigates to this route.   
-First argument can be required based on path declaration (first argument)  
+Navigates to this route.
+First argument can be required based on path declaration (first argument)
 
-**API Signature**  
+**API Signature**
 ```ts
 open(params?, opts?): Promise<void>
 open(params?, replace?, query?): Promise<void>
@@ -63,9 +63,9 @@ open(url: string, replace?, query?): Promise<void>
 
 When the first argument is a string, navigation goes to that URL directly without compiling the path pattern.
 
-More about `mergeQuery` you can read [here](/core/routeConfig#mergequery)   
+More about `mergeQuery` you can read [here](/core/routeConfig#mergequery)
 
-Examples:  
+Examples:
 ```ts
 const stars = createRoute('/stars');
 await stars.open();
@@ -84,6 +84,40 @@ await starsWithMeta.open({ meta: 1 }, {
   query: { foo: 'bar' },
 });
 
+```
+
+### `update()`
+
+Updates the current route if it is already open. Unlike `open()`, this is a no-op when the route is not open, and defaults to `replace: true` (does not create a new history entry).
+
+**API Signature**
+```ts
+update(params?, opts?): Promise<void>
+update(params?, replace?, query?): Promise<void>
+update(url: string, opts?): Promise<void>
+update(url: string, replace?, query?): Promise<void>
+```
+
+`opts`: `{ query?, replace?, state?, mergeQuery? }`. Same as `open()`, but `replace` defaults to `true`.
+
+Examples:
+```ts
+const userRoute = createRoute('/users/:userId');
+await userRoute.open({ userId: 1 });
+
+// Replace current history entry (no back button entry)
+await userRoute.update({ userId: 2 });
+location.pathname; // /users/2
+
+// Override replace to false (creates new history entry)
+await userRoute.update({ userId: 3 }, { replace: false });
+```
+
+```ts
+const userRoute = createRoute('/users/:userId');
+// Route is not open — update is a no-op
+await userRoute.update({ userId: 1 });
+location.pathname; // / (unchanged)
 ```
 
 ### `confirmOpening()` <Badge type="warning" text="protected" />
@@ -497,11 +531,40 @@ const route = createRoute('/foo/bar', {
 
 See [Protected routes](/recipes/protected-routes).
 
-### `afterClose()`  
+### `afterClose()`
 Called after the route closes.
 
-### `afterOpen(data, route)`  
+### `afterOpen(data, route)`
 Called after successful open. Receives parsed path data and the route instance.
+
+### `afterUpdate(data, route)`
+Called when the route is already open and its path params or query params change. Receives parsed path data and the route instance — same signature as `afterOpen`.
+
+Triggers include:
+- `open()` called while the route is already open
+- `update()` called
+- Browser navigation changes path params while the route is open (e.g. `/users/1` → `/users/2`)
+- Query params change while the route is open
+
+```ts
+const userRoute = createRoute('/users/:userId', {
+  afterOpen: (data) => {
+    console.log('Opened user:', data.params.userId);
+  },
+  afterUpdate: (data) => {
+    console.log('Updated user:', data.params.userId);
+  },
+});
+
+await userRoute.open({ userId: 1 });
+// Log: "Opened user: 1"
+
+await userRoute.open({ userId: 2 });
+// Log: "Updated user: 2" (afterUpdate, not afterOpen)
+
+userRoute.query.update({ tab: 'profile' });
+// Log: "Updated user: 2" (query changed while open)
+```
 
 ### `createUrl()`   
 Ability to customize path or query params before create route url.   

@@ -111,6 +111,13 @@ export interface VirtualRouteConfiguration<
     params: NoInfer<TParams | null>,
     route: VirtualRoute<NoInfer<TParams>>,
   ) => void;
+  /**
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#afterupdate)
+   */
+  afterUpdate?: (
+    params: NoInfer<TParams | null>,
+    route: VirtualRoute<NoInfer<TParams>>,
+  ) => void;
 }
 
 export interface VirtualRouteTrx {
