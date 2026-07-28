@@ -2,6 +2,8 @@ import { act, render } from '@testing-library/react';
 import { when } from 'mobx';
 import { createBrowserHistory } from 'mobx-location-history';
 import { withViewModel } from 'mobx-view-model';
+import type { ComponentType } from 'react';
+import { lazy } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { sleep } from 'yummies/async';
 import { Route, routeConfig } from '../../core/index.js';
@@ -665,5 +667,112 @@ describe('<RouteViewGroup />', () => {
     expect(() => screen.getByText('home')).toThrowError();
 
     vi.useRealTimers();
+  });
+
+  describe('suspense prop', () => {
+    it('should wrap active route in Suspense when suspense=true', async () => {
+      const history = mockHistory(createBrowserHistory());
+      routeConfig.update({ history });
+
+      const routeA = new Route('/route-a');
+
+      await routeA.open();
+
+      const screen = await act(async () =>
+        render(
+          <RouteViewGroup
+            suspense
+            fallback={<div data-testid="loading">Loading</div>}
+          >
+            <RouteView route={routeA} view={() => <div>route-a</div>} />
+          </RouteViewGroup>,
+        ),
+      );
+
+      expect(screen.getByText('route-a')).toBeDefined();
+    });
+
+    it('should show fallback while lazy component is loading', async () => {
+      const history = mockHistory(createBrowserHistory());
+      routeConfig.update({ history });
+
+      const routeA = new Route('/route-a');
+
+      await routeA.open();
+
+      let resolveModule!: (module: { default: ComponentType }) => void;
+      const LazyView = lazy(
+        () =>
+          new Promise<{ default: ComponentType }>((resolve) => {
+            resolveModule = resolve;
+          }),
+      );
+
+      const ResolvedView = () => <div data-testid="route-content">route-a</div>;
+
+      const screen = await act(async () =>
+        render(
+          <RouteViewGroup
+            suspense
+            fallback={<div data-testid="suspense-fallback">Loading</div>}
+          >
+            <RouteView route={routeA} view={LazyView} />
+          </RouteViewGroup>,
+        ),
+      );
+
+      // Fallback visible while lazy loads
+      expect(screen.getByTestId('suspense-fallback')).toBeDefined();
+
+      // Resolve lazy — content appears
+      await act(async () => {
+        resolveModule({ default: ResolvedView });
+      });
+
+      await act(async () => {});
+
+      expect(screen.getByTestId('route-content')).toBeDefined();
+    });
+
+    it('should wrap inactive fallback in Suspense when suspense=true', async () => {
+      const history = mockHistory(createBrowserHistory());
+      routeConfig.update({ history });
+
+      history.push('/unmatched-url', null);
+
+      const routeA = new Route('/route-a', { exact: true });
+
+      expect(routeA.isOpened).toBe(false);
+
+      const screen = await act(async () =>
+        render(
+          <RouteViewGroup suspense fallback={null}>
+            <RouteView route={routeA} view={() => <div>route-a</div>} />
+            <div data-testid="not-found">not_found</div>
+          </RouteViewGroup>,
+        ),
+      );
+
+      expect(screen.getByTestId('not-found')).toBeDefined();
+    });
+
+    it('should not wrap content in Suspense when suspense is not set', async () => {
+      const history = mockHistory(createBrowserHistory());
+      routeConfig.update({ history });
+
+      const routeA = new Route('/route-a');
+
+      await routeA.open();
+
+      const screen = await act(async () =>
+        render(
+          <RouteViewGroup>
+            <RouteView route={routeA} view={() => <div>route-a</div>} />
+          </RouteViewGroup>,
+        ),
+      );
+
+      expect(screen.getByText('route-a')).toBeDefined();
+    });
   });
 });

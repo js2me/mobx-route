@@ -8,7 +8,7 @@ import {
   type RouteParams,
   routeConfig,
 } from 'mobx-route';
-import { isValidElement, useEffect, useLayoutEffect } from 'react';
+import { isValidElement, Suspense, useEffect, useLayoutEffect } from 'react';
 import type { IsPartial, Maybe } from 'yummies/types';
 
 type LayoutComponent =
@@ -19,6 +19,10 @@ interface BaseProps extends RouteNavigateParams {
   children: React.ReactNode;
   layout?: LayoutComponent;
   useLastOpened?: boolean;
+  /** When true, wraps the active route content in `<Suspense fallback={fallback}>`. */
+  suspense?: boolean;
+  /** Fallback content for the Suspense boundary. Only used when `suspense` is true. */
+  fallback?: React.ReactNode;
 }
 
 type PropsWithDefaultRoute<TRoute extends AnyRouteEntity> = BaseProps & {
@@ -52,6 +56,8 @@ export const RouteViewGroup = observer(
     layout: Layout,
     otherwise: otherwiseNavigation,
     useLastOpened,
+    suspense,
+    fallback,
     // @ts-expect-error
     params,
     ...navigateParams
@@ -131,10 +137,16 @@ export const RouteViewGroup = observer(
     const resultNodeToRender =
       activeChildRouteNode ?? lastInactiveChildNode ?? null;
 
+    const content = suspense ? (
+      <Suspense fallback={fallback ?? null}>{resultNodeToRender}</Suspense>
+    ) : (
+      resultNodeToRender
+    );
+
     if (Layout) {
-      return <Layout>{resultNodeToRender}</Layout>;
+      return <Layout>{content}</Layout>;
     }
 
-    return resultNodeToRender;
+    return content;
   },
 ) as unknown as RouteViewGroupComponent;
