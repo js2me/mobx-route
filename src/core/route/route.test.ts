@@ -312,6 +312,48 @@ describe('route', () => {
     expect(foo).toBeDefined();
   });
 
+  it('update() type tests: null/undefined as first arg is valid for routes with required params', () => {
+    const routeWithRequiredParam = new Route('/users/:id');
+
+    // These should all be valid type-wise
+    expectTypeOf(routeWithRequiredParam.update).toBeCallableWith(null, {
+      query: { tab: 'settings' },
+    });
+    expectTypeOf(routeWithRequiredParam.update).toBeCallableWith(undefined, {
+      query: { tab: 'settings' },
+    });
+    expectTypeOf(routeWithRequiredParam.update).toBeCallableWith();
+    expectTypeOf(routeWithRequiredParam.update).toBeCallableWith(
+      { id: '5' },
+      { query: { tab: 'settings' } },
+    );
+    expectTypeOf(routeWithRequiredParam.update).toBeCallableWith({ id: '5' });
+
+    // This should give a type error (wrong param shape)
+    // @ts-expect-error - wrong param key
+    routeWithRequiredParam.update({ wrong: 'param' });
+  });
+
+  it('update() type tests: null/undefined as first arg is valid for routes without required params', () => {
+    const routeWithoutRequiredParams = new Route('/settings');
+
+    expectTypeOf(routeWithoutRequiredParams.update).toBeCallableWith(null, {
+      query: { theme: 'dark' },
+    });
+    expectTypeOf(routeWithoutRequiredParams.update).toBeCallableWith(undefined);
+    expectTypeOf(routeWithoutRequiredParams.update).toBeCallableWith();
+  });
+
+  it('update() type tests: string URL overload still works', () => {
+    const route = new Route('/users/:id');
+
+    expectTypeOf(route.update).toBeCallableWith('/users/5?tab=settings');
+    expectTypeOf(route.update).toBeCallableWith('/users/5', { replace: true });
+    expectTypeOf(route.update).toBeCallableWith('/users/5', true, {
+      tab: 'settings',
+    });
+  });
+
   it('extend typings: should merge parent and child input params', () => {
     const parent = new Route<
       '/users/:userId',
@@ -1586,6 +1628,94 @@ describe('route', () => {
     await route.open({ id: '4' });
     expect(afterOpenFn).toBeCalledTimes(2);
     expect(afterUpdateFn).toBeCalledTimes(2);
+  });
+
+  it('update(null, { query }) should update only query params on route with required path params', async () => {
+    const route = new Route('/users/:id');
+
+    await route.open({ id: '1' }, { query: { tab: 'profile' } });
+    await sleep(10);
+
+    expect(route.isOpened).toBe(true);
+    expect(route.query.data).toStrictEqual({ tab: 'profile' });
+    history.resetMock();
+
+    await route.update(null, { query: { tab: 'settings', page: '2' } });
+
+    expect(history.replace).toBeCalledWith(
+      '/users/1?tab=settings&page=2',
+      null,
+    );
+    expect(route.params).toEqual({ id: '1' });
+    expect(route.query.data).toStrictEqual({ tab: 'settings', page: '2' });
+  });
+
+  it('update(undefined, { query }) should update only query params on route with required path params', async () => {
+    const route = new Route('/users/:id');
+
+    await route.open({ id: '42' }, { query: { sort: 'asc' } });
+    await sleep(10);
+
+    expect(route.isOpened).toBe(true);
+    history.resetMock();
+
+    await route.update(undefined, { query: { sort: 'desc' } });
+
+    expect(history.replace).toBeCalledWith('/users/42?sort=desc', null);
+    expect(route.params).toEqual({ id: '42' });
+  });
+
+  it('update(null, { query }) should update only query params on route without required path params', async () => {
+    const route = new Route('/settings');
+
+    await route.open(null, { query: { theme: 'dark' } });
+    await sleep(10);
+
+    expect(route.isOpened).toBe(true);
+    history.resetMock();
+
+    await route.update(null, { query: { theme: 'light', lang: 'en' } });
+
+    expect(history.replace).toBeCalledWith(
+      '/settings?theme=light&lang=en',
+      null,
+    );
+    expect(route.query.data).toStrictEqual({ theme: 'light', lang: 'en' });
+  });
+
+  it('update(null, { query, mergeQuery: true }) should merge query params while preserving path params', async () => {
+    const route = new Route('/users/:id');
+
+    await route.open({ id: '5' }, { query: { tab: 'profile', page: '1' } });
+    await sleep(10);
+
+    expect(route.query.data).toStrictEqual({ tab: 'profile', page: '1' });
+    history.resetMock();
+
+    await route.update(null, { query: { tab: 'settings' }, mergeQuery: true });
+
+    expect(history.replace).toBeCalledWith(
+      '/users/5?tab=settings&page=1',
+      null,
+    );
+    expect(route.params).toEqual({ id: '5' });
+    expect(route.query.data).toStrictEqual({ tab: 'settings', page: '1' });
+  });
+
+  it('update() with no args should be a no-op on an open route', async () => {
+    const route = new Route('/users/:id');
+
+    await route.open({ id: '1' }, { query: { tab: 'profile' } });
+    await sleep(10);
+
+    expect(route.isOpened).toBe(true);
+    history.resetMock();
+
+    await route.update();
+
+    expect(history.replace).toBeCalledWith('/users/1?tab=profile', null);
+    expect(route.params).toEqual({ id: '1' });
+    expect(route.query.data).toStrictEqual({ tab: 'profile' });
   });
 
   it('matchPath should return null when path does not match baseUrl', () => {

@@ -275,22 +275,17 @@ export class Route<
       return null;
     }
 
-    let params: TOutputParams | null =
-      (this.parsedPathData?.params as unknown as Maybe<TOutputParams>) ?? null;
-
     if (this.config.params) {
       const result = this.config.params(
         this.parsedPathData.params,
         this.config.meta,
       );
-      if (result) {
-        params = result;
-      } else {
-        return null;
-      }
+      return result || null;
     }
 
-    return params;
+    return (
+      (this.parsedPathData?.params as unknown as Maybe<TOutputParams>) ?? null
+    );
   }
 
   protected get isPathMatched() {
@@ -393,12 +388,13 @@ export class Route<
   ): ParamData | undefined {
     if (params == null) return undefined;
 
-    return Object.entries(params).reduce((acc, [key, value]) => {
+    const result: ParamData = {};
+    for (const [key, value] of Object.entries(params)) {
       if (value != null) {
-        acc[key] = Array.isArray(value) ? value.map(String) : String(value);
+        result[key] = Array.isArray(value) ? value.map(String) : String(value);
       }
-      return acc;
-    }, {} as ParamData);
+    }
+    return result;
   }
 
   /**
@@ -503,11 +499,6 @@ export class Route<
     query?: RouteNavigateParams['query'],
   ): Promise<void>;
 
-  /**
-   * Navigates to this route.
-   *
-   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#open)
-   */
   async open(...args: any[]) {
     const {
       replace,
@@ -517,26 +508,19 @@ export class Route<
     } = typeof args[1] === 'boolean' || args.length > 2
       ? ({ replace: args[1], query: args[2] } as RouteNavigateParams)
       : ((args[1] ?? {}) as RouteNavigateParams);
-    let url: string;
-    let params: Maybe<InputPathParams<TPath>>;
 
     const mergeQuery = rawMergeQuery ?? this.isAbleToMergeQuery;
     const query = mergeQuery ? { ...this.query.data, ...rawQuery } : rawQuery;
 
-    if (typeof args[0] === 'string') {
-      url = args[0];
-    } else {
-      params = args[0] as InputPathParams<TPath>;
-      url = this.createUrl(args[0], query);
-    }
-
-    const state = rawState ?? null;
+    const params = typeof args[0] === 'string' ? undefined : args[0];
+    const url =
+      typeof args[0] === 'string' ? args[0] : this.createUrl(args[0], query);
 
     const trx: NavigationTrx<TInputParams> = {
       url,
       params: params as TInputParams,
       replace,
-      state,
+      state: rawState ?? null,
       query,
     };
 
@@ -559,25 +543,13 @@ export class Route<
    * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#update)
    */
   update(
-    ...args: IsPartial<TInputParams> extends true
-      ? [
-          params?: TInputParams | null | undefined,
-          navigateParams?: RouteNavigateParams,
-        ]
-      : [params: TInputParams, navigateParams?: RouteNavigateParams]
+    params?: TInputParams | null | undefined,
+    navigateParams?: RouteNavigateParams,
   ): Promise<void>;
   update(
-    ...args: IsPartial<TInputParams> extends true
-      ? [
-          params?: TInputParams | null | undefined,
-          replace?: RouteNavigateParams['replace'],
-          query?: RouteNavigateParams['query'],
-        ]
-      : [
-          params: TInputParams,
-          replace?: RouteNavigateParams['replace'],
-          query?: RouteNavigateParams['query'],
-        ]
+    params?: TInputParams | null | undefined,
+    replace?: RouteNavigateParams['replace'],
+    query?: RouteNavigateParams['query'],
   ): Promise<void>;
   update(url: string, navigateParams?: RouteNavigateParams): Promise<void>;
   update(
@@ -586,42 +558,31 @@ export class Route<
     query?: RouteNavigateParams['query'],
   ): Promise<void>;
 
-  /**
-   * Updates the current route if it is already open.
-   * Unlike `open`, this is a no-op if the route is not open,
-   * defaults to `replace: true` instead of push,
-   * and defaults to `mergeQuery: true` when no query params are provided.
-   *
-   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#update)
-   */
   async update(...args: any[]) {
     if (this.status !== 'open-confirmed') {
       return;
     }
 
-    // Default replace to true for update method
-    // Default mergeQuery to true when no query params are provided
-    const isObjectNavigateParams =
-      args.length > 1 && typeof args[1] === 'object' && args[1] !== null;
-    const isPositionalReplace = args.length > 1 && typeof args[1] === 'boolean';
+    // Reuse current path params when omitted
+    if (args[0] == null) {
+      args[0] = this.parsedPathData?.params;
+    }
 
-    if (isObjectNavigateParams) {
-      const hasQuery = 'query' in (args[1] as object);
+    const secondArg = args[1];
+    const isObjectParams = typeof secondArg === 'object' && secondArg !== null;
+
+    if (isObjectParams) {
       args[1] = {
         replace: true,
-        ...(hasQuery ? {} : { mergeQuery: true }),
-        ...args[1],
+        ...('query' in secondArg ? {} : { mergeQuery: true }),
+        ...secondArg,
       };
-    } else if (isPositionalReplace) {
-      // User explicitly passed boolean replace -- leave as-is
-      // If no query provided positionally, default mergeQuery: true
-      const hasPositionalQuery = args.length > 2 && args[2] !== undefined;
-      if (!hasPositionalQuery) {
-        args[1] = { replace: args[1], mergeQuery: true };
+    } else if (typeof secondArg === 'boolean') {
+      if (args[2] === undefined) {
+        args[1] = { replace: secondArg, mergeQuery: true };
         args.length = 2;
       }
     } else if (args.length === 1) {
-      // Only params/url provided, no second arg -- add default replace and mergeQuery
       args[1] = { replace: true, mergeQuery: true };
     }
 
@@ -659,8 +620,7 @@ export class Route<
         return;
       }
 
-      // Rebuild URL from updated trx.params if beforeOpen changed them
-      // This ensures that mutations to trx.params are reflected in the URL
+      // Rebuild URL if beforeOpen mutated trx.params
       const newUrl = this.createUrl(
         trx.params as TInputParams,
         trx.query as AnyObject,
@@ -696,8 +656,7 @@ export class Route<
 
       if (this.isUpdate) {
         this.isUpdate = false;
-        // afterUpdate is handled by the updateDisposer reaction which
-        // watches parsedPathData and query.data changes while open-confirmed
+        // afterUpdate handled by updateDisposer reaction
       } else if (!wasAlreadyConfirmed) {
         this.config.afterOpen?.(this.parsedPathData!, this);
       }
@@ -739,20 +698,18 @@ export class Route<
             this.config.afterOpen?.(this.parsedPathData, this);
           }
         }
-        // For updates (status is already 'open-confirmed'), confirmOpening
-        // handles the rest — no need to do anything here.
+        // update() delegates to confirmOpening
         return;
       }
 
-      // Sync before any await — closes the Back gap where isOpened/isOpening
-      // were both false until confirmOpening's first runInAction ran.
+      // Set opening sync to avoid isOpened/isOpening flicker
       if (this.status !== 'opening' && this.status !== 'open-confirmed') {
         runInAction(() => {
           this.status = 'opening';
         });
       }
 
-      // Already open-confirmed via confirmOpening — no need to re-confirm
+      // already confirmed
       if (this.status === 'open-confirmed') {
         return;
       }
