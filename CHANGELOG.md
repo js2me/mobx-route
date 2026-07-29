@@ -1,5 +1,11 @@
 # mobx-route
 
+## 1.3.1
+
+### Patch Changes
+
+- [`ccd432f`](https://github.com/js2me/mobx-route/commit/ccd432f977efd2947f8697f0bff7bdd882ee5498) Thanks [@js2me](https://github.com/js2me)! - add "suspense" + "fallback" props for `RouteViewGroup`
+
 ## 1.3.0
 
 ### Minor Changes
