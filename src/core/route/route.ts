@@ -739,6 +739,8 @@ export class Route<
             this.config.afterOpen?.(this.parsedPathData, this);
           }
         }
+        // For updates (status is already 'open-confirmed'), confirmOpening
+        // handles the rest — no need to do anything here.
         return;
       }
 
@@ -748,6 +750,11 @@ export class Route<
         runInAction(() => {
           this.status = 'opening';
         });
+      }
+
+      // Already open-confirmed via confirmOpening — no need to re-confirm
+      if (this.status === 'open-confirmed') {
+        return;
       }
 
       const trx: NavigationTrx<TInputParams> = {
