@@ -1,5 +1,11 @@
 # mobx-route
 
+## 1.3.3
+
+### Patch Changes
+
+- [`6d25faf`](https://github.com/js2me/mobx-route/commit/6d25fafa8ea06cf3e73d88235e16c90842b8902d) Thanks [@js2me](https://github.com/js2me)! - send `null`\`undefined`(first arg) to`update()`method for`Route`
+
 ## 1.3.2
 
 ### Patch Changes
