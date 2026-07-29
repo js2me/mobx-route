@@ -1,5 +1,11 @@
 # mobx-route
 
+## 1.3.2
+
+### Patch Changes
+
+- [`e76638a`](https://github.com/js2me/mobx-route/commit/e76638a33093d5e85939f4a3ea01092971ce0232) Thanks [@js2me](https://github.com/js2me)! - fix flicking isOpening isOpened states for path routes due to `update()` method call
+
 ## 1.3.1
 
 ### Patch Changes
