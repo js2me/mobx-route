@@ -553,7 +553,8 @@ export class Route<
   /**
    * Updates the current route if it is already open.
    * Unlike `open`, this is a no-op if the route is not open,
-   * and defaults to `replace: true` instead of push.
+   * defaults to `replace: true` instead of push,
+   * and defaults to `mergeQuery: true` when no query params are provided.
    *
    * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#update)
    */
@@ -588,7 +589,8 @@ export class Route<
   /**
    * Updates the current route if it is already open.
    * Unlike `open`, this is a no-op if the route is not open,
-   * and defaults to `replace: true` instead of push.
+   * defaults to `replace: true` instead of push,
+   * and defaults to `mergeQuery: true` when no query params are provided.
    *
    * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#update)
    */

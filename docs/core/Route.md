@@ -88,7 +88,7 @@ await starsWithMeta.open({ meta: 1 }, {
 
 ### `update()`
 
-Updates the current route if it is already open. Unlike `open()`, this is a no-op when the route is not open, and defaults to `replace: true` (does not create a new history entry).
+Same as `open()` but only works when the route is already open (no-op otherwise). Defaults: `replace: true`, `mergeQuery: true` (when no `query` is provided — existing query params are preserved).
 
 **API Signature**
 ```ts
@@ -98,26 +98,27 @@ update(url: string, opts?): Promise<void>
 update(url: string, replace?, query?): Promise<void>
 ```
 
-`opts`: `{ query?, replace?, state?, mergeQuery? }`. Same as `open()`, but `replace` defaults to `true`.
+`opts`: `{ query?, replace?, state?, mergeQuery? }`
 
-Examples:
 ```ts
 const userRoute = createRoute('/users/:userId');
-await userRoute.open({ userId: 1 });
+await userRoute.open({ userId: 1 }, { query: { tab: 'profile' } });
 
-// Replace current history entry (no back button entry)
+// replace: true, mergeQuery: true by default
 await userRoute.update({ userId: 2 });
-location.pathname; // /users/2
+// /users/2?tab=profile
 
-// Override replace to false (creates new history entry)
-await userRoute.update({ userId: 3 }, { replace: false });
+// explicit query → mergeQuery uses config default
+await userRoute.update({ userId: 2 }, { query: { tab: 'settings' } });
+
+// override defaults
+await userRoute.update({ userId: 3 }, { replace: false, mergeQuery: false });
 ```
 
 ```ts
 const userRoute = createRoute('/users/:userId');
-// Route is not open — update is a no-op
+// not open — no-op
 await userRoute.update({ userId: 1 });
-location.pathname; // / (unchanged)
 ```
 
 ### `confirmOpening()` <Badge type="warning" text="protected" />
