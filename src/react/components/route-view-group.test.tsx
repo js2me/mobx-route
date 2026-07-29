@@ -475,7 +475,9 @@ describe('<RouteViewGroup />', () => {
     await act(async () => {
       history.back();
     });
-    await when(() => product.isOpening);
+    await act(async () => {
+      await when(() => product.isOpening);
+    });
     await act(async () => {});
 
     expect(product.isOpened).toBe(false);
@@ -486,7 +488,9 @@ describe('<RouteViewGroup />', () => {
     await act(async () => {
       resolveProductOpen();
     });
-    await when(() => product.isOpened);
+    await act(async () => {
+      await when(() => product.isOpened);
+    });
     await act(async () => {});
 
     expect(screen.getByText('product:1')).toBeDefined();

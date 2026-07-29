@@ -1,4 +1,4 @@
-/** biome-ignore-all lint/nursery/noFloatingPromises: <explanation> */
+/** biome-ignore-all lint/nursery/noFloatingPromises: test assertions are intentionally floating */
 import { when } from 'mobx';
 import { createBrowserHistory } from 'mobx-location-history';
 import {

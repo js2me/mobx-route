@@ -1,4 +1,4 @@
-/** biome-ignore-all lint/nursery/noFloatingPromises: <explanation> */
+/** biome-ignore-all lint/nursery/noFloatingPromises: test assertions are intentionally floating */
 
 import { observable, reaction, when } from 'mobx';
 import {
@@ -1179,7 +1179,7 @@ describe('route', () => {
   });
 
   it('should use custom createUrl function', async () => {
-    const customCreateUrl = vi.fn((params, query) => {
+    const customCreateUrl = vi.fn((params, _query) => {
       return {
         ...params,
         baseUrl: '/custom',
@@ -1849,7 +1849,7 @@ describe('route', () => {
     const route = new Route('/test/:id', {
       params: (parsedParams) => {
         return {
-          transformedId: parseInt(parsedParams.id) * 2,
+          transformedId: parseInt(parsedParams.id, 10) * 2,
           originalId: parsedParams.id,
         };
       },
@@ -2043,6 +2043,7 @@ describe('route', () => {
 
     // After async check resolves → redirect to /login
     expect(dashboardRoute.isOpened).toBe(false);
+    await when(() => loginRoute.isOpened);
     expect(loginRoute.isOpened).toBe(true);
     expect(history.location.pathname).toBe('/login');
 
