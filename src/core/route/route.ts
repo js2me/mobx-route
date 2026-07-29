@@ -598,17 +598,29 @@ export class Route<
     }
 
     // Default replace to true for update method
+    // Default mergeQuery to true when no query params are provided
     const isObjectNavigateParams =
       args.length > 1 && typeof args[1] === 'object' && args[1] !== null;
     const isPositionalReplace = args.length > 1 && typeof args[1] === 'boolean';
 
     if (isObjectNavigateParams) {
-      args[1] = { replace: true, ...args[1] };
+      const hasQuery = 'query' in (args[1] as object);
+      args[1] = {
+        replace: true,
+        ...(hasQuery ? {} : { mergeQuery: true }),
+        ...args[1],
+      };
     } else if (isPositionalReplace) {
       // User explicitly passed boolean replace -- leave as-is
+      // If no query provided positionally, default mergeQuery: true
+      const hasPositionalQuery = args.length > 2 && args[2] !== undefined;
+      if (!hasPositionalQuery) {
+        args[1] = { replace: args[1], mergeQuery: true };
+        args.length = 2;
+      }
     } else if (args.length === 1) {
-      // Only params/url provided, no second arg -- add default replace
-      args[1] = { replace: true };
+      // Only params/url provided, no second arg -- add default replace and mergeQuery
+      args[1] = { replace: true, mergeQuery: true };
     }
 
     return (this.open as (...args: any[]) => Promise<void>)(...args);
@@ -622,9 +634,11 @@ export class Route<
   }
 
   protected async confirmOpening(trx: NavigationTrx<TInputParams>) {
-    runInAction(() => {
-      this.status = 'opening';
-    });
+    if (!this.isUpdate) {
+      runInAction(() => {
+        this.status = 'opening';
+      });
+    }
 
     let skipHistoryUpdate = !!trx.preferSkipHistoryUpdate;
 
@@ -678,15 +692,12 @@ export class Route<
         this.status = 'open-confirmed';
       });
 
-      if (!wasAlreadyConfirmed) {
-        if (this.isUpdate) {
-          this.isUpdate = false;
-          this.config.afterUpdate?.(this.parsedPathData!, this);
-        } else {
-          this.config.afterOpen?.(this.parsedPathData!, this);
-        }
-      } else {
+      if (this.isUpdate) {
         this.isUpdate = false;
+        // afterUpdate is handled by the updateDisposer reaction which
+        // watches parsedPathData and query.data changes while open-confirmed
+      } else if (!wasAlreadyConfirmed) {
+        this.config.afterOpen?.(this.parsedPathData!, this);
       }
     }
 

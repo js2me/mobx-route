@@ -1,6 +1,6 @@
 /** biome-ignore-all lint/nursery/noFloatingPromises: <explanation> */
 
-import { observable, when } from 'mobx';
+import { observable, reaction, when } from 'mobx';
 import {
   createBrowserHistory,
   createHashHistory,
@@ -1371,6 +1371,115 @@ describe('route', () => {
     expect(history.replace).toBeCalledWith('/users/2', null);
     expect(afterOpenFn).toBeCalledTimes(1);
     expect(afterUpdateFn).toBeCalledTimes(1);
+  });
+
+  it('update() should default mergeQuery: true when no query params are provided', async () => {
+    const route = new Route('/users/:id');
+
+    await route.open({ id: '1' }, { query: { tab: 'profile', page: '1' } });
+    await sleep(10);
+
+    expect(route.query.data).toStrictEqual({ tab: 'profile', page: '1' });
+    history.resetMock();
+
+    await route.update({ id: '2' });
+
+    expect(history.replace).toBeCalledWith('/users/2?tab=profile&page=1', null);
+    expect(route.query.data).toStrictEqual({ tab: 'profile', page: '1' });
+  });
+
+  it('update() should preserve existing query via default mergeQuery: true with object navigateParams', async () => {
+    const route = new Route('/users/:id');
+
+    await route.open({ id: '1' }, { query: { tab: 'profile' } });
+    await sleep(10);
+
+    expect(route.query.data).toStrictEqual({ tab: 'profile' });
+    history.resetMock();
+
+    await route.update({ id: '2' }, { replace: false });
+
+    expect(history.push).toBeCalledWith('/users/2?tab=profile', null);
+    expect(route.query.data).toStrictEqual({ tab: 'profile' });
+  });
+
+  it('update() should not default mergeQuery: true when query params are explicitly provided', async () => {
+    const route = new Route('/users/:id');
+
+    await route.open({ id: '1' }, { query: { tab: 'profile', page: '1' } });
+    await sleep(10);
+
+    expect(route.query.data).toStrictEqual({ tab: 'profile', page: '1' });
+    history.resetMock();
+
+    await route.update({ id: '2' }, { query: { tab: 'settings' } });
+
+    expect(history.replace).toBeCalledWith('/users/2?tab=settings', null);
+    expect(route.query.data).toStrictEqual({ tab: 'settings' });
+  });
+
+  it('update() should allow explicit mergeQuery: false override when query is provided', async () => {
+    const route = new Route('/users/:id');
+
+    await route.open({ id: '1' }, { query: { tab: 'profile', page: '1' } });
+    await sleep(10);
+
+    expect(route.query.data).toStrictEqual({ tab: 'profile', page: '1' });
+    history.resetMock();
+
+    await route.update(
+      { id: '2' },
+      { query: { tab: 'settings' }, mergeQuery: false },
+    );
+
+    expect(history.replace).toBeCalledWith('/users/2?tab=settings', null);
+    expect(route.query.data).toStrictEqual({ tab: 'settings' });
+  });
+
+  it('update() should allow explicit mergeQuery: false override without query', async () => {
+    const route = new Route('/users/:id');
+
+    await route.open({ id: '1' }, { query: { tab: 'profile' } });
+    await sleep(10);
+
+    expect(route.query.data).toStrictEqual({ tab: 'profile' });
+    history.resetMock();
+
+    await route.update({ id: '2' }, { mergeQuery: false });
+
+    expect(history.replace).toBeCalledWith('/users/2', null);
+    expect(route.query.data).toStrictEqual({});
+  });
+
+  it('update() should not cause isOpened/isOpening to flicker', async () => {
+    const route = new Route('/users/:id');
+
+    await route.open({ id: '1' });
+    await sleep(10);
+
+    expect(route.isOpened).toBe(true);
+    expect(route.isOpening).toBe(false);
+
+    const isOpenedValues: boolean[] = [];
+    const isOpeningValues: boolean[] = [];
+
+    const dispose = reaction(
+      () => [route.isOpened, route.isOpening] as const,
+      ([isOpened, isOpening]) => {
+        isOpenedValues.push(isOpened);
+        isOpeningValues.push(isOpening);
+      },
+    );
+
+    await route.update({ id: '2' });
+    await sleep(10);
+
+    expect(route.isOpened).toBe(true);
+    expect(route.isOpening).toBe(false);
+    expect(isOpenedValues).toEqual([]);
+    expect(isOpeningValues).toEqual([]);
+
+    dispose();
   });
 
   it('update() should allow explicit replace: false override', async () => {
