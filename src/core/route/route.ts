@@ -28,23 +28,22 @@ import type {
 
 declare const process: { env: { NODE_ENV?: string } };
 
-const annotations: ObservableAnnotationsArray<Route<any, any, any, any, any>> =
+const annotations: ObservableAnnotationsArray<Route<any, any, any, any>> = [
   [
-    [
-      computed,
-      'isPathMatched',
-      'isOpened',
-      'isOpening',
-      'path',
-      'absolutePath',
-      'hasOpenedChildren',
-      'isAbleToMergeQuery',
-      'baseUrl',
-    ],
-    [computed.struct, 'parsedPathData', 'params'],
-    [observable, 'children'],
-    [observable.ref, 'parent', 'status'],
-  ];
+    computed,
+    'isPathMatched',
+    'isOpened',
+    'isOpening',
+    'path',
+    'absolutePath',
+    'hasOpenedChildren',
+    'isAbleToMergeQuery',
+    'baseUrl',
+  ],
+  [computed.struct, 'parsedPathData', 'params'],
+  [observable, 'children'],
+  [observable.ref, 'parent', 'status'],
+];
 
 /**
  * Class for creating path based route.
@@ -55,7 +54,6 @@ export class Route<
   TPath extends string,
   TInputParams extends InputPathParams<TPath> = InputPathParams<TPath>,
   TOutputParams extends AnyObject = ParsedPathParams<TPath>,
-  TParentRoute extends Route<any, any, any, any, any> | null = null,
   TQueryParams extends Record<string, any> = AnyObject,
 > {
   private isDestroyed?: boolean;
@@ -68,7 +66,7 @@ export class Route<
    *
    * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#parent)
    */
-  parent: TParentRoute;
+  parent: AnyRoute | null;
 
   query: IQueryParams<TQueryParams>;
 
@@ -122,7 +120,6 @@ export class Route<
       TPath,
       TInputParams,
       TOutputParams,
-      TParentRoute,
       TQueryParams
     > = {},
   ) {
@@ -134,7 +131,7 @@ export class Route<
     this.isHash = !!this.config.hash;
     this.meta = this.config.meta;
     this.status = 'unknown';
-    this.parent = config.parent ?? (null as unknown as TParentRoute);
+    this.parent = config.parent ?? null;
 
     applyObservable(this, annotations);
 
@@ -336,21 +333,18 @@ export class Route<
         `${TPath}${TExtendedPath}`,
         TInputParams & TExtendedInputParams,
         TExtendedOutputParams,
-        any,
         TExtendedQueryParams
       >,
       'parent'
     >,
   ) {
     type ExtendedRoutePath = `${TPath}${TExtendedPath}`;
-    type ParentRoute = this;
     const { index, params, exact, ...configFromCurrentRoute } = this.config;
 
     const extendedChild = new Route<
       ExtendedRoutePath,
       TInputParams & TExtendedInputParams,
       TExtendedOutputParams,
-      ParentRoute,
       TExtendedQueryParams
     >(`${this.pathDeclaration}${pathDeclaration}`, {
       ...configFromCurrentRoute,
@@ -778,19 +772,8 @@ export const createRoute = <
   TPath extends string,
   TInputParams extends InputPathParams<TPath> = InputPathParams<TPath>,
   TOutputParams extends AnyObject = ParsedPathParams<TPath>,
-  TParentRoute extends Route<any, any, any, any, any> | null = null,
   TQueryParams extends Record<string, any> = AnyObject,
 >(
   path: TPath,
-  config?: RouteConfiguration<
-    TPath,
-    TInputParams,
-    TOutputParams,
-    TParentRoute,
-    TQueryParams
-  >,
-) =>
-  new Route<TPath, TInputParams, TOutputParams, TParentRoute, TQueryParams>(
-    path,
-    config,
-  );
+  config?: RouteConfiguration<TPath, TInputParams, TOutputParams, TQueryParams>,
+) => new Route<TPath, TInputParams, TOutputParams, TQueryParams>(path, config);

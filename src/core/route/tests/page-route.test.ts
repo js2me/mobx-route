@@ -14,15 +14,8 @@ interface PageRouteConfiguration<
   TPath extends string,
   TInputParams extends InputPathParams<TPath> = InputPathParams<TPath>,
   TOutputParams extends AnyObject = ParsedPathParams<TPath>,
-  TParentRoute extends Route<string, any, any, any, any> | null = null,
   TQueryParams extends Record<string, any> = AnyObject,
-> extends RouteConfiguration<
-    TPath,
-    TInputParams,
-    TOutputParams,
-    TParentRoute,
-    TQueryParams
-  > {
+> extends RouteConfiguration<TPath, TInputParams, TOutputParams, TQueryParams> {
   trackName: string;
 }
 
@@ -30,15 +23,8 @@ class PageRoute<
   TPath extends string,
   TInputParams extends InputPathParams<TPath> = InputPathParams<TPath>,
   TOutputParams extends AnyObject = ParsedPathParams<TPath>,
-  TParentRoute extends Route<any, any, any, any, any> | null = null,
   TQueryParams extends Record<string, any> = AnyObject,
-> extends Route<
-  TPath,
-  TInputParams,
-  TOutputParams,
-  TParentRoute,
-  TQueryParams
-> {
+> extends Route<TPath, TInputParams, TOutputParams, TQueryParams> {
   trackEvent: () => void;
 
   constructor(
@@ -46,13 +32,7 @@ class PageRoute<
     {
       trackName,
       ...routeConfig
-    }: PageRouteConfiguration<
-      TPath,
-      TInputParams,
-      TOutputParams,
-      TParentRoute,
-      TQueryParams
-    >,
+    }: PageRouteConfiguration<TPath, TInputParams, TOutputParams, TQueryParams>,
   ) {
     super(pathDeclaration, routeConfig);
     this.trackEvent = () => {
@@ -74,7 +54,6 @@ class PageRoute<
         `${TPath}${TExtendedPath}`,
         TInputParams & TExtendedInputParams,
         TExtendedOutputParams,
-        any,
         TExtendedQueryParams
       >,
       'parent'
@@ -83,26 +62,24 @@ class PageRoute<
     `${TPath}${TExtendedPath}`,
     TInputParams & TExtendedInputParams,
     TExtendedOutputParams,
-    this,
     TExtendedQueryParams
   > {
     const child = new PageRoute<
       `${TPath}${TExtendedPath}`,
       TInputParams & TExtendedInputParams,
       TExtendedOutputParams,
-      this,
       TExtendedQueryParams
     >(`${this.pathDeclaration}${pathDeclaration}`, {
       ...config,
-      parent: this,
+      parent: this as any,
     });
     return child;
   }
 }
 
 describe('page route extend typings', () => {
-  it('should allow generic vm constrained by PageRoute<any, any, any, any, any>', () => {
-    class TestVM<TRoute extends PageRoute<any, any, any, any, any>> {
+  it('should allow generic vm constrained by PageRoute<any, any, any, any>', () => {
+    class TestVM<TRoute extends PageRoute<any, any, any, any>> {
       constructor(public data: { route: TRoute }) {}
     }
 
@@ -141,7 +118,7 @@ describe('page route extend typings', () => {
     void child.open({ userId: 1, postId: 2 });
   });
 
-  it('should infer full path literal and parent route type', () => {
+  it('should infer full path literal', () => {
     const root = new PageRoute('/projects/:projectId', {
       trackName: 'projects',
     });
@@ -153,7 +130,6 @@ describe('page route extend typings', () => {
     expectTypeOf(
       issue.pathDeclaration,
     ).toEqualTypeOf<'/projects/:projectId/issues/:issueId'>();
-    expectTypeOf(issue.parent).toEqualTypeOf<typeof root>();
   });
 
   it('should keep merged params in chained extend calls', () => {
@@ -175,7 +151,6 @@ describe('page route extend typings', () => {
           memberId: InputPathParam;
         }
     >();
-    expectTypeOf(level3.parent).toEqualTypeOf<typeof level2>();
   });
 
   it('should infer custom output params from params config in extend', () => {
@@ -211,7 +186,6 @@ describe('query params typings', () => {
       '/users/:id',
       { id: InputPathParam },
       { id: string },
-      null,
       { tab: string; page?: number }
     >('/users/:id');
 
@@ -238,7 +212,6 @@ describe('query params typings', () => {
       '/users/:id',
       { id: InputPathParam },
       { id: string },
-      null,
       QueryShape
     >('/users/:id');
 
@@ -251,7 +224,6 @@ describe('query params typings', () => {
       '/users/:userId',
       { userId: InputPathParam },
       { userId: string },
-      null,
       { tab: string; page?: number }
     >('/users/:userId');
 
@@ -268,7 +240,6 @@ describe('query params typings', () => {
       '/users/:userId',
       { userId: InputPathParam },
       { userId: string },
-      null,
       { tab: string }
     >('/users/:userId');
 
@@ -290,7 +261,6 @@ describe('query params typings', () => {
       '/users/:id',
       { id: InputPathParam },
       { id: string },
-      null,
       { tab: string; page?: number }
     >('/users/:id');
 

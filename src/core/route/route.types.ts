@@ -68,7 +68,6 @@ export interface RouteConfiguration<
   TPath extends string,
   TInputParams extends InputPathParams<TPath> = InputPathParams<TPath>,
   TOutputParams extends AnyObject = ParsedPathParams<TPath>,
-  TParentRoute extends Route<string, any, any, any, any> | null = null,
   TQueryParams extends Record<string, any> = AnyObject,
 > extends Omit<Partial<RouteGlobalConfig>, 'createUrl'> {
   /**
@@ -88,7 +87,7 @@ export interface RouteConfiguration<
   meta?: AnyObject;
   parseOptions?: ParseOptions;
   matchOptions?: MatchOptions & ParseOptions;
-  parent?: TParentRoute;
+  parent?: AnyRoute | null;
   children?: AnyRoute[];
   /**
    * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#params)
@@ -123,7 +122,6 @@ export interface RouteConfiguration<
       NoInfer<TPath>,
       NoInfer<TInputParams>,
       NoInfer<TOutputParams>,
-      NoInfer<TParentRoute>,
       NoInfer<TQueryParams>
     >,
   ) => void;
@@ -136,7 +134,6 @@ export interface RouteConfiguration<
       NoInfer<TPath>,
       NoInfer<TInputParams>,
       NoInfer<TOutputParams>,
-      NoInfer<TParentRoute>,
       NoInfer<TQueryParams>
     >,
   ) => void;
@@ -146,7 +143,7 @@ export interface RouteConfiguration<
   createUrl?: UrlCreateParamsFn<TInputParams, TQueryParams>;
 }
 
-export type AnyRoute = Route<any, any, any, any, any>;
+export type AnyRoute = Route<any, any, any, any>;
 
 export type InputPathParam = string | number | boolean | null;
 
@@ -206,23 +203,21 @@ export interface ParsedPathData<TPath extends string> {
 }
 
 export type InferPath<T extends AnyRoute> =
-  T extends Route<infer TPath, any, any, any, any> ? TPath : never;
+  T extends Route<infer TPath, any, any, any> ? TPath : never;
 
 export type InferInputParams<T extends AnyRoute> =
   T extends VirtualRoute<infer TParams>
     ? TParams
-    : T extends Route<any, infer TInputParams, any, any, any>
+    : T extends Route<any, infer TInputParams, any, any>
       ? TInputParams
       : never;
 
 export type InferParams<T extends AnyRoute> =
   T extends VirtualRoute<infer TParams>
     ? TParams
-    : T extends Route<any, any, infer TParams, any, any>
+    : T extends Route<any, any, infer TParams, any>
       ? TParams
       : never;
 
 export type InferQueryParams<T extends AnyRoute> =
-  T extends Route<any, any, any, any, infer TQueryParams>
-    ? TQueryParams
-    : never;
+  T extends Route<any, any, any, infer TQueryParams> ? TQueryParams : never;
