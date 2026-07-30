@@ -1,6 +1,5 @@
 packages:
   - .
-  - docs
 
 allowBuilds:
   '@swc/core': false
@@ -8,4 +7,4 @@ allowBuilds:
   lefthook: false
 
 minimumReleaseAgeExclude:
-  - docusite@0.1.6
+  - docusite@0.1.8

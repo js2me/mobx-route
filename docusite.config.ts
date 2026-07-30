@@ -1,13 +1,13 @@
 import { defineConfig } from 'docusite';
 
 export default defineConfig({
-  packageJsonPath: '..',
+  packageJsonPath: '.',
   base: `/@{packageJson.name}/`,
   title: '@{packageJson.name}',
   description: '@{packageJson.description}',
   search: 'local',
   changelog: {
-    src: '../CHANGELOG.md',
+    src: './CHANGELOG.md',
   },
   github: 'https://github.com/@{packageJson.author}/@{packageJson.name}',
   colors: {
@@ -18,10 +18,9 @@ export default defineConfig({
     main: '/public/logo.png',
     banner: '/public/banner.png',
   },
-  docsDir: '.',
   nav: [
     { text: 'Home', link: '/' },
-    { text: 'Introduction', link: '/introduction/getting-started' }
+    { text: 'Introduction', link: '/introduction/getting-started' },
   ],
   sidebar: [
     {
@@ -54,9 +53,7 @@ export default defineConfig({
     },
     {
       text: 'mobx-view-model',
-      items: [
-        { text: 'RouteViewModel', link: '/view-model/RouteViewModel' },
-      ],
+      items: [{ text: 'RouteViewModel', link: '/view-model/RouteViewModel' }],
     },
     {
       text: 'Recipes',
@@ -73,9 +70,7 @@ export default defineConfig({
     {
       text: 'Other 🛸',
       link: '/other/project-examples',
-      items: [
-        { text: 'Project examples', link: '/other/project-examples' },
-      ],
+      items: [{ text: 'Project examples', link: '/other/project-examples' }],
     },
     {
       text: 'Errors 🚨',
@@ -96,4 +91,4 @@ export default defineConfig({
       ],
     },
   ],
-})
+});
