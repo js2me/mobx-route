@@ -1,5 +1,11 @@
 # mobx-route
 
+## 1.3.4
+
+### Patch Changes
+
+- [`c8b531f`](https://github.com/js2me/mobx-route/commit/c8b531f83eb7b9ed829769f8ffa1952e1e3d2088) Thanks [@js2me](https://github.com/js2me)! - enhance typings for `Route` `VirtualRoute` -> add generic for query params (last one). It allows to add typings for query
+
 ## 1.3.3
 
 ### Patch Changes
