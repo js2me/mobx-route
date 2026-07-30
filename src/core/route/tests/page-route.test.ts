@@ -1,19 +1,28 @@
 import { describe, expect, expectTypeOf, it } from 'vitest';
 import type { AnyObject } from 'yummies/types';
-import { Route } from '../route.js';
+import { createRoute, Route } from '../route.js';
 import type {
+  InferQueryParams,
   InputPathParam,
   InputPathParams,
   ParsedPathParams,
   RouteConfiguration,
+  RouteNavigateParams,
 } from '../route.types.js';
 
 interface PageRouteConfiguration<
   TPath extends string,
   TInputParams extends InputPathParams<TPath> = InputPathParams<TPath>,
   TOutputParams extends AnyObject = ParsedPathParams<TPath>,
-  TParentRoute extends Route<string, any, any, any> | null = null,
-> extends RouteConfiguration<TPath, TInputParams, TOutputParams, TParentRoute> {
+  TParentRoute extends Route<string, any, any, any, any> | null = null,
+  TQueryParams extends Record<string, any> = AnyObject,
+> extends RouteConfiguration<
+    TPath,
+    TInputParams,
+    TOutputParams,
+    TParentRoute,
+    TQueryParams
+  > {
   trackName: string;
 }
 
@@ -21,8 +30,15 @@ class PageRoute<
   TPath extends string,
   TInputParams extends InputPathParams<TPath> = InputPathParams<TPath>,
   TOutputParams extends AnyObject = ParsedPathParams<TPath>,
-  TParentRoute extends Route<any, any, any, any> | null = null,
-> extends Route<TPath, TInputParams, TOutputParams, TParentRoute> {
+  TParentRoute extends Route<any, any, any, any, any> | null = null,
+  TQueryParams extends Record<string, any> = AnyObject,
+> extends Route<
+  TPath,
+  TInputParams,
+  TOutputParams,
+  TParentRoute,
+  TQueryParams
+> {
   trackEvent: () => void;
 
   constructor(
@@ -30,7 +46,13 @@ class PageRoute<
     {
       trackName,
       ...routeConfig
-    }: PageRouteConfiguration<TPath, TInputParams, TOutputParams, TParentRoute>,
+    }: PageRouteConfiguration<
+      TPath,
+      TInputParams,
+      TOutputParams,
+      TParentRoute,
+      TQueryParams
+    >,
   ) {
     super(pathDeclaration, routeConfig);
     this.trackEvent = () => {
@@ -44,6 +66,7 @@ class PageRoute<
       InputPathParams<`${TPath}${TExtendedPath}`> = InputPathParams<`${TPath}${TExtendedPath}`>,
     TExtendedOutputParams extends AnyObject = TInputParams &
       ParsedPathParams<`${TPath}${TExtendedPath}`>,
+    TExtendedQueryParams extends Record<string, any> = TQueryParams,
   >(
     pathDeclaration: TExtendedPath,
     config: Omit<
@@ -51,7 +74,8 @@ class PageRoute<
         `${TPath}${TExtendedPath}`,
         TInputParams & TExtendedInputParams,
         TExtendedOutputParams,
-        any
+        any,
+        TExtendedQueryParams
       >,
       'parent'
     >,
@@ -59,13 +83,15 @@ class PageRoute<
     `${TPath}${TExtendedPath}`,
     TInputParams & TExtendedInputParams,
     TExtendedOutputParams,
-    this
+    this,
+    TExtendedQueryParams
   > {
     const child = new PageRoute<
       `${TPath}${TExtendedPath}`,
       TInputParams & TExtendedInputParams,
       TExtendedOutputParams,
-      this
+      this,
+      TExtendedQueryParams
     >(`${this.pathDeclaration}${pathDeclaration}`, {
       ...config,
       parent: this,
@@ -75,8 +101,8 @@ class PageRoute<
 }
 
 describe('page route extend typings', () => {
-  it('should allow generic vm constrained by PageRoute<any, any, any, any>', () => {
-    class TestVM<TRoute extends PageRoute<any, any, any, any>> {
+  it('should allow generic vm constrained by PageRoute<any, any, any, any, any>', () => {
+    class TestVM<TRoute extends PageRoute<any, any, any, any, any>> {
       constructor(public data: { route: TRoute }) {}
     }
 
@@ -169,6 +195,108 @@ describe('page route extend typings', () => {
     expectTypeOf(posts.params).toEqualTypeOf<null | {
       slug: string;
       ids: string[];
+    }>();
+  });
+});
+
+describe('query params typings', () => {
+  it('should type query.data as AnyObject by default', () => {
+    const route = createRoute('/users/:id');
+
+    expectTypeOf(route.query.data).toEqualTypeOf<AnyObject>();
+  });
+
+  it('should type query.data with explicit TQueryParams', () => {
+    const route = createRoute<
+      '/users/:id',
+      { id: InputPathParam },
+      { id: string },
+      null,
+      { tab: string; page?: number }
+    >('/users/:id');
+
+    expectTypeOf(route.query.data).toEqualTypeOf<{
+      tab: string;
+      page?: number;
+    }>();
+  });
+
+  it('should type open query param with explicit TQueryParams', () => {
+    type QueryShape = { tab: string; page?: number };
+
+    // Verify RouteNavigateParams<TQueryParams> has query typed as Partial<TQueryParams>
+    expectTypeOf<RouteNavigateParams<QueryShape>['query']>().toEqualTypeOf<
+      Partial<QueryShape> | undefined
+    >();
+  });
+
+  it('should type createUrl query param with explicit TQueryParams', () => {
+    type QueryShape = { tab: string; page?: number };
+
+    // Verify createUrl query param type through UrlCreateParams
+    const route = createRoute<
+      '/users/:id',
+      { id: InputPathParam },
+      { id: string },
+      null,
+      QueryShape
+    >('/users/:id');
+
+    // Verify route.query.data is typed correctly
+    expectTypeOf(route.query.data).toEqualTypeOf<QueryShape>();
+  });
+
+  it('should extend with inherited query params by default', () => {
+    const parent = createRoute<
+      '/users/:userId',
+      { userId: InputPathParam },
+      { userId: string },
+      null,
+      { tab: string; page?: number }
+    >('/users/:userId');
+
+    const child = parent.extend('/posts/:postId');
+
+    expectTypeOf(child.query.data).toEqualTypeOf<{
+      tab: string;
+      page?: number;
+    }>();
+  });
+
+  it('should extend with custom query params', () => {
+    const parent = createRoute<
+      '/users/:userId',
+      { userId: InputPathParam },
+      { userId: string },
+      null,
+      { tab: string }
+    >('/users/:userId');
+
+    const child = parent.extend<
+      '/posts/:postId',
+      { userId: InputPathParam; postId: InputPathParam },
+      { userId: string; postId: string },
+      { filter: string; sort?: string }
+    >('/posts/:postId');
+
+    expectTypeOf(child.query.data).toEqualTypeOf<{
+      filter: string;
+      sort?: string;
+    }>();
+  });
+
+  it('should extract query params type with InferQueryParams', () => {
+    const route = createRoute<
+      '/users/:id',
+      { id: InputPathParam },
+      { id: string },
+      null,
+      { tab: string; page?: number }
+    >('/users/:id');
+
+    expectTypeOf<InferQueryParams<typeof route>>().toEqualTypeOf<{
+      tab: string;
+      page?: number;
     }>();
   });
 });

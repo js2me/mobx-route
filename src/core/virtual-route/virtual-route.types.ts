@@ -10,13 +10,17 @@ import type {
 import type { RouteNavigateParams } from '../route/index.js';
 import type { VirtualRoute } from './virtual-route.js';
 
-export type AnyVirtualRoute = VirtualRoute<any> | AbstractVirtualRoute<any>;
+export type AnyVirtualRoute =
+  | VirtualRoute<any, any>
+  | AbstractVirtualRoute<any, any>;
 
-export interface VirtualOpenExtraParams
-  extends Omit<RouteNavigateParams, 'state' | 'mergeQuery'> {}
+export interface VirtualOpenExtraParams<
+  TQueryParams extends Record<string, any> = AnyObject,
+> extends Omit<RouteNavigateParams<TQueryParams>, 'state' | 'mergeQuery'> {}
 
 export interface AbstractVirtualRoute<
   TParams extends AnyObject | EmptyObject = EmptyObject,
+  TQueryParams extends Record<string, any> = AnyObject,
 > {
   isOpened: boolean;
   isOpening: boolean;
@@ -27,20 +31,24 @@ export interface AbstractVirtualRoute<
    */
   open(
     ...args: IsPartial<TParams> extends true
-      ? [params?: Maybe<TParams>, extraParams?: VirtualOpenExtraParams]
-      : [params: TParams, extraParams?: VirtualOpenExtraParams]
+      ? [
+          params?: Maybe<TParams>,
+          extraParams?: VirtualOpenExtraParams<TQueryParams>,
+        ]
+      : [params: TParams, extraParams?: VirtualOpenExtraParams<TQueryParams>]
   ): Promise<void>;
 }
 
 export interface VirtualRouteConfiguration<
   TParams extends AnyObject | EmptyObject = EmptyObject,
+  TQueryParams extends Record<string, any> = AnyObject,
 > {
   /**
    * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#abortsignal)
    */
   abortSignal?: AbortSignal;
 
-  queryParams?: IQueryParams;
+  queryParams?: IQueryParams<TQueryParams>;
 
   /**
    * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#initialparams)
@@ -120,8 +128,10 @@ export interface VirtualRouteConfiguration<
   ) => void;
 }
 
-export interface VirtualRouteTrx {
+export interface VirtualRouteTrx<
+  TQueryParams extends Record<string, any> = AnyObject,
+> {
   params: any;
-  extra?: Maybe<VirtualOpenExtraParams>;
+  extra?: Maybe<VirtualOpenExtraParams<TQueryParams>>;
   manual?: boolean;
 }

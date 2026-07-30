@@ -28,22 +28,23 @@ import type {
 
 declare const process: { env: { NODE_ENV?: string } };
 
-const annotations: ObservableAnnotationsArray<Route<any, any, any, any>> = [
+const annotations: ObservableAnnotationsArray<Route<any, any, any, any, any>> =
   [
-    computed,
-    'isPathMatched',
-    'isOpened',
-    'isOpening',
-    'path',
-    'absolutePath',
-    'hasOpenedChildren',
-    'isAbleToMergeQuery',
-    'baseUrl',
-  ],
-  [computed.struct, 'parsedPathData', 'params'],
-  [observable, 'children'],
-  [observable.ref, 'parent', 'status'],
-];
+    [
+      computed,
+      'isPathMatched',
+      'isOpened',
+      'isOpening',
+      'path',
+      'absolutePath',
+      'hasOpenedChildren',
+      'isAbleToMergeQuery',
+      'baseUrl',
+    ],
+    [computed.struct, 'parsedPathData', 'params'],
+    [observable, 'children'],
+    [observable.ref, 'parent', 'status'],
+  ];
 
 /**
  * Class for creating path based route.
@@ -54,7 +55,8 @@ export class Route<
   TPath extends string,
   TInputParams extends InputPathParams<TPath> = InputPathParams<TPath>,
   TOutputParams extends AnyObject = ParsedPathParams<TPath>,
-  TParentRoute extends Route<any, any, any, any> | null = null,
+  TParentRoute extends Route<any, any, any, any, any> | null = null,
+  TQueryParams extends Record<string, any> = AnyObject,
 > {
   private isDestroyed?: boolean;
   private disposer?: VoidFunction;
@@ -68,7 +70,7 @@ export class Route<
    */
   parent: TParentRoute;
 
-  query: IQueryParams;
+  query: IQueryParams<TQueryParams>;
 
   private _tokenData: TokenData | undefined;
   private _matcher?: ReturnType<typeof match>;
@@ -120,11 +122,13 @@ export class Route<
       TPath,
       TInputParams,
       TOutputParams,
-      TParentRoute
+      TParentRoute,
+      TQueryParams
     > = {},
   ) {
     this.history = config.history ?? routeConfig.get().history;
-    this.query = config.queryParams ?? routeConfig.get().queryParams;
+    this.query = (config.queryParams ??
+      routeConfig.get().queryParams) as IQueryParams<TQueryParams>;
     this.pathDeclaration = pathDeclaration;
     this.isIndex = !!this.config.index;
     this.isHash = !!this.config.hash;
@@ -324,6 +328,7 @@ export class Route<
       InputPathParams<`${TPath}${TExtendedPath}`> = InputPathParams<`${TPath}${TExtendedPath}`>,
     TExtendedOutputParams extends AnyObject = TInputParams &
       ParsedPathParams<`${TPath}${TExtendedPath}`>,
+    TExtendedQueryParams extends Record<string, any> = TQueryParams,
   >(
     pathDeclaration: TExtendedPath,
     config?: Omit<
@@ -331,7 +336,8 @@ export class Route<
         `${TPath}${TExtendedPath}`,
         TInputParams & TExtendedInputParams,
         TExtendedOutputParams,
-        any
+        any,
+        TExtendedQueryParams
       >,
       'parent'
     >,
@@ -344,7 +350,8 @@ export class Route<
       ExtendedRoutePath,
       TInputParams & TExtendedInputParams,
       TExtendedOutputParams,
-      ParentRoute
+      ParentRoute,
+      TExtendedQueryParams
     >(`${this.pathDeclaration}${pathDeclaration}`, {
       ...configFromCurrentRoute,
       ...config,
@@ -406,12 +413,12 @@ export class Route<
     ...args: IsPartial<TInputParams> extends true
       ? [
           params?: Maybe<TInputParams>,
-          query?: Maybe<AnyObject>,
+          query?: Maybe<Partial<TQueryParams>>,
           mergeQueryOrParams?: boolean | CreatedUrlOutputParams,
         ]
       : [
           params: TInputParams,
-          query?: Maybe<AnyObject>,
+          query?: Maybe<Partial<TQueryParams>>,
           mergeQueryOrParams?: boolean | CreatedUrlOutputParams,
         ]
   ) {
@@ -429,12 +436,13 @@ export class Route<
 
     this._compiler ??= compile(this.tokenData);
 
-    const defaultUrlCreateParams: UrlCreateParams<TInputParams> = {
-      baseUrl: this.baseUrl,
-      params: params as TInputParams,
-      query,
-    };
-    const urlCreateParams: UrlCreateParams<TInputParams> =
+    const defaultUrlCreateParams: UrlCreateParams<TInputParams, TQueryParams> =
+      {
+        baseUrl: this.baseUrl,
+        params: params as TInputParams,
+        query,
+      };
+    const urlCreateParams: UrlCreateParams<TInputParams, TQueryParams> =
       this.config.createUrl?.(defaultUrlCreateParams, this.query.data) ??
       routeConfig.get().createUrl?.(defaultUrlCreateParams, this.query.data) ??
       defaultUrlCreateParams;
@@ -475,28 +483,34 @@ export class Route<
     ...args: IsPartial<TInputParams> extends true
       ? [
           params?: TInputParams | null | undefined,
-          navigateParams?: RouteNavigateParams,
+          navigateParams?: RouteNavigateParams<TQueryParams>,
         ]
-      : [params: TInputParams, navigateParams?: RouteNavigateParams]
+      : [
+          params: TInputParams,
+          navigateParams?: RouteNavigateParams<TQueryParams>,
+        ]
   ): Promise<void>;
   open(
     ...args: IsPartial<TInputParams> extends true
       ? [
           params?: TInputParams | null | undefined,
-          replace?: RouteNavigateParams['replace'],
-          query?: RouteNavigateParams['query'],
+          replace?: RouteNavigateParams<TQueryParams>['replace'],
+          query?: RouteNavigateParams<TQueryParams>['query'],
         ]
       : [
           params: TInputParams,
-          replace?: RouteNavigateParams['replace'],
-          query?: RouteNavigateParams['query'],
+          replace?: RouteNavigateParams<TQueryParams>['replace'],
+          query?: RouteNavigateParams<TQueryParams>['query'],
         ]
   ): Promise<void>;
-  open(url: string, navigateParams?: RouteNavigateParams): Promise<void>;
   open(
     url: string,
-    replace?: RouteNavigateParams['replace'],
-    query?: RouteNavigateParams['query'],
+    navigateParams?: RouteNavigateParams<TQueryParams>,
+  ): Promise<void>;
+  open(
+    url: string,
+    replace?: RouteNavigateParams<TQueryParams>['replace'],
+    query?: RouteNavigateParams<TQueryParams>['query'],
   ): Promise<void>;
 
   async open(...args: any[]) {
@@ -506,8 +520,11 @@ export class Route<
       query: rawQuery,
       mergeQuery: rawMergeQuery,
     } = typeof args[1] === 'boolean' || args.length > 2
-      ? ({ replace: args[1], query: args[2] } as RouteNavigateParams)
-      : ((args[1] ?? {}) as RouteNavigateParams);
+      ? ({
+          replace: args[1],
+          query: args[2],
+        } as RouteNavigateParams<TQueryParams>)
+      : ((args[1] ?? {}) as RouteNavigateParams<TQueryParams>);
 
     const mergeQuery = rawMergeQuery ?? this.isAbleToMergeQuery;
     const query = mergeQuery ? { ...this.query.data, ...rawQuery } : rawQuery;
@@ -516,7 +533,7 @@ export class Route<
     const url =
       typeof args[0] === 'string' ? args[0] : this.createUrl(args[0], query);
 
-    const trx: NavigationTrx<TInputParams> = {
+    const trx: NavigationTrx<TInputParams, TQueryParams> = {
       url,
       params: params as TInputParams,
       replace,
@@ -544,18 +561,21 @@ export class Route<
    */
   update(
     params?: TInputParams | null | undefined,
-    navigateParams?: RouteNavigateParams,
+    navigateParams?: RouteNavigateParams<TQueryParams>,
   ): Promise<void>;
   update(
     params?: TInputParams | null | undefined,
-    replace?: RouteNavigateParams['replace'],
-    query?: RouteNavigateParams['query'],
+    replace?: RouteNavigateParams<TQueryParams>['replace'],
+    query?: RouteNavigateParams<TQueryParams>['query'],
   ): Promise<void>;
-  update(url: string, navigateParams?: RouteNavigateParams): Promise<void>;
   update(
     url: string,
-    replace?: RouteNavigateParams['replace'],
-    query?: RouteNavigateParams['query'],
+    navigateParams?: RouteNavigateParams<TQueryParams>,
+  ): Promise<void>;
+  update(
+    url: string,
+    replace?: RouteNavigateParams<TQueryParams>['replace'],
+    query?: RouteNavigateParams<TQueryParams>['query'],
   ): Promise<void>;
 
   async update(...args: any[]) {
@@ -596,7 +616,9 @@ export class Route<
     return this._tokenData;
   }
 
-  protected async confirmOpening(trx: NavigationTrx<TInputParams>) {
+  protected async confirmOpening(
+    trx: NavigationTrx<TInputParams, TQueryParams>,
+  ) {
     if (!this.isUpdate) {
       runInAction(() => {
         this.status = 'opening';
@@ -714,7 +736,7 @@ export class Route<
         return;
       }
 
-      const trx: NavigationTrx<TInputParams> = {
+      const trx: NavigationTrx<TInputParams, TQueryParams> = {
         url: `${this.parsedPathData!.path}${buildSearchString(this.query.data)}`,
         params: this.parsedPathData!.params as TInputParams,
         state: this.history.location.state,
@@ -756,8 +778,19 @@ export const createRoute = <
   TPath extends string,
   TInputParams extends InputPathParams<TPath> = InputPathParams<TPath>,
   TOutputParams extends AnyObject = ParsedPathParams<TPath>,
-  TParentRoute extends Route<any, any, any, any> | null = null,
+  TParentRoute extends Route<any, any, any, any, any> | null = null,
+  TQueryParams extends Record<string, any> = AnyObject,
 >(
   path: TPath,
-  config?: RouteConfiguration<TPath, TInputParams, TOutputParams, TParentRoute>,
-) => new Route<TPath, TInputParams, TOutputParams, TParentRoute>(path, config);
+  config?: RouteConfiguration<
+    TPath,
+    TInputParams,
+    TOutputParams,
+    TParentRoute,
+    TQueryParams
+  >,
+) =>
+  new Route<TPath, TInputParams, TOutputParams, TParentRoute, TQueryParams>(
+    path,
+    config,
+  );

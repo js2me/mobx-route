@@ -224,6 +224,42 @@ route.query.update({ q: 'mobx' });
 route.query.data; // { q: 'mobx' }
 ```
 
+#### Typed query params
+
+Path params are typed automatically from the path string (`/users/:id` → `{ id: string }`), but query params are untyped by default — `query.data` is `AnyObject`, and `open({ query: ... })` accepts any object.
+
+To get the same type safety for query params, pass the shape as the 5th generic argument:
+
+```ts
+const userRoute = createRoute<
+  '/users/:userId',
+  { userId: InputPathParam },
+  { userId: string },
+  null,
+  { tab: string; page?: number }
+>('/users/:userId');
+
+// Now query.data, open(), createUrl(), update() all know the query shape
+userRoute.query.data.tab;   // string
+userRoute.query.data.page;  // number | undefined
+
+await userRoute.open({ userId: 1 }, { query: { tab: 'settings' } });
+```
+
+Child routes created with `extend()` inherit the parent's query type — no need to repeat it:
+
+```ts
+const childRoute = userRoute.extend('/posts/:postId');
+childRoute.query.data.tab; // string — inherited from parent
+```
+
+To extract the query type from a route variable, use `InferQueryParams`:
+
+```ts
+import type { InferQueryParams } from 'mobx-route';
+type UserQuery = InferQueryParams<typeof userRoute>; // { tab: string; page?: number }
+```
+
 ### `isIndex`  
 Indicates if this route is an index route. Set via `{ index: true }` in config.  
 Useful with [`groupRoutes`](/core/groupRoutes).

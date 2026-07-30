@@ -30,13 +30,15 @@ const annotations: ObservableAnnotationsArray<VirtualRoute<any>> = [
  *
  * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html)
  */
-export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
-  implements AbstractVirtualRoute<TParams>
+export class VirtualRoute<
+  TParams extends AnyObject | EmptyObject = EmptyObject,
+  TQueryParams extends Record<string, any> = AnyObject,
+> implements AbstractVirtualRoute<TParams, TQueryParams>
 {
   private isDestroyed?: boolean;
   private disposer?: VoidFunction;
 
-  query: IQueryParams;
+  query: IQueryParams<TQueryParams>;
   params: TParams | null;
 
   protected status:
@@ -62,8 +64,11 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
    */
   isOuterOpened: boolean | undefined;
 
-  constructor(protected config: VirtualRouteConfiguration<TParams> = {}) {
-    this.query = config.queryParams ?? routeConfig.get().queryParams;
+  constructor(
+    protected config: VirtualRouteConfiguration<TParams, TQueryParams> = {},
+  ) {
+    this.query = (config.queryParams ??
+      routeConfig.get().queryParams) as IQueryParams<TQueryParams>;
     this.params = callFunction(config.initialParams, this) ?? null;
     this.openChecker = config.checkOpened;
     this.skipAutoOpenClose = false;
@@ -167,8 +172,11 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
    */
   open(
     ...args: IsPartial<TParams> extends true
-      ? [params?: Maybe<TParams>, extraParams?: VirtualOpenExtraParams]
-      : [params: TParams, extraParams?: VirtualOpenExtraParams]
+      ? [
+          params?: Maybe<TParams>,
+          extraParams?: VirtualOpenExtraParams<TQueryParams>,
+        ]
+      : [params: TParams, extraParams?: VirtualOpenExtraParams<TQueryParams>]
   ): Promise<void>;
   async open(...args: any[]) {
     const params = (args[0] ?? null) as unknown as TParams;
@@ -285,6 +293,7 @@ export class VirtualRoute<TParams extends AnyObject | EmptyObject = EmptyObject>
 
 export const createVirtualRoute = <
   TParams extends AnyObject | EmptyObject = EmptyObject,
+  TQueryParams extends Record<string, any> = AnyObject,
 >(
-  config?: VirtualRouteConfiguration<TParams>,
-) => new VirtualRoute<TParams>(config);
+  config?: VirtualRouteConfiguration<TParams, TQueryParams>,
+) => new VirtualRoute<TParams, TQueryParams>(config);

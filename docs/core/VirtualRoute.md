@@ -108,6 +108,22 @@ const filtersRoute = createVirtualRoute({
 filtersRoute.query.update({ filters: '1' });
 ```
 
+#### Typed query params
+
+Same as `Route` — pass the query shape as the 2nd generic to get type safety:
+
+```ts
+const modalRoute = createVirtualRoute<
+  { id: string },                    // TParams
+  { modal: string; tab?: string }    // TQueryParams
+>({
+  checkOpened: (route) => route.query.data.modal === 'profile',
+});
+
+modalRoute.query.data.modal; // string
+await modalRoute.open({ id: '42' }, { query: { modal: 'profile' } });
+```
+
 ### `open(params?, extra?)` <Badge type="info" text="action" />
 Opens the route manually and optionally updates query.
 
