@@ -38,7 +38,7 @@ export class VirtualRoute<
   private isDestroyed?: boolean;
   private disposer?: VoidFunction;
 
-  query: IQueryParams<TQueryParams>;
+  query: IQueryParams;
   params: TParams | null;
 
   protected status:
@@ -64,11 +64,8 @@ export class VirtualRoute<
    */
   isOuterOpened: boolean | undefined;
 
-  constructor(
-    protected config: VirtualRouteConfiguration<TParams, TQueryParams> = {},
-  ) {
-    this.query = (config.queryParams ??
-      routeConfig.get().queryParams) as IQueryParams<TQueryParams>;
+  constructor(protected config: VirtualRouteConfiguration<TParams> = {}) {
+    this.query = config.queryParams ?? routeConfig.get().queryParams;
     this.params = callFunction(config.initialParams, this) ?? null;
     this.openChecker = config.checkOpened;
     this.skipAutoOpenClose = false;
@@ -295,5 +292,5 @@ export const createVirtualRoute = <
   TParams extends AnyObject | EmptyObject = EmptyObject,
   TQueryParams extends Record<string, any> = AnyObject,
 >(
-  config?: VirtualRouteConfiguration<TParams, TQueryParams>,
+  config?: VirtualRouteConfiguration<TParams>,
 ) => new VirtualRoute<TParams, TQueryParams>(config);

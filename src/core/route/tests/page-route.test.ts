@@ -175,13 +175,13 @@ describe('page route extend typings', () => {
 });
 
 describe('query params typings', () => {
-  it('should type query.data as AnyObject by default', () => {
+  it('should type query.data as Record<string, string> by default', () => {
     const route = createRoute('/users/:id');
 
-    expectTypeOf(route.query.data).toEqualTypeOf<AnyObject>();
+    expectTypeOf(route.query.data).toEqualTypeOf<Record<string, string>>();
   });
 
-  it('should type query.data with explicit TQueryParams', () => {
+  it('should type query.data as Record<string, string> regardless of TQueryParams', () => {
     const route = createRoute<
       '/users/:id',
       { id: InputPathParam },
@@ -189,10 +189,8 @@ describe('query params typings', () => {
       { tab: string; page?: number }
     >('/users/:id');
 
-    expectTypeOf(route.query.data).toEqualTypeOf<{
-      tab: string;
-      page?: number;
-    }>();
+    // query.data is always Record<string, string> at runtime — TQueryParams is for input typing only
+    expectTypeOf(route.query.data).toEqualTypeOf<Record<string, string>>();
   });
 
   it('should type open query param with explicit TQueryParams', () => {
@@ -215,8 +213,8 @@ describe('query params typings', () => {
       QueryShape
     >('/users/:id');
 
-    // Verify route.query.data is typed correctly
-    expectTypeOf(route.query.data).toEqualTypeOf<QueryShape>();
+    // query.data is always Record<string, string> at runtime
+    expectTypeOf(route.query.data).toEqualTypeOf<Record<string, string>>();
   });
 
   it('should extend with inherited query params by default', () => {
@@ -229,10 +227,8 @@ describe('query params typings', () => {
 
     const child = parent.extend('/posts/:postId');
 
-    expectTypeOf(child.query.data).toEqualTypeOf<{
-      tab: string;
-      page?: number;
-    }>();
+    // query.data is always Record<string, string> at runtime
+    expectTypeOf(child.query.data).toEqualTypeOf<Record<string, string>>();
   });
 
   it('should extend with custom query params', () => {
@@ -250,13 +246,11 @@ describe('query params typings', () => {
       { filter: string; sort?: string }
     >('/posts/:postId');
 
-    expectTypeOf(child.query.data).toEqualTypeOf<{
-      filter: string;
-      sort?: string;
-    }>();
+    // query.data is always Record<string, string> at runtime
+    expectTypeOf(child.query.data).toEqualTypeOf<Record<string, string>>();
   });
 
-  it('should extract query params type with InferQueryParams', () => {
+  it('should extract query params input type with InferQueryParams', () => {
     const route = createRoute<
       '/users/:id',
       { id: InputPathParam },
@@ -264,6 +258,7 @@ describe('query params typings', () => {
       { tab: string; page?: number }
     >('/users/:id');
 
+    // InferQueryParams extracts the INPUT shape, not the runtime output
     expectTypeOf<InferQueryParams<typeof route>>().toEqualTypeOf<{
       tab: string;
       page?: number;

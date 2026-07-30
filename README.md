@@ -98,9 +98,12 @@ const search = createRoute<
   { q: string; page?: number; sort?: "asc" | "desc" }
 >("/search");
 
+// TQueryParams types the INPUT — what you pass to open()
 await search.open({}, { query: { q: "mobx", page: 1 } });
-search.query.data.q;    // string — fully typed
-search.query.data.page; // number | undefined
+
+// query.data is always Record<string, string> at runtime (values come from URL)
+search.query.data.q;    // string
+search.query.data.page; // string | undefined — use Number() or QueryParam for typed access
 ```
 
 ### 🔄 `update()` for In-Place Changes

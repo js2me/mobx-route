@@ -68,7 +68,7 @@ export class Route<
    */
   parent: AnyRoute | null;
 
-  query: IQueryParams<TQueryParams>;
+  query: IQueryParams;
 
   private _tokenData: TokenData | undefined;
   private _matcher?: ReturnType<typeof match>;
@@ -124,8 +124,7 @@ export class Route<
     > = {},
   ) {
     this.history = config.history ?? routeConfig.get().history;
-    this.query = (config.queryParams ??
-      routeConfig.get().queryParams) as IQueryParams<TQueryParams>;
+    this.query = config.queryParams ?? routeConfig.get().queryParams;
     this.pathDeclaration = pathDeclaration;
     this.isIndex = !!this.config.index;
     this.isHash = !!this.config.hash;
@@ -425,8 +424,8 @@ export class Route<
         : mergeQueryOrOutputParams;
 
     const query = outputParams?.mergeQuery
-      ? { ...this.query.data, ...rawQuery }
-      : (rawQuery ?? {});
+      ? ({ ...this.query.data, ...rawQuery } as Partial<TQueryParams>)
+      : ((rawQuery ?? {}) as Partial<TQueryParams>);
 
     this._compiler ??= compile(this.tokenData);
 
@@ -521,7 +520,9 @@ export class Route<
       : ((args[1] ?? {}) as RouteNavigateParams<TQueryParams>);
 
     const mergeQuery = rawMergeQuery ?? this.isAbleToMergeQuery;
-    const query = mergeQuery ? { ...this.query.data, ...rawQuery } : rawQuery;
+    const query = (
+      mergeQuery ? { ...this.query.data, ...rawQuery } : rawQuery
+    ) as Partial<TQueryParams> | undefined;
 
     const params = typeof args[0] === 'string' ? undefined : args[0];
     const url =
@@ -734,7 +735,7 @@ export class Route<
         url: `${this.parsedPathData!.path}${buildSearchString(this.query.data)}`,
         params: this.parsedPathData!.params as TInputParams,
         state: this.history.location.state,
-        query: this.query.data,
+        query: this.query.data as Partial<TQueryParams>,
         preferSkipHistoryUpdate: true,
       };
 

@@ -226,34 +226,30 @@ route.query.data; // { q: 'mobx' }
 
 #### Typed query params
 
-Path params are typed automatically from the path string (`/users/:id` → `{ id: string }`), but query params are untyped by default — `query.data` is `AnyObject`, and `open({ query: ... })` accepts any object.
+Path params are typed automatically from the path string (`/users/:id` → `{ id: string }`), but query params are untyped by default — `query.data` is `Record<string, string>`, and `open({ query: ... })` accepts any object.
 
-To get the same type safety for query params, pass the shape as the 5th generic argument:
+Pass the 4th generic to get type-checked query params in `open()`, `createUrl()`, and `update()`:
 
 ```ts
 const userRoute = createRoute<
   '/users/:userId',
   { userId: InputPathParam },
   { userId: string },
-  null,
   { tab: string; page?: number }
 >('/users/:userId');
-
-// Now query.data, open(), createUrl(), update() all know the query shape
-userRoute.query.data.tab;   // string
-userRoute.query.data.page;  // number | undefined
 
 await userRoute.open({ userId: 1 }, { query: { tab: 'settings' } });
 ```
 
-Child routes created with `extend()` inherit the parent's query type — no need to repeat it:
+> **Note:** `query.data` always returns `Record<string, string>` — values come from the URL and are never automatically converted. For typed access, use `QueryParam` with [`queryParamPresets`](/core/query#queryparampresets).
+
+Child routes inherit the parent's query type automatically:
 
 ```ts
 const childRoute = userRoute.extend('/posts/:postId');
-childRoute.query.data.tab; // string — inherited from parent
 ```
 
-To extract the query type from a route variable, use `InferQueryParams`:
+Extract the query type from a route variable with `InferQueryParams`:
 
 ```ts
 import type { InferQueryParams } from 'mobx-route';

@@ -41,14 +41,13 @@ export interface AbstractVirtualRoute<
 
 export interface VirtualRouteConfiguration<
   TParams extends AnyObject | EmptyObject = EmptyObject,
-  TQueryParams extends Record<string, any> = AnyObject,
 > {
   /**
    * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#abortsignal)
    */
   abortSignal?: AbortSignal;
 
-  queryParams?: IQueryParams<TQueryParams>;
+  queryParams?: IQueryParams;
 
   /**
    * [**Documentation**](https://js2me.github.io/mobx-route/core/VirtualRoute.html#initialparams)

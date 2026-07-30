@@ -219,5 +219,11 @@ export type InferParams<T extends AnyRoute> =
       ? TParams
       : never;
 
+/**
+ * Extracts the query params input type from a route.
+ *
+ * Note: this represents the INPUT shape used in `open()`, `createUrl()`, etc.
+ * The actual `route.query.data` values are always `Record<string, string>` at runtime.
+ */
 export type InferQueryParams<T extends AnyRoute> =
   T extends Route<any, any, any, infer TQueryParams> ? TQueryParams : never;

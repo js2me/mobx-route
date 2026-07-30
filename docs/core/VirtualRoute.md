@@ -110,19 +110,20 @@ filtersRoute.query.update({ filters: '1' });
 
 #### Typed query params
 
-Same as `Route` — pass the query shape as the 2nd generic to get type safety:
+Pass the 2nd generic to get type-checked query params in `open()` and `createUrl()`:
 
 ```ts
 const modalRoute = createVirtualRoute<
-  { id: string },                    // TParams
-  { modal: string; tab?: string }    // TQueryParams
+  { id: string },
+  { modal: string; tab?: string }
 >({
   checkOpened: (route) => route.query.data.modal === 'profile',
 });
 
-modalRoute.query.data.modal; // string
 await modalRoute.open({ id: '42' }, { query: { modal: 'profile' } });
 ```
+
+> **Note:** `query.data` always returns `Record<string, string>` — same as `Route`. For typed access, use `QueryParam` with [`queryParamPresets`](/core/query#queryparampresets).
 
 ### `open(params?, extra?)` <Badge type="info" text="action" />
 Opens the route manually and optionally updates query.
