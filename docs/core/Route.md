@@ -280,8 +280,23 @@ stars.isOpened; // true
 With an async `beforeOpen` or `params()` the route sits in `isOpening` first. Reading `isOpened` without `await` is only safe when no async gates are configured.
 :::
 
-### `isOpening` <Badge type="tip" text="computed" />   
+### `isOpening` <Badge type="tip" text="computed" />
 `true` while the route is transitioning to open — during an `open()` call and also during URL-match transitions (like browser Back). This means the route never looks "closed" between URL match and full confirmation, so mounted components don't flicker.
+
+### `isPathMatched` <Badge type="tip" text="computed" />
+
+Whether the current URL includes this route's path. Matches as prefix — `/users` matches both `/users` and `/users/123`. Useful for navigation menu highlighting.
+
+Unlike `isOpened`, this does not consider the open lifecycle (`beforeOpen`, `params`, `checkOpened`) — it only checks the URL.
+
+Example:
+```ts
+const usersRoute = createRoute('/users', { exact: true });
+// current URL: /users/123
+
+usersRoute.isPathMatched; // true
+usersRoute.isOpened;      // false (exact match fails)
+```
 
 ### `params`  <Badge type="tip" text="computed.struct" />  
 Current parsed path parameters. `null` if route isn't open.  

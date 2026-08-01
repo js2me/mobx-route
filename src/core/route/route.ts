@@ -31,6 +31,7 @@ declare const process: { env: { NODE_ENV?: string } };
 const annotations: ObservableAnnotationsArray<Route<any, any, any, any>> = [
   [
     computed,
+    'isConfigPathMatched',
     'isPathMatched',
     'isOpened',
     'isOpening',
@@ -137,9 +138,13 @@ export class Route<
     if (this.config.abortSignal?.aborted) {
       this.isDestroyed = true;
     } else {
-      this.disposer = reaction(() => this.isPathMatched, this.checkPathMatch, {
-        fireImmediately: true,
-      });
+      this.disposer = reaction(
+        () => this.isConfigPathMatched,
+        this.checkPathMatch,
+        {
+          fireImmediately: true,
+        },
+      );
       this.updateDisposer = reaction(
         () => {
           if (this.status !== 'open-confirmed') return undefined;
@@ -230,7 +235,7 @@ export class Route<
 
     if (
       this.isDestroyed ||
-      !this.isPathMatched ||
+      !this.isConfigPathMatched ||
       this.params === null ||
       this.status === 'open-confirmed' ||
       this.status === 'open-rejected'
@@ -288,8 +293,37 @@ export class Route<
     );
   }
 
-  protected get isPathMatched() {
+  protected get isConfigPathMatched() {
     return this.parsedPathData !== null;
+  }
+
+  /**
+   * Whether the current URL path includes this route's path pattern.
+   * Uses prefix matching (`end: false`), so `/users` matches `/users/123`.
+   * Useful for navigation menu highlighting.
+   *
+   * [**Documentation**](https://js2me.github.io/mobx-route/core/Route.html#ispathmatched)
+   */
+  get isPathMatched(): boolean {
+    let pathname = this.isHash
+      ? this.history.location.hash.slice(1)
+      : this.history.location.pathname;
+
+    if (this.baseUrl) {
+      if (!pathname.startsWith(this.baseUrl)) return false;
+      pathname = pathname.replace(this.baseUrl, '');
+    }
+
+    // Root route always matches any path (prefix of everything)
+    if (this.pathDeclaration === '' || this.pathDeclaration === '/') {
+      return pathname === '/' || pathname === '' || pathname.startsWith('/');
+    }
+
+    const matcher = match(this.tokenData, {
+      end: false,
+      ...this.config.matchOptions,
+    });
+    return matcher(pathname) !== false;
   }
 
   /**
@@ -300,7 +334,7 @@ export class Route<
   get isOpened() {
     if (
       this.isDestroyed ||
-      !this.isPathMatched ||
+      !this.isConfigPathMatched ||
       this.params === null ||
       this.status !== 'open-confirmed'
     ) {
@@ -665,7 +699,7 @@ export class Route<
       }
     }
 
-    if (this.isPathMatched) {
+    if (this.isConfigPathMatched) {
       const wasAlreadyConfirmed = this.status === 'open-confirmed';
       runInAction(() => {
         this.status = 'open-confirmed';

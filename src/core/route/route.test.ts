@@ -2153,4 +2153,124 @@ describe('route', () => {
     expect(route.params).toEqual({ tab: 'settings' });
     expect(history.location.pathname).toBe('/service/settings');
   });
+
+  describe('isPathMatched', () => {
+    it('should be true when URL exactly matches route path', () => {
+      const route = new Route('/users');
+
+      history.push('/users');
+
+      expect(route.isPathMatched).toBe(true);
+    });
+
+    it('should be true when URL is a child of route path (prefix match)', () => {
+      const route = new Route('/users');
+
+      history.push('/users/123');
+
+      expect(route.isPathMatched).toBe(true);
+    });
+
+    it('should be true when URL is a deep child of route path', () => {
+      const route = new Route('/users');
+
+      history.push('/users/123/settings/profile');
+
+      expect(route.isPathMatched).toBe(true);
+    });
+
+    it('should be false when URL does not match route path', () => {
+      const route = new Route('/users');
+
+      history.push('/posts');
+
+      expect(route.isPathMatched).toBe(false);
+    });
+
+    it('should be false for partial segment match (/test vs /testing)', () => {
+      const route = new Route('/test');
+
+      history.push('/testing');
+
+      expect(route.isPathMatched).toBe(false);
+    });
+
+    it('should use prefix matching even when route has exact: true', () => {
+      const route = new Route('/users', { exact: true });
+
+      history.push('/users/123');
+
+      expect(route.isPathMatched).toBe(true);
+      expect(route.isOpened).toBe(false);
+    });
+
+    it('should work with dynamic path params', () => {
+      const route = new Route('/users/:userId');
+
+      history.push('/users/42');
+
+      expect(route.isPathMatched).toBe(true);
+    });
+
+    it('should be true for dynamic route when URL goes deeper', () => {
+      const route = new Route('/users/:userId');
+
+      history.push('/users/42/posts');
+
+      expect(route.isPathMatched).toBe(true);
+    });
+
+    it('should work with hash routes', () => {
+      const route = new Route('/panel', { hash: true });
+
+      history.push('#/panel');
+
+      expect(route.isPathMatched).toBe(true);
+
+      history.push('#/panel/settings');
+
+      expect(route.isPathMatched).toBe(true);
+    });
+
+    it('should respect baseUrl', () => {
+      const route = new Route('/users', { baseUrl: '/app' });
+
+      history.push('/app/users');
+
+      expect(route.isPathMatched).toBe(true);
+
+      history.push('/app/users/123');
+
+      expect(route.isPathMatched).toBe(true);
+
+      history.push('/users');
+
+      expect(route.isPathMatched).toBe(false);
+    });
+
+    it('should match root route', () => {
+      const route = new Route('/');
+
+      history.push('/');
+
+      expect(route.isPathMatched).toBe(true);
+
+      history.push('/anything');
+
+      expect(route.isPathMatched).toBe(true);
+    });
+
+    it('should be reactive (update when URL changes)', () => {
+      const route = new Route('/users');
+
+      history.push('/users');
+      expect(route.isPathMatched).toBe(true);
+
+      history.push('/posts');
+      expect(route.isPathMatched).toBe(false);
+
+      history.push('/users/123');
+      expect(route.isPathMatched).toBe(true);
+    });
+  });
 });
