@@ -1,5 +1,26 @@
 # mobx-route
 
+## 2.0.0
+
+### Major Changes
+
+- [`056e6c0`](https://github.com/js2me/mobx-route/commit/056e6c00c02dbf2ff1be901ad373b04e7cd68d9d) Thanks [@js2me](https://github.com/js2me)! - Fix type-safety bug: `Route.query.data` and `VirtualRoute.query.data` now correctly return `Record<string, string>` instead of the claimed `TQueryParams` type.
+
+  **Breaking Change:** `query.data` is now typed as `Record<string, string>` (the actual runtime type) instead of the `TQueryParams` generic parameter. The `TQueryParams` generic is still used for typing query parameters passed to `open()`, `createUrl()`, and navigation methods.
+
+  If you previously relied on `route.query.data.page` being typed as `number`, you now need to:
+
+  - Use `QueryParam` with `queryParamPresets.number` for per-field typed access
+  - Or cast manually: `Number(route.query.data.page)`
+
+- [`4833f27`](https://github.com/js2me/mobx-route/commit/4833f27d16c3aa8e68515a076b5bce2e8da09fc4) Thanks [@js2me](https://github.com/js2me)! - Remove `TParentRoute` generic parameter from `Route`, `RouteConfiguration`, and `createRoute`
+
+  - `Route` now has 4 generics instead of 5: `TPath, TInputParams, TOutputParams, TQueryParams`
+  - `RouteConfiguration` now has 4 generics instead of 5
+  - `createRoute` now has 4 generics instead of 5 — `TQueryParams` moved from 5th to 4th position
+  - `parent` property type changed from `TParentRoute` to `AnyRoute | null`
+  - `AnyRoute` and `Infer*` utility types updated to 4 generics
+
 ## 1.3.4
 
 ### Patch Changes
