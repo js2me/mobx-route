@@ -1,5 +1,11 @@
 # mobx-route
 
+## 2.1.0
+
+### Minor Changes
+
+- [`233a6e1`](https://github.com/js2me/mobx-route/commit/233a6e112bd74489b01203c6c4cc6b3743108728) Thanks [@js2me](https://github.com/js2me)! - added `isPathMatched` computed getter for `Route`
+
 ## 2.0.0
 
 ### Major Changes
