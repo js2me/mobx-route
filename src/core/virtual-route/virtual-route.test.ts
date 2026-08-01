@@ -2,6 +2,7 @@
 import { when } from 'mobx';
 import { createBrowserHistory } from 'mobx-location-history';
 import {
+  afterEach,
   beforeAll,
   beforeEach,
   describe,
@@ -30,6 +31,10 @@ describe('VirtualRoute', () => {
     window.history.replaceState(null, '', '/');
 
     history.resetMock();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('should open and close route manually', async () => {
@@ -520,14 +525,14 @@ describe('VirtualRoute', () => {
     });
 
     await route.open();
-    await sleep(10);
+    await when(() => route.isOpened);
 
     expect(route.isOpened).toBe(true);
     expect(afterOpenFn).toBeCalledTimes(1);
     expect(afterUpdateFn).toBeCalledTimes(0);
 
     route.query.update({ tab: 'profile' });
-    await sleep(10);
+    await when(() => afterUpdateFn.mock.calls.length > 0);
 
     expect(afterOpenFn).toBeCalledTimes(1);
     expect(afterUpdateFn).toBeCalledTimes(1);
@@ -552,12 +557,12 @@ describe('VirtualRoute', () => {
     });
 
     await route.open({ id: '1' });
-    await sleep(10);
+    await when(() => route.isOpened);
 
     expect(afterUpdateFn).toBeCalledTimes(0);
 
     await route.open({ id: '2' });
-    await sleep(10);
+    await when(() => afterUpdateFn.mock.calls.length > 0);
 
     expect(afterUpdateFn).toBeCalledTimes(1);
   });
@@ -880,7 +885,7 @@ describe('VirtualRoute', () => {
     expect(route.isOpened).toBe(false);
     expect(route.isOpening).toBe(false);
 
-    sleep(1000);
+    sleep(10);
     await vi.runAllTimersAsync();
 
     expect(route.isOpened).toBe(false);
@@ -935,10 +940,5 @@ describe('VirtualRoute', () => {
     expect(closeFn).toBeCalledTimes(3);
 
     await vi.runAllTicks().runAllTimers().runAllTimersAsync();
-
-    vi.clearAllTimers();
-    vi.useRealTimers();
-
-    vi.clearAllTimers();
   });
 });

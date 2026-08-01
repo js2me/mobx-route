@@ -620,7 +620,7 @@ describe('route', () => {
     });
 
     await route.open();
-    await sleep(10);
+    await when(() => route.isOpened);
 
     expect(beforeOpen).toHaveBeenCalledTimes(1);
   });
@@ -632,15 +632,15 @@ describe('route', () => {
     });
 
     await route.open();
-    await sleep(10);
+    await when(() => route.isOpened);
 
     beforeOpen.mockClear();
 
     history.push('/bar');
-    await sleep(10);
+    await when(() => !route.isOpened);
 
     history.push('/foo');
-    await sleep(10);
+    await when(() => route.isOpened);
 
     expect(beforeOpen).toHaveBeenCalledTimes(1);
   });
@@ -658,13 +658,13 @@ describe('route', () => {
     });
 
     await route.open();
-    await sleep(10);
+    await when(() => !route.isOpening);
 
     expect(route.isOpened).toBe(false);
     expect(beforeOpen).toHaveBeenCalledTimes(1);
 
     history.push('/foo');
-    await sleep(10);
+    await when(() => route.isOpened);
 
     expect(beforeOpen).toHaveBeenCalledTimes(2);
     expect(route.isOpened).toBe(true);
@@ -690,10 +690,10 @@ describe('route', () => {
     await homeRoute.open(null, { replace: true });
 
     hashHistory.push('/about', null);
-    await sleep(10);
+    await when(() => aboutRoute.isOpened);
 
     hashHistory.push('/', null);
-    await sleep(10);
+    await when(() => homeRoute.isOpened);
 
     expect(homeRoute.isOpened).toBe(true);
     expect(aboutRoute.isOpened).toBe(false);
@@ -706,16 +706,16 @@ describe('route', () => {
     const aboutRoute = createRoute('/about', { exact: true });
 
     history.push('/');
-    await sleep(10);
+    await when(() => homeRoute.isOpened);
 
     history.push('/');
-    await sleep(10);
+    await when(() => homeRoute.isOpened);
 
     history.push('/quiz');
-    await sleep(10);
+    await when(() => quizRoute.isOpened);
 
     history.push('/about');
-    await sleep(10);
+    await when(() => aboutRoute.isOpened);
 
     await quizRoute.open();
     await when(() => quizRoute.isOpened);
@@ -731,16 +731,16 @@ describe('route', () => {
     const aboutRoute = createRoute('/about', { exact: true });
 
     history.push('/');
-    await sleep(10);
+    await when(() => homeRoute.isOpened);
 
     history.push('/quiz');
-    await sleep(10);
+    await when(() => quizRoute.isOpened);
 
     history.push('/about');
-    await sleep(10);
+    await when(() => aboutRoute.isOpened);
 
     await homeRoute.open();
-    await sleep(10);
+    await when(() => homeRoute.isOpened);
 
     expect(homeRoute.isOpened).toBe(true);
     expect(quizRoute.isOpened).toBe(false);
@@ -756,15 +756,13 @@ describe('route', () => {
     const aboutRoute = createRoute('/about', { exact: true });
 
     history.push('/');
-    await sleep(10);
+    await when(() => homeRoute.isOpened);
 
     await quizRoute.open();
-    await sleep(10);
-    expect(quizRoute.isOpening).toBe(false);
+    await when(() => quizRoute.isOpened);
 
     history.push('/');
-    await sleep(10);
-    expect(homeRoute.isOpening).toBe(false);
+    await when(() => homeRoute.isOpened);
 
     expect(homeRoute.isOpened).toBe(true);
     expect(quizRoute.isOpened).toBe(false);
@@ -780,16 +778,13 @@ describe('route', () => {
     const aboutRoute = createRoute('/about', { exact: true });
 
     history.push('/');
-    await sleep(10);
-    expect(homeRoute.isOpening).toBe(false);
+    await when(() => homeRoute.isOpened);
 
     history.push('/quiz');
-    await sleep(10);
-    expect(quizRoute.isOpening).toBe(false);
+    await when(() => quizRoute.isOpened);
 
     await homeRoute.open(null, { replace: true });
-    await sleep(10);
-    expect(homeRoute.isOpening).toBe(false);
+    await when(() => homeRoute.isOpened);
 
     expect(homeRoute.isOpened).toBe(true);
     expect(quizRoute.isOpened).toBe(false);
@@ -805,16 +800,13 @@ describe('route', () => {
     const aboutRoute = createRoute('/about', { exact: true });
 
     history.push('/');
-    await sleep(10);
-    expect(homeRoute.isOpening).toBe(false);
+    await when(() => homeRoute.isOpened);
 
     await quizRoute.open();
-    await sleep(10);
-    expect(quizRoute.isOpening).toBe(false);
+    await when(() => quizRoute.isOpened);
 
     history.push('/about');
-    await sleep(10);
-    expect(aboutRoute.isOpening).toBe(false);
+    await when(() => aboutRoute.isOpened);
 
     expect(aboutRoute.isOpened).toBe(true);
     expect(homeRoute.isOpened).toBe(false);
@@ -830,13 +822,13 @@ describe('route', () => {
     const aboutRoute = createRoute('/about', { exact: true });
 
     history.push('/');
-    await sleep(10);
+    await when(() => homeRoute.isOpened);
 
     history.push('/quiz');
-    await sleep(10);
+    await when(() => quizRoute.isOpened);
 
     await quizRoute.open();
-    await sleep(10);
+    await when(() => quizRoute.isOpened);
 
     expect(quizRoute.isOpened).toBe(true);
     expect(homeRoute.isOpened).toBe(false);
@@ -852,16 +844,16 @@ describe('route', () => {
     const aboutRoute = createRoute('/about', { exact: true });
 
     history.push('/');
-    await sleep(10);
+    await when(() => homeRoute.isOpened);
 
     history.replace('/quiz', null);
-    await sleep(10);
+    await when(() => quizRoute.isOpened);
 
     history.push('/about');
-    await sleep(10);
+    await when(() => aboutRoute.isOpened);
 
     await quizRoute.open('/quiz?mode=fast');
-    await sleep(10);
+    await when(() => quizRoute.isOpened);
 
     expect(quizRoute.isOpened).toBe(true);
     expect(homeRoute.isOpened).toBe(false);
@@ -877,16 +869,16 @@ describe('route', () => {
     const aboutRoute = createRoute('/about', { exact: true });
 
     history.push('/');
-    await sleep(10);
+    await when(() => homeRoute.isOpened);
 
     await quizRoute.open();
-    await sleep(10);
+    await when(() => quizRoute.isOpened);
 
     await homeRoute.open(null, { replace: true });
-    await sleep(10);
+    await when(() => homeRoute.isOpened);
 
     history.push('/about?from=home');
-    await sleep(10);
+    await when(() => aboutRoute.isOpened);
 
     expect(aboutRoute.isOpened).toBe(true);
     expect(homeRoute.isOpened).toBe(false);
@@ -902,13 +894,13 @@ describe('route', () => {
     const aboutRoute = createRoute('/about', { exact: true });
 
     history.push('/about');
-    await sleep(10);
+    await when(() => aboutRoute.isOpened);
 
     await quizRoute.open();
-    await sleep(10);
+    await when(() => quizRoute.isOpened);
 
     history.replace('/', null);
-    await sleep(10);
+    await when(() => homeRoute.isOpened);
 
     expect(homeRoute.isOpened).toBe(true);
     expect(quizRoute.isOpened).toBe(false);
@@ -946,10 +938,10 @@ describe('route', () => {
     const aboutRoute = createRoute('/about', { exact: true });
 
     history.push('/');
-    await sleep(10);
+    await when(() => homeRoute.isOpened);
 
     history.push('/about');
-    await sleep(10);
+    await when(() => aboutRoute.isOpened);
 
     await quizRoute.open();
     await when(() => quizRoute.isOpened);
@@ -963,8 +955,6 @@ describe('route', () => {
   });
 
   it('should be called afterOpen if route is opened at start', async () => {
-    await sleep(1000);
-
     history.push('/foo?modal=new-thing');
     history.push('/foo?modal=new-thing');
     history.push('/foo?modal=new-thing');
@@ -985,7 +975,7 @@ describe('route', () => {
     history.push('/foo?modal=new-thing');
     history.push('/foo?modal=new-thing');
 
-    await sleep(10);
+    await when(() => route.isOpened);
 
     expect(route.isOpened).toBe(true);
     expect(route.isOpening).toBe(false);
@@ -1186,7 +1176,7 @@ describe('route', () => {
 
     history.push('/other');
 
-    await sleep(10);
+    await when(() => !route.isOpened);
 
     expect(afterCloseFn).toHaveBeenCalled();
   });
@@ -1234,7 +1224,7 @@ describe('route', () => {
     const route = new Route('/fruits/:id');
 
     history.push('/fruits/123');
-    await sleep(10);
+    await when(() => route.isOpened);
 
     expect(route.isOpened).toBe(true);
     expect(route.path).toBe('/fruits/123');
@@ -1295,14 +1285,14 @@ describe('route', () => {
     });
 
     history.push('/users/1');
-    await sleep(10);
+    await when(() => route.isOpened);
 
     expect(route.isOpened).toBe(true);
     expect(afterOpenFn).toBeCalledTimes(1);
     expect(afterUpdateFn).toBeCalledTimes(0);
 
     history.push('/users/2');
-    await sleep(10);
+    await when(() => afterUpdateFn.mock.calls.length > 0);
 
     expect(route.isOpened).toBe(true);
     expect(afterOpenFn).toBeCalledTimes(1);
@@ -1323,14 +1313,14 @@ describe('route', () => {
     });
 
     await route.open({ id: '1' });
-    await sleep(10);
+    await when(() => route.isOpened);
 
     expect(route.isOpened).toBe(true);
     expect(afterOpenFn).toBeCalledTimes(1);
     expect(afterUpdateFn).toBeCalledTimes(0);
 
     route.query.update({ tab: 'profile' });
-    await sleep(10);
+    await when(() => afterUpdateFn.mock.calls.length > 0);
 
     expect(afterOpenFn).toBeCalledTimes(1);
     expect(afterUpdateFn).toBeCalledTimes(1);
@@ -1344,7 +1334,7 @@ describe('route', () => {
     });
 
     history.push('/other');
-    await sleep(10);
+    await when(() => !route.isOpened);
 
     expect(route.isOpened).toBe(false);
     expect(afterUpdateFn).toBeCalledTimes(0);
@@ -1358,7 +1348,7 @@ describe('route', () => {
     });
 
     history.push('/other');
-    await sleep(10);
+    await when(() => !route.isOpened);
 
     expect(route.isOpened).toBe(false);
 
@@ -1378,7 +1368,7 @@ describe('route', () => {
     });
 
     await route.open({ id: '1' });
-    await sleep(10);
+    await when(() => route.isOpened);
 
     expect(route.isOpened).toBe(true);
     expect(afterOpenFn).toBeCalledTimes(1);
@@ -1396,7 +1386,7 @@ describe('route', () => {
     const route = new Route('/users/:id');
 
     await route.open({ id: '1' }, { query: { tab: 'profile', page: '1' } });
-    await sleep(10);
+    await when(() => route.isOpened);
 
     expect(route.query.data).toStrictEqual({ tab: 'profile', page: '1' });
     history.resetMock();
@@ -1411,7 +1401,7 @@ describe('route', () => {
     const route = new Route('/users/:id');
 
     await route.open({ id: '1' }, { query: { tab: 'profile' } });
-    await sleep(10);
+    await when(() => route.isOpened);
 
     expect(route.query.data).toStrictEqual({ tab: 'profile' });
     history.resetMock();
@@ -1426,7 +1416,7 @@ describe('route', () => {
     const route = new Route('/users/:id');
 
     await route.open({ id: '1' }, { query: { tab: 'profile', page: '1' } });
-    await sleep(10);
+    await when(() => route.isOpened);
 
     expect(route.query.data).toStrictEqual({ tab: 'profile', page: '1' });
     history.resetMock();
@@ -1441,7 +1431,7 @@ describe('route', () => {
     const route = new Route('/users/:id');
 
     await route.open({ id: '1' }, { query: { tab: 'profile', page: '1' } });
-    await sleep(10);
+    await when(() => route.isOpened);
 
     expect(route.query.data).toStrictEqual({ tab: 'profile', page: '1' });
     history.resetMock();
@@ -1459,7 +1449,7 @@ describe('route', () => {
     const route = new Route('/users/:id');
 
     await route.open({ id: '1' }, { query: { tab: 'profile' } });
-    await sleep(10);
+    await when(() => route.isOpened);
 
     expect(route.query.data).toStrictEqual({ tab: 'profile' });
     history.resetMock();
@@ -1474,7 +1464,7 @@ describe('route', () => {
     const route = new Route('/users/:id');
 
     await route.open({ id: '1' });
-    await sleep(10);
+    await when(() => route.isOpened);
 
     expect(route.isOpened).toBe(true);
     expect(route.isOpening).toBe(false);
@@ -1491,7 +1481,7 @@ describe('route', () => {
     );
 
     await route.update({ id: '2' });
-    await sleep(10);
+    await when(() => !route.isOpening);
 
     expect(route.isOpened).toBe(true);
     expect(route.isOpening).toBe(false);
@@ -1505,7 +1495,7 @@ describe('route', () => {
     const route = new Route('/users/:id');
 
     await route.open({ id: '1' });
-    await sleep(10);
+    await when(() => route.isOpened);
 
     expect(route.isOpened).toBe(true);
     history.resetMock();
@@ -1526,7 +1516,7 @@ describe('route', () => {
     });
 
     await route.open({ id: '1' });
-    await sleep(10);
+    await when(() => route.isOpened);
 
     expect(afterOpenFn).toBeCalledTimes(1);
     expect(afterUpdateFn).toBeCalledTimes(0);
@@ -1545,12 +1535,12 @@ describe('route', () => {
     });
 
     await route.open({ id: '1' });
-    await sleep(10);
+    await when(() => route.isOpened);
 
     expect(afterUpdateFn).toBeCalledTimes(0);
 
     await route.open({ id: '2' });
-    await sleep(10);
+    await when(() => afterUpdateFn.mock.calls.length > 0);
 
     expect(afterUpdateFn).toBeCalledTimes(1);
   });
@@ -1563,12 +1553,12 @@ describe('route', () => {
     });
 
     await route.open({ id: '1' });
-    await sleep(10);
+    await when(() => route.isOpened);
 
     expect(afterUpdateFn).toBeCalledTimes(0);
 
     await route.update({ id: '2' });
-    await sleep(10);
+    await when(() => afterUpdateFn.mock.calls.length > 0);
 
     expect(afterUpdateFn).toBeCalledTimes(1);
   });
@@ -1599,7 +1589,7 @@ describe('route', () => {
 
     // Close and re-open
     history.push('/other');
-    await sleep(10);
+    await when(() => !route.isOpened);
     expect(route.isOpened).toBe(false);
 
     await route.open({ id: '4' });
@@ -1611,7 +1601,7 @@ describe('route', () => {
     const route = new Route('/users/:id');
 
     await route.open({ id: '1' }, { query: { tab: 'profile' } });
-    await sleep(10);
+    await when(() => route.isOpened);
 
     expect(route.isOpened).toBe(true);
     expect(route.query.data).toStrictEqual({ tab: 'profile' });
@@ -1631,7 +1621,7 @@ describe('route', () => {
     const route = new Route('/users/:id');
 
     await route.open({ id: '42' }, { query: { sort: 'asc' } });
-    await sleep(10);
+    await when(() => route.isOpened);
 
     expect(route.isOpened).toBe(true);
     history.resetMock();
@@ -1646,7 +1636,7 @@ describe('route', () => {
     const route = new Route('/settings');
 
     await route.open(null, { query: { theme: 'dark' } });
-    await sleep(10);
+    await when(() => route.isOpened);
 
     expect(route.isOpened).toBe(true);
     history.resetMock();
@@ -1664,7 +1654,7 @@ describe('route', () => {
     const route = new Route('/users/:id');
 
     await route.open({ id: '5' }, { query: { tab: 'profile', page: '1' } });
-    await sleep(10);
+    await when(() => route.isOpened);
 
     expect(route.query.data).toStrictEqual({ tab: 'profile', page: '1' });
     history.resetMock();
@@ -1683,7 +1673,7 @@ describe('route', () => {
     const route = new Route('/users/:id');
 
     await route.open({ id: '1' }, { query: { tab: 'profile' } });
-    await sleep(10);
+    await when(() => route.isOpened);
 
     expect(route.isOpened).toBe(true);
     history.resetMock();
@@ -1992,12 +1982,10 @@ describe('route', () => {
   });
 
   it('protected route: redirect to /login after async authorization check', async () => {
-    vi.useFakeTimers();
-
     const loginRoute = createRoute('/login');
     const dashboardRoute = createRoute('/dashboard', {
       beforeOpen: async () => {
-        await sleep(100);
+        await sleep(10);
         const isAuthorized = false;
 
         if (!isAuthorized) {
@@ -2016,15 +2004,11 @@ describe('route', () => {
     expect(dashboardRoute.isOpening).toBe(true);
     expect(dashboardRoute.isOpened).toBe(false);
 
-    await vi.runAllTimersAsync();
-
     // After async check resolves → redirect to /login
-    expect(dashboardRoute.isOpened).toBe(false);
     await when(() => loginRoute.isOpened);
+    expect(dashboardRoute.isOpened).toBe(false);
     expect(loginRoute.isOpened).toBe(true);
     expect(history.location.pathname).toBe('/login');
-
-    vi.useRealTimers();
   });
 
   it('beforeOpen: auto-fill params from query — mutation works accidentally via shared reference (path-based open)', async () => {
