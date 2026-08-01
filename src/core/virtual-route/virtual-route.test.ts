@@ -12,7 +12,7 @@ import {
 } from 'vitest';
 import { sleep } from 'yummies/async';
 import { routeConfig } from '../config/config.js';
-import { mockHistory } from '../route/route.test.js';
+import { mockHistory } from '../test-utils/mock-history.js';
 import { createVirtualRoute, VirtualRoute } from './virtual-route.js';
 
 describe('VirtualRoute', () => {

@@ -6,7 +6,7 @@ import { createBrowserHistory } from 'mobx-location-history';
 import { ViewModelBase } from 'mobx-view-model';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createRoute, routeConfig } from './core/index.js';
-import { mockHistory } from './core/route/route.test.js';
+import { mockHistory } from './core/test-utils/mock-history.js';
 import { createVirtualRoute } from './core/virtual-route/virtual-route.js';
 import { Link } from './react/components/link.js';
 import { RouteView } from './react/components/route-view.js';

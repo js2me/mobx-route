@@ -5,7 +5,6 @@ import {
   createBrowserHistory,
   createHashHistory,
   createQueryParams,
-  type History,
 } from 'mobx-location-history';
 import {
   beforeAll,
@@ -19,31 +18,9 @@ import {
 import { sleep } from 'yummies/async';
 import { routeConfig } from '../config/index.js';
 import { RouteGroup } from '../route-group/route-group.js';
+import { mockHistory } from '../test-utils/mock-history.js';
 import { createRoute, Route } from './route.js';
 import type { InputPathParam } from './route.types.js';
-
-export const mockHistory = <THistory extends History>(history: THistory) => {
-  const originPush = history.push.bind(history);
-  const originReplace = history.replace.bind(history);
-
-  const pushSpy = vi.fn(originPush);
-  const replaceSpy = vi.fn(originReplace);
-
-  const resetMock = () => {
-    pushSpy.mockReset();
-    replaceSpy.mockReset();
-  };
-
-  Object.assign(history, {
-    push: pushSpy,
-    replace: replaceSpy,
-    resetMock,
-  });
-
-  return history as THistory & {
-    resetMock: () => void;
-  };
-};
 
 describe('route', () => {
   const history = mockHistory(createBrowserHistory());
@@ -947,13 +924,13 @@ describe('route', () => {
     const aboutRoute = createRoute('/about', { exact: true });
 
     history.push('/');
-    await sleep(10);
+    await when(() => homeRoute.isOpened);
 
     await homeRoute.open();
-    await sleep(10);
+    await when(() => homeRoute.isOpened);
 
     await quizRoute.open();
-    await sleep(10);
+    await when(() => quizRoute.isOpened);
 
     expect(quizRoute.isOpened).toBe(true);
     expect(homeRoute.isOpened).toBe(false);

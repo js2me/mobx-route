@@ -5,9 +5,8 @@ import { withViewModel } from 'mobx-view-model';
 import type { ComponentType } from 'react';
 import { lazy } from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { sleep } from 'yummies/async';
 import { Route, routeConfig } from '../../core/index.js';
-import { mockHistory } from '../../core/route/route.test.js';
+import { mockHistory } from '../../core/test-utils/mock-history.js';
 import { createVirtualRoute } from '../../core/virtual-route/virtual-route.js';
 import { RouteViewModel } from '../../view-model/route-view-model.js';
 import { RouteView } from './route-view.js';
@@ -474,11 +473,8 @@ describe('<RouteViewGroup />', () => {
 
     await act(async () => {
       history.back();
-    });
-    await act(async () => {
       await when(() => product.isOpening);
     });
-    await act(async () => {});
 
     expect(product.isOpened).toBe(false);
     expect(screen.getByText('product:1')).toBeDefined();
@@ -487,31 +483,28 @@ describe('<RouteViewGroup />', () => {
 
     await act(async () => {
       resolveProductOpen();
-    });
-    await act(async () => {
       await when(() => product.isOpened);
     });
-    await act(async () => {});
 
     expect(screen.getByText('product:1')).toBeDefined();
   });
 
   it('does not open otherwise while a route isOpening', async () => {
-    vi.useFakeTimers();
-
     const history = mockHistory(createBrowserHistory());
     routeConfig.update({ history });
 
+    let resolveOpen!: () => void;
     const page = new Route('/page', {
-      beforeOpen: async () => {
-        await sleep(50);
-      },
+      beforeOpen: () =>
+        new Promise<void>((resolve) => {
+          resolveOpen = resolve;
+        }),
     });
     const otherwiseRoute = new Route('/fallback');
     const otherwiseSpy = vi.spyOn(otherwiseRoute, 'open');
 
     history.push('/page');
-    expect(page.isOpening).toBe(true);
+    await when(() => page.isOpening);
 
     await act(async () => {
       render(
@@ -525,31 +518,30 @@ describe('<RouteViewGroup />', () => {
     expect(page.isOpening).toBe(true);
 
     await act(async () => {
-      await vi.runAllTimersAsync();
+      resolveOpen();
+      await when(() => page.isOpened);
     });
 
     expect(page.isOpened).toBe(true);
     expect(otherwiseSpy).not.toHaveBeenCalled();
-
-    vi.useRealTimers();
   });
 
   it('keeps opening path route over already opened otherwise (notFound)', async () => {
-    vi.useFakeTimers();
-
     const history = mockHistory(createBrowserHistory());
     routeConfig.update({ history });
 
+    let resolveOpen!: () => void;
     const home = new Route('/', {
       exact: true,
-      beforeOpen: async () => {
-        await sleep(50);
-      },
+      beforeOpen: () =>
+        new Promise<void>((resolve) => {
+          resolveOpen = resolve;
+        }),
     });
     const notFound = createVirtualRoute();
 
     history.push('/');
-    expect(home.isOpening).toBe(true);
+    await when(() => home.isOpening);
 
     await act(async () => {
       await notFound.open();
@@ -570,32 +562,30 @@ describe('<RouteViewGroup />', () => {
     expect(() => screen.getByText('not_found')).toThrowError();
 
     await act(async () => {
-      await vi.runAllTimersAsync();
+      resolveOpen();
+      await when(() => home.isOpened);
     });
-    await when(() => home.isOpened);
 
     expect(screen.getByText('home')).toBeDefined();
     expect(() => screen.getByText('not_found')).toThrowError();
-
-    vi.useRealTimers();
   });
 
   it('keeps opening path route over already opened notFound (without useLastOpened)', async () => {
-    vi.useFakeTimers();
-
     const history = mockHistory(createBrowserHistory());
     routeConfig.update({ history });
 
+    let resolveOpen!: () => void;
     const home = new Route('/', {
       exact: true,
-      beforeOpen: async () => {
-        await sleep(50);
-      },
+      beforeOpen: () =>
+        new Promise<void>((resolve) => {
+          resolveOpen = resolve;
+        }),
     });
     const notFound = createVirtualRoute();
 
     history.push('/');
-    expect(home.isOpening).toBe(true);
+    await when(() => home.isOpening);
 
     await act(async () => {
       await notFound.open();
@@ -616,32 +606,26 @@ describe('<RouteViewGroup />', () => {
     expect(() => screen.getByText('not_found')).toThrowError();
 
     await act(async () => {
-      await vi.runAllTimersAsync();
+      resolveOpen();
+      await when(() => home.isOpened);
     });
-    await when(() => home.isOpened);
 
     expect(screen.getByText('home')).toBeDefined();
     expect(() => screen.getByText('not_found')).toThrowError();
-
-    vi.useRealTimers();
   });
 
   it('keeps opening path route over already opened notFound (with useLastOpened)', async () => {
-    vi.useFakeTimers();
-
     const history = mockHistory(createBrowserHistory());
     routeConfig.update({ history });
 
     const home = new Route('/', {
       exact: true,
-      beforeOpen: async () => {
-        await sleep(50);
-      },
+      beforeOpen: () => new Promise<void>(() => {}),
     });
     const notFound = createVirtualRoute();
 
     history.push('/');
-    expect(home.isOpening).toBe(true);
+    await when(() => home.isOpening);
 
     await act(async () => {
       await notFound.open();
@@ -661,16 +645,13 @@ describe('<RouteViewGroup />', () => {
     expect(screen.getByText('not_found')).toBeDefined();
     expect(() => screen.getByText('home')).toThrowError();
 
-    void notFound.open();
     await act(async () => {
-      await vi.runAllTimersAsync();
+      await notFound.open();
+      await when(() => notFound.isOpened);
     });
-    await when(() => notFound.isOpened);
 
     expect(screen.getByText('not_found')).toBeDefined();
     expect(() => screen.getByText('home')).toThrowError();
-
-    vi.useRealTimers();
   });
 
   describe('suspense prop', () => {
@@ -731,9 +712,9 @@ describe('<RouteViewGroup />', () => {
       // Resolve lazy — content appears
       await act(async () => {
         resolveModule({ default: ResolvedView });
+        // Flush React's Suspense resolution
+        await new Promise((r) => setTimeout(r, 0));
       });
-
-      await act(async () => {});
 
       expect(screen.getByTestId('route-content')).toBeDefined();
     });
