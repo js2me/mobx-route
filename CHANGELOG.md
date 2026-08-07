@@ -1,5 +1,11 @@
 # mobx-route
 
+## 2.1.1
+
+### Patch Changes
+
+- [`dc3332b`](https://github.com/js2me/mobx-route/commit/dc3332bd879c9e24f58744926c275e1860b7525e) Thanks [@js2me](https://github.com/js2me)! - fixed query params (createUrl work)
+
 ## 2.1.0
 
 ### Minor Changes
