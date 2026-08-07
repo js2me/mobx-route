@@ -45,7 +45,7 @@
     "url": "https://github.com/js2me/mobx-route"
   },
   "dependencies": {
-    "mobx-location-history": "^9.4.1",
+    "mobx-location-history": "^9.4.2",
     "path-to-regexp": "^8.4.2",
     "yummies": "^7.20.1"
   },
@@ -86,7 +86,7 @@
     "@vitejs/plugin-react-swc": "^3.11.0",
     "@vitest/coverage-istanbul": "^4.1.9",
     "commitfmt": "^1.0.4",
-    "docusite": "^0.1.8",
+    "docusite": "^0.2.0",
     "js2me-biome-config": "^1.1.0",
     "jsdom": "^29.1.1",
     "lefthook": "^1.13.6",

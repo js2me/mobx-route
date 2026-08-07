@@ -12,8 +12,8 @@ importers:
         specifier: ^6.12.4
         version: 6.16.1
       mobx-location-history:
-        specifier: ^9.4.1
-        version: 9.4.1(mobx@6.16.1)(react@19.2.7)
+        specifier: ^9.4.2
+        version: 9.4.2(mobx@6.16.1)(react@19.2.7)
       mobx-react-lite:
         specifier: ^4.0.7
         version: 4.1.1(mobx@6.16.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -64,8 +64,8 @@ importers:
         specifier: ^1.0.4
         version: 1.0.4
       docusite:
-        specifier: ^0.1.8
-        version: 0.1.8(@algolia/client-search@5.55.1)(@types/node@20.19.43)(@types/react@19.2.17)(lightningcss@1.32.0)(postcss@8.5.15)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(search-insights@2.17.3)(terser@5.48.0)(typescript@6.0.3)(vite@7.3.5(@types/node@20.19.43)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0))
+        specifier: ^0.2.0
+        version: 0.2.0(@algolia/client-search@5.55.1)(@types/node@20.19.43)(@types/react@19.2.17)(lightningcss@1.32.0)(postcss@8.5.15)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(search-insights@2.17.3)(terser@5.48.0)(typescript@6.0.3)(vite@7.3.5(@types/node@20.19.43)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0))
       js2me-biome-config:
         specifier: ^1.1.0
         version: 1.1.0
@@ -2308,8 +2308,8 @@ packages:
     resolution: {integrity: sha512-WkrWp9GR4KXfKGYzOLmTuGVi1UWFfws377n9cc55/tb6DuqyF6pcQ5AbiHEshaDpY9v6oaSr2XCDidGmMwdzIA==}
     engines: {node: '>=8'}
 
-  docusite@0.1.8:
-    resolution: {integrity: sha512-wM9K1VZh4gJJEvJYSyXhUD9naClEXsoUDIyrqZ5EnjAhanrFPe4m5YFK+6/3fL1/6kf6xwNV74yfWIdoqYg8Vw==}
+  docusite@0.2.0:
+    resolution: {integrity: sha512-7+E9WqAyGKd5/W8d4UQHocwFyL1tFnvSYv/7qq1HjTHWpRUP10r5UZI6pFMh+Zs0S7XMEsLrX1HmsZxHUSYd4A==}
     hasBin: true
 
   dom-accessibility-api@0.5.16:
@@ -3015,9 +3015,6 @@ packages:
   lines-and-columns@1.2.4:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
 
-  linked-abort-controller@1.1.1:
-    resolution: {integrity: sha512-jx6n22UPonBx9KsGcsDv580+EDI0LQ22iLQCx/WOuqQ44Wx7sQ12AgrbV74LYYzkYce2v7FlVPVLDl//zxfDBA==}
-
   linkify-it@5.0.1:
     resolution: {integrity: sha512-wVoTjP4Q6R0NW5hiZkVJaFZPWgtXfoGF+6LucL3/FtiNjmcHhYjEr5f1Kqjirc1nBW07J/ZuRFumqr2oqccEWg==}
 
@@ -3255,8 +3252,8 @@ packages:
   mlly@1.8.2:
     resolution: {integrity: sha512-d+ObxMQFmbt10sretNDytwt85VrbkhhUA/JBGm1MPaWJ65Cl4wOgLaB1NYvJSZ0Ef03MMEU/0xpPMXUIQ29UfA==}
 
-  mobx-location-history@9.4.1:
-    resolution: {integrity: sha512-oazIIkaPi1g0mXnHevqCwYTo2igwqnhCAaQroY0fV6fUCdAnSn++fzs07PSsBrLMSTKfS+N6c0mHW/V9ptAwsQ==}
+  mobx-location-history@9.4.2:
+    resolution: {integrity: sha512-+nsXSCP0wfC/zrZOrQjmO0nfS7NoF6QRnXSTSPJYxr5aEYM6rXv+TYwg78pwK52jvbxCzUgsXKz8VZ3LzVMHoQ==}
     peerDependencies:
       mobx: ^6.13.3
 
@@ -6731,7 +6728,7 @@ snapshots:
     dependencies:
       path-type: 4.0.0
 
-  docusite@0.1.8(@algolia/client-search@5.55.1)(@types/node@20.19.43)(@types/react@19.2.17)(lightningcss@1.32.0)(postcss@8.5.15)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(search-insights@2.17.3)(terser@5.48.0)(typescript@6.0.3)(vite@7.3.5(@types/node@20.19.43)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)):
+  docusite@0.2.0(@algolia/client-search@5.55.1)(@types/node@20.19.43)(@types/react@19.2.17)(lightningcss@1.32.0)(postcss@8.5.15)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(search-insights@2.17.3)(terser@5.48.0)(typescript@6.0.3)(vite@7.3.5(@types/node@20.19.43)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)):
     dependencies:
       '@iconify-json/logos': 1.2.11
       cac: 6.7.14
@@ -7489,8 +7486,6 @@ snapshots:
 
   lines-and-columns@1.2.4: {}
 
-  linked-abort-controller@1.1.1: {}
-
   linkify-it@5.0.1:
     dependencies:
       uc.micro: 2.1.0
@@ -7808,7 +7803,7 @@ snapshots:
 
   minimatch@10.2.3:
     dependencies:
-      brace-expansion: 5.0.6
+      brace-expansion: 5.0.8
 
   minimatch@10.2.5:
     dependencies:
@@ -7841,11 +7836,10 @@ snapshots:
       pkg-types: 1.3.1
       ufo: 1.6.4
 
-  mobx-location-history@9.4.1(mobx@6.16.1)(react@19.2.7):
+  mobx-location-history@9.4.2(mobx@6.16.1)(react@19.2.7):
     dependencies:
       '@types/qs': 6.15.1
       history: 5.3.0
-      linked-abort-controller: 1.1.1
       mobx: 6.16.1
       qs: 6.15.2
       yummies: 7.20.1(mobx@6.16.1)(react@19.2.7)

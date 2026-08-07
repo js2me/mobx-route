@@ -8,3 +8,5 @@ allowBuilds:
 
 minimumReleaseAgeExclude:
   - docusite@0.1.8
+  - mobx-location-history@9.4.2
+  - docusite@0.2.0
