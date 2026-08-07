@@ -2,59 +2,59 @@
   "benchmarks": [
     {
       "name": "create route",
-      "mean": 0.08361330802675691
+      "mean": 0.1039
     },
     {
       "name": "match path with params",
-      "mean": 0.07645066258981889
+      "mean": 0.0854
     },
     {
       "name": "createUrl with params and query",
-      "mean": 0.07862966740053658
+      "mean": 0.0927
     },
     {
       "name": "open route",
-      "mean": 0.021658653296370088
+      "mean": 0.022
     },
     {
       "name": "open route (replace)",
-      "mean": 0.022194089168585885
+      "mean": 0.0198
     },
     {
       "name": "open route (string URL)",
-      "mean": 0.01786443306298829
+      "mean": 0.0164
     },
     {
       "name": "open route (without query)",
-      "mean": 0.01058354483109051
+      "mean": 0.0105
     },
     {
       "name": "create group and resolve index route",
-      "mean": 0.13001293499740016
+      "mean": 0.17
     },
     {
       "name": "find navigable nested group",
-      "mean": 0.12028425162376719
+      "mean": 0.1536
     },
     {
       "name": "create router",
-      "mean": 0.12515091841841827
+      "mean": 0.1923
     },
     {
       "name": "navigate with query params",
-      "mean": 0.17189016019250866
+      "mean": 0.2203
     },
     {
       "name": "create virtual route",
-      "mean": 0.020661837024793038
+      "mean": 0.0194
     },
     {
       "name": "open and close",
-      "mean": 0.03860857231101942
+      "mean": 0.0424
     },
     {
       "name": "update params",
-      "mean": 0.04642599749303614
+      "mean": 0.0476
     }
   ]
 }
