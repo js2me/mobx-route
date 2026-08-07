@@ -16,6 +16,8 @@
     "pub:minor": "PUBLISH_VERSION=minor pnpm pub",
     "pub:major": "PUBLISH_VERSION=major pnpm pub",
     "test": "vitest run --config vitest.config.ts",
+    "profile:bench": "vitest bench --config vitest.config.ts --run",
+    "profile:bench:update-baseline": "pnpm profile:bench --outputJson=benchmark-current.json && node scripts/update-benchmark-baseline.mjs benchmark-current.json",
     "test:watch": "vitest watch --config vitest.config.ts",
     "test:coverage": "vitest run --config vitest.config.ts --coverage",
     "docs": "pnpm build && docusite dev",
@@ -70,11 +72,6 @@
       "optional": true
     }
   },
-  "pnpm": {
-    "overrides": {
-      "react-dom": "^19.0.0"
-    }
-  },
   "devDependencies": {
     "@biomejs/biome": "^2.5.1",
     "@changesets/changelog-github": "^0.5.2",
@@ -97,5 +94,5 @@
     "vite": "^7.3.5",
     "vitest": "^4.1.9"
   },
-  "packageManager": "pnpm@11.8.0"
+  "packageManager": "pnpm@9.5.0"
 }
