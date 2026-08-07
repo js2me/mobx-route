@@ -560,7 +560,9 @@ export class Route<
 
     const params = typeof args[0] === 'string' ? undefined : args[0];
     const url =
-      typeof args[0] === 'string' ? args[0] : this.createUrl(args[0], query);
+      typeof args[0] === 'string'
+        ? args[0]
+        : this.createUrl(args[0], query, false);
 
     const trx: NavigationTrx<TInputParams, TQueryParams> = {
       url,
@@ -675,6 +677,7 @@ export class Route<
       const newUrl = this.createUrl(
         trx.params as TInputParams,
         trx.query as AnyObject,
+        false,
       );
       if (newUrl !== trx.url) {
         trx.url = newUrl;

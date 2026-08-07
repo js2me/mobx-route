@@ -1,5 +1,5 @@
 import { createMemoryHistory, createQueryParams } from 'mobx-location-history';
-import { bench, describe } from 'vitest';
+import { afterAll, bench, describe } from 'vitest';
 import { Route } from './route.js';
 
 const createRoute = (path: string) => {
@@ -10,6 +10,14 @@ const createRoute = (path: string) => {
 };
 
 describe('Route', () => {
+  const warmRoute = createRoute('/users/:userId');
+  let warmUserId = 0;
+
+  afterAll(() => {
+    warmRoute.route.destroy();
+    warmRoute.history.destroy();
+  });
+
   bench('create route', () => {
     const { history, route } = createRoute('/users/:userId/posts/:postId');
     route.destroy();
@@ -31,9 +39,28 @@ describe('Route', () => {
   });
 
   bench('open route', async () => {
-    const { history, route } = createRoute('/users/:userId');
-    await route.open({ userId: 42 }, { query: { tab: 'profile' } });
-    route.destroy();
-    history.destroy();
+    const userId = warmUserId++;
+    await warmRoute.route.open(
+      { userId },
+      { query: { tab: `profile-${userId}` } },
+    );
+  });
+
+  bench('open route (replace)', async () => {
+    const userId = warmUserId++;
+    await warmRoute.route.open(
+      { userId },
+      { replace: true, query: { tab: `profile-${userId}` } },
+    );
+  });
+
+  bench('open route (string URL)', async () => {
+    const userId = warmUserId++;
+    await warmRoute.route.open(`/users/${userId}?tab=profile-${userId}`);
+  });
+
+  bench('open route (without query)', async () => {
+    const userId = warmUserId++;
+    await warmRoute.route.open({ userId });
   });
 });
