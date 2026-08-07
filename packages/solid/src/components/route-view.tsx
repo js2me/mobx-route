@@ -5,6 +5,7 @@ import type {
 } from 'mobx-route';
 import type { Component, JSX } from 'solid-js';
 import { Dynamic } from 'solid-js/web';
+import { Show } from 'solid-js';
 import { useRouteViewGroup } from './route-view-group-context.js';
 
 export type RouteViewComponent<TRoute extends AnyAbstractRouteEntity> =
@@ -71,6 +72,16 @@ export function RouteView<TRoute extends AnyAbstractRouteEntity>(
     return r && 'params' in r ? r.params : {};
   };
 
+  // When inside a RouteViewGroup, check if this route is the active one
+  const isActiveInGroup = () => {
+    if (!group) return isOpenedOrOpening();
+    const r = route();
+    if (!r || !isOpenedOrOpening()) return false;
+    const active = group.activeRoute();
+    if (!active) return false;
+    return active === r;
+  };
+
   // Register with parent RouteViewGroup if present
   if (group) {
     const r = route();
@@ -79,37 +90,47 @@ export function RouteView<TRoute extends AnyAbstractRouteEntity>(
     }
   }
 
-  // No route prop — render children directly
+  // No route prop — these are non-route children inside RouteViewGroup
+  // (e.g. <RouteView><div>not_found</div></RouteView>). Only render when
+  // no route is active AND the group is not in "shouldRenderNull" state.
   if (!isWithRoute()) {
-    return typeof props.children === 'function'
-      ? (props.children as () => JSX.Element)()
-      : (props.children as JSX.Element);
+    // Use <Show> for reactive visibility — static `if` won't update
+    return (
+      <Show when={group ? !group.hasActiveChild() && !group.shouldRenderNull() : true}>
+        {typeof props.children === 'function'
+          ? (props.children as () => JSX.Element)()
+          : (props.children as JSX.Element)}
+      </Show>
+    );
   }
 
-  // Route not opened and not opening — render fallback
-  if (!isOpenedOrOpening()) {
-    return ((props as RouteViewConfigWithRoute<TRoute>).fallback ??
-      null) as JSX.Element;
-  }
+  // Determine if this route view should be visible.
+  // IMPORTANT: In SolidJS, component body runs once. Static `if` conditions
+  // are NOT reactive. We must use <Show> for reactive conditional rendering.
+  const shouldShow = () => {
+    if (group) return isActiveInGroup();
+    return isOpenedOrOpening();
+  };
+
+  const fallback = () =>
+    ((props as RouteViewConfigWithRoute<TRoute>).fallback ?? null) as JSX.Element;
 
   const viewComponent = () => (props as RouteViewConfigWithRoute<TRoute>).view;
   const children = () => props.children;
 
-  // View component provided
-  if (viewComponent()) {
-    return (
-      <Dynamic component={viewComponent()!} params={params()}>
-        {typeof children() === 'function'
-          ? undefined
-          : (children() as JSX.Element)}
-      </Dynamic>
-    );
-  }
-
-  // Render function children
-  if (typeof children() === 'function') {
-    return (children() as (p: any, r: any) => JSX.Element)(params(), route());
-  }
-
-  return ((children() as JSX.Element) ?? null) as JSX.Element;
+  return (
+    <Show when={shouldShow()} fallback={fallback()}>
+      {viewComponent() ? (
+        <Dynamic component={viewComponent()!} params={params()}>
+          {typeof children() === 'function'
+            ? undefined
+            : (children() as JSX.Element)}
+        </Dynamic>
+      ) : typeof children() === 'function' ? (
+        (children() as (p: any, r: any) => JSX.Element)(params(), route())
+      ) : (
+        ((children() as JSX.Element) ?? null)
+      )}
+    </Show>
+  );
 }

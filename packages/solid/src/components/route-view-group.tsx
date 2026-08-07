@@ -2,17 +2,20 @@ import {
   type AnyAbstractRouteEntity,
   type AnyRoute,
   buildSearchString,
+  isRouteEntity,
   type RouteNavigateParams,
   type RouteParams,
   routeConfig,
 } from 'mobx-route';
 import {
+  children,
   type Component,
   createMemo,
   createRenderEffect,
   createSignal,
   type JSX,
   onCleanup,
+  Show,
   Suspense,
 } from 'solid-js';
 import { Dynamic } from 'solid-js/web';
@@ -69,31 +72,44 @@ export function RouteViewGroup<TRoute extends AnyAbstractRouteEntity>(
     setRegisteredRoutes((prev) => prev.filter((r) => r !== route));
   };
 
-  // Determine active route from registered routes
-  const activeRoute = createMemo(() => {
-    const routes = registeredRoutes();
-    const useLastOpened = (props as BaseProps).useLastOpened;
+  const useLastOpened = () => (props as BaseProps).useLastOpened;
 
-    let lastActive: AnyAbstractRouteEntity | null = null;
+  // With enableObservableTracking() active, MobX observables (route.isOpened,
+  // route.isOpening) are automatically tracked by SolidJS createMemo.
+  const activeChildInfo = createMemo(() => {
+    const routes = registeredRoutes();
+    const useLast = useLastOpened();
+
+    let activeRoute: AnyAbstractRouteEntity | null = null;
     let hasRoutesInOpening = false;
 
     for (const route of routes) {
       const isOpening = isOpeningRoute(route) && route.isOpening;
       if (route.isOpened || isOpening) {
-        lastActive = route;
+        activeRoute = route;
         if (isOpening) {
           hasRoutesInOpening = true;
         }
-        if (!useLastOpened) {
+        if (!useLast) {
           return { route, hasRoutesInOpening };
         }
       }
     }
 
-    return lastActive ? { route: lastActive, hasRoutesInOpening } : null;
+    return activeRoute
+      ? { route: activeRoute, hasRoutesInOpening }
+      : null;
   });
 
-  const hasActiveChild = () => !!activeRoute();
+  const activeRouteEntity = createMemo(() => {
+    const info = activeChildInfo();
+    return info ? info.route : null;
+  });
+
+  const hasActiveChild = () => !!activeChildInfo();
+
+  const hasRoutesInOpening = () =>
+    activeChildInfo()?.hasRoutesInOpening ?? false;
 
   const otherwiseNavigation = () =>
     'otherwise' in props ? props.otherwise : undefined;
@@ -105,10 +121,14 @@ export function RouteViewGroup<TRoute extends AnyAbstractRouteEntity>(
       ? (otherwiseNavigation() as AnyAbstractRouteEntity | undefined)
       : undefined;
 
-  // otherwise redirect effect (equivalent to useLayoutEffect in React)
+  // otherwise redirect effect — mirrors React's useLayoutEffect logic:
+  // only fires when no route is active AND no route is in isOpening state.
+  // We guard against the initial render cycle where children haven't
+  // registered yet by requiring registeredRoutes().length > 0.
   createRenderEffect(() => {
     const otherwise = otherwiseNavigation();
-    if (!hasActiveChild() && otherwise) {
+    const routesRegistered = registeredRoutes().length > 0;
+    if (!hasActiveChild() && !hasRoutesInOpening() && otherwise && routesRegistered) {
       const navigateParams: RouteNavigateParams = {
         mergeQuery: props.mergeQuery,
         query: props.query,
@@ -144,28 +164,33 @@ export function RouteViewGroup<TRoute extends AnyAbstractRouteEntity>(
   const fallback = () => (props as BaseProps).fallback;
 
   // For string otherwise: return null — effect will navigate and route opens next tick.
+  // For route otherwise: don't return null — the effect opens it synchronously,
+  // returning null would unmount Layout and break withViewModel auto-id VMs.
   const shouldRenderNullOtherwise = () =>
-    otherwiseNavigation() && !hasActiveChild() && otherwiseIsString();
+    !!(otherwiseNavigation() && !hasActiveChild() && otherwiseIsString());
 
-  const content = useSuspense() ? (
-    <Suspense fallback={fallback() ?? null}>{props.children}</Suspense>
-  ) : (
-    props.children
-  );
-
-  const wrappedContent = layout() ? (
-    <Dynamic component={layout()!}>{content}</Dynamic>
-  ) : (
-    content
-  );
-
-  if (shouldRenderNullOtherwise()) {
-    return null as JSX.Element;
-  }
-
+  // IMPORTANT: All JSX must be rendered INSIDE the Provider so that RouteView
+  // components can access the context. In SolidJS, JSX expressions are evaluated
+  // eagerly when the variable is created — if we create `content` before the
+  // Provider, the child component functions run before the context is set up.
+  // We must NOT use <Show> to block rendering, because that would prevent
+  // RouteView from registering routes (deadlock: no registration → no active
+  // child → Show blocks rendering → no registration).
   return (
-    <RouteViewGroupContext.Provider value={{ registerRoute, unregisterRoute }}>
-      {wrappedContent}
+    <RouteViewGroupContext.Provider value={{ registerRoute, unregisterRoute, activeRoute: activeRouteEntity, hasActiveChild, useLastOpened: !!useLastOpened(), shouldRenderNull: shouldRenderNullOtherwise }}>
+      {layout() ? (
+        <Dynamic component={layout()!}>
+          {useSuspense() ? (
+            <Suspense fallback={fallback() ?? null}>{props.children}</Suspense>
+          ) : (
+            props.children
+          )}
+        </Dynamic>
+      ) : useSuspense() ? (
+        <Suspense fallback={fallback() ?? null}>{props.children}</Suspense>
+      ) : (
+        props.children
+      )}
     </RouteViewGroupContext.Provider>
   );
 }
