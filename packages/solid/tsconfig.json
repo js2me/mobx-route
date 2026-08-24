@@ -15,23 +15,12 @@
     "moduleResolution": "nodenext",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "typeRoots": [
-      "./node_modules/@types/", "./types", "./node_modules"
-    ],
     "noEmit": false,
-    "jsx": "react-jsx",
-		"paths": {
-      "mobx-route": ["./src/index.ts"],
-			"mobx-route/react": ["./src/react/index.ts"],
-			"mobx-route/solid": ["./src/solid/index.ts"],
-			"mobx-route/view-model": ["./src/view-model/index.ts"]
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js",
+    "paths": {
+      "mobx-route": ["../../src/index.ts"]
     }
   },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "src/solid",
-    "packages/solid"
-  ]
+  "include": ["src"]
 }

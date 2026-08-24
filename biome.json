@@ -1,3 +1,9 @@
 {
-  "extends": ["js2me-biome-config/base.json", "js2me-biome-config/lib.json"]
+  "extends": ["js2me-biome-config/base.json", "js2me-biome-config/lib.json"],
+  "files": {
+    "includes": [
+      "packages/solid/**/*.{js,jsx,ts,tsx}",
+      "!packages/solid/**/*.jsx"
+    ]
+  }
 }
