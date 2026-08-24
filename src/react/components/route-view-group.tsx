@@ -8,7 +8,7 @@ import {
   type RouteParams,
   routeConfig,
 } from 'mobx-route';
-import { isValidElement, Suspense, useEffect, useLayoutEffect } from 'react';
+import { isValidElement, Suspense, useEffect } from 'react';
 import type { IsPartial, Maybe } from 'yummies/types';
 
 type LayoutComponent =
@@ -46,9 +46,6 @@ export type RouteViewGroupProps<TRoute extends AnyRouteEntity> =
 type RouteViewGroupComponent = <TRoute extends AnyRouteEntity>(
   props: RouteViewGroupProps<TRoute>,
 ) => React.ReactNode;
-
-const useOtherwiseEffect =
-  typeof window === 'undefined' ? useEffect : useLayoutEffect;
 
 export const RouteViewGroup = observer(
   <TRoute extends AnyRouteEntity>({
@@ -102,8 +99,19 @@ export const RouteViewGroup = observer(
     const otherwiseIsString = typeof otherwiseNavigation === 'string';
     const otherwiseRoute = !otherwiseIsString ? otherwiseNavigation : undefined;
 
-    useOtherwiseEffect(() => {
-      if (!hasActiveChildNode && !hasRoutesInOpening && otherwiseNavigation) {
+    useEffect(() => {
+      let cancelled = false;
+
+      queueMicrotask(() => {
+        if (
+          cancelled ||
+          hasActiveChildNode ||
+          hasRoutesInOpening ||
+          !otherwiseNavigation
+        ) {
+          return;
+        }
+
         if (otherwiseIsString) {
           const history = routeConfig.get().history;
           const url = `${otherwiseNavigation}${buildSearchString(navigateParams.query || {})}`;
@@ -116,7 +124,11 @@ export const RouteViewGroup = observer(
         } else if (otherwiseRoute && !otherwiseRoute.isOpened) {
           otherwiseRoute.open(params, navigateParams);
         }
-      }
+      });
+
+      return () => {
+        cancelled = true;
+      };
     }, [
       hasActiveChildNode,
       hasRoutesInOpening,

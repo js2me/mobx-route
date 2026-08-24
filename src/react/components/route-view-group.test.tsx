@@ -3,7 +3,7 @@ import { when } from 'mobx';
 import { createBrowserHistory } from 'mobx-location-history';
 import { withViewModel } from 'mobx-view-model';
 import type { ComponentType } from 'react';
-import { lazy } from 'react';
+import { lazy, useEffect, useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { Route, routeConfig } from '../../core/index.js';
 import { mockHistory } from '../../core/test-utils/mock-history.js';
@@ -524,6 +524,45 @@ describe('<RouteViewGroup />', () => {
 
     expect(page.isOpened).toBe(true);
     expect(otherwiseSpy).not.toHaveBeenCalled();
+  });
+
+  it('does not open otherwise when a matching route is added after mount', async () => {
+    const history = mockHistory(createBrowserHistory());
+    routeConfig.update({ history });
+    history.push('/operations', null);
+
+    const otherwiseRoute = createVirtualRoute();
+    const otherwiseSpy = vi.spyOn(otherwiseRoute, 'open');
+
+    const App = () => {
+      const [operationsRoute, setOperationsRoute] =
+        useState<Route<'/operations'> | null>(null);
+
+      useEffect(() => {
+        setOperationsRoute(new Route('/operations', { exact: true }));
+      }, []);
+
+      return (
+        <RouteViewGroup otherwise={otherwiseRoute}>
+          {operationsRoute && (
+            <RouteView
+              route={operationsRoute}
+              view={() => <div>operations</div>}
+            />
+          )}
+        </RouteViewGroup>
+      );
+    };
+
+    let screen!: ReturnType<typeof render>;
+    await act(async () => {
+      screen = render(<App />);
+    });
+
+    await when(() => screen.queryByText('operations') !== null);
+
+    expect(otherwiseSpy).not.toHaveBeenCalled();
+    expect(history.location.pathname).toBe('/operations');
   });
 
   it('keeps opening path route over already opened otherwise (notFound)', async () => {
