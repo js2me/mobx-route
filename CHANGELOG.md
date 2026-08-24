@@ -1,5 +1,11 @@
 # mobx-route
 
+## 2.1.2
+
+### Patch Changes
+
+- [`405bd3f`](https://github.com/js2me/mobx-route/commit/405bd3ff55aab2a093e8e722fc41bf5bfa400af1) Thanks [@js2me](https://github.com/js2me)! - fix flaky <RouteViewGroup /> otherwise property work
+
 ## 2.1.1
 
 ### Patch Changes
