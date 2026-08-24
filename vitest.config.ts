@@ -12,5 +12,8 @@ export default defineLibVitestConfig(ConfigsManager.create(), {
     testTimeout: 5000,
     hookTimeout: 10000,
     teardownTimeout: 10000,
+    coverage: {
+      exclude: ['src/**/*.bench.ts'],
+    },
   },
 });

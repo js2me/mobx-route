@@ -1,6 +1,6 @@
 {
   "name": "mobx-route",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "scripts": {
     "prepare": "pnpm dev:install-hooks",
     "clean": "rimraf dist",
@@ -16,6 +16,8 @@
     "pub:minor": "PUBLISH_VERSION=minor pnpm pub",
     "pub:major": "PUBLISH_VERSION=major pnpm pub",
     "test": "vitest run --config vitest.config.ts",
+    "profile:bench": "vitest bench --config vitest.config.ts --run",
+    "profile:bench:update-baseline": "pnpm profile:bench --outputJson=benchmark-current.json && node scripts/update-benchmark-baseline.mjs benchmark-current.json",
     "test:watch": "vitest watch --config vitest.config.ts",
     "test:coverage": "vitest run --config vitest.config.ts --coverage",
     "docs": "pnpm build && docusite dev",
@@ -46,7 +48,7 @@
     "url": "https://github.com/js2me/mobx-route"
   },
   "dependencies": {
-    "mobx-location-history": "^9.4.1",
+    "mobx-location-history": "^9.4.2",
     "path-to-regexp": "^8.4.2",
     "yummies": "^7.20.1"
   },
@@ -79,11 +81,6 @@
       "optional": true
     }
   },
-  "pnpm": {
-    "overrides": {
-      "react-dom": "^19.0.0"
-    }
-  },
   "devDependencies": {
     "@biomejs/biome": "^2.5.1",
     "@changesets/changelog-github": "^0.5.2",
@@ -96,7 +93,7 @@
     "@vitejs/plugin-react-swc": "^3.11.0",
     "@vitest/coverage-istanbul": "^4.1.9",
     "commitfmt": "^1.0.4",
-    "docusite": "^0.1.8",
+    "docusite": "^0.2.0",
     "js2me-biome-config": "^1.1.0",
     "jsdom": "^29.1.1",
     "lefthook": "^1.13.6",
@@ -110,5 +107,5 @@
     "vite-plugin-solid": "^2.11.0",
     "vitest": "^4.1.9"
   },
-  "packageManager": "pnpm@11.8.0"
+  "packageManager": "pnpm@9.5.0"
 }

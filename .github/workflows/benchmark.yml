@@ -1,0 +1,40 @@
+name: Benchmark
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run benchmark
+        run: |
+          pnpm run profile:bench --outputJson=benchmark-results-1.json
+          pnpm run profile:bench --outputJson=benchmark-results-2.json
+          pnpm run profile:bench --outputJson=benchmark-results-3.json
+
+      - name: Check for regressions
+        run: node scripts/check-benchmark.mjs benchmark-baseline.json benchmark-results-1.json benchmark-results-2.json benchmark-results-3.json
