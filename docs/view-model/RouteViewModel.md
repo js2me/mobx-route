@@ -29,7 +29,7 @@ Returns current query params:
 ```tsx
 import { RouteViewModel } from 'mobx-route/view-model';
 import { userRoute } from '@/shared/config/routing';
-import { withViewModel } from "mobx-view-model";
+import { withViewModel } from "mobx-view-model-react";
 
 class UserPageVM extends RouteViewModel<typeof userRoute> {
   route = userRoute;
@@ -50,7 +50,7 @@ When you need the route benefits (`pathParams`, `query`, `isMounted`) but your v
 import { withRoute } from 'mobx-route/view-model';
 import { ViewModelBase } from 'mobx-view-model';
 import { userRoute } from '@/shared/config/routing';
-import { withViewModel } from "mobx-view-model";
+import { withViewModel } from "mobx-view-model-react";
 
 // With ViewModelBase directly
 class UserPageVM extends withRoute(userRoute)(ViewModelBase) {}

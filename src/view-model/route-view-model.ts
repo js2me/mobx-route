@@ -4,6 +4,7 @@ import {
   applyObservable,
   type ViewModel,
   ViewModelBase,
+  viewModelsConfig,
 } from 'mobx-view-model';
 import type { ObservableAnnotationsArray } from 'yummies/mobx';
 import type { Class } from 'yummies/types';
@@ -69,7 +70,14 @@ export function withRoute<TRoute extends AnyAbstractRouteEntity>(
       constructor(...args: any[]) {
         super(...args);
 
-        applyObservable(this, annotations, this.vmConfig.observable.viewModels);
+        // v11 keeps vmConfig internal; the exported config supplies its defaults.
+        const observableConfig = (this as any).vmConfig?.observable
+          ?.viewModels ?? {
+          ...viewModelsConfig.observable.viewModels,
+          ...args[0]?.vmConfig?.observable?.viewModels,
+        };
+
+        applyObservable(this, annotations, observableConfig);
       }
 
       /**

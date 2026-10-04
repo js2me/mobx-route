@@ -1,7 +1,7 @@
 import { act, render } from '@testing-library/react';
 import { when } from 'mobx';
 import { createBrowserHistory } from 'mobx-location-history';
-import { withViewModel } from 'mobx-view-model';
+import { withViewModel } from 'mobx-view-model-react';
 import type { ComponentType } from 'react';
 import { lazy, useEffect, useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
