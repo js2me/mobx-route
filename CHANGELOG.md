@@ -1,5 +1,11 @@
 # mobx-route
 
+## 2.1.3
+
+### Patch Changes
+
+- [`bc7f65b`](https://github.com/js2me/mobx-route/commit/bc7f65b6fc3bb994723473e2a4f9a06f5575d202) Thanks [@js2me](https://github.com/js2me)! - Add support for `mobx-view-model` v11.
+
 ## 2.1.2
 
 ### Patch Changes
