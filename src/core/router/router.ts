@@ -3,11 +3,8 @@ import {
   type History,
   type IQueryParams,
 } from 'mobx-location-history';
-import {
-  annotation,
-  applyObservable,
-  type ObservableAnnotationsArray,
-} from 'yummies/mobx';
+import * as annotation from 'yummies/mobx';
+import { applyObservable, type ObservableAnnotationsArray } from 'yummies/mobx';
 import { routeConfig } from '../config/index.js';
 import type { RoutesCollection } from '../route-group/index.js';
 import type {

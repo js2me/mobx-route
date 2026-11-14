@@ -11,11 +11,8 @@ import {
   parse,
   type TokenData,
 } from 'path-to-regexp';
-import {
-  annotation,
-  applyObservable,
-  type ObservableAnnotationsArray,
-} from 'yummies/mobx';
+import * as annotation from 'yummies/mobx';
+import { applyObservable, type ObservableAnnotationsArray } from 'yummies/mobx';
 import type { AnyObject, IsPartial, Maybe } from 'yummies/types';
 import { routeConfig } from '../config/index.js';
 import type {

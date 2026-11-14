@@ -4,11 +4,8 @@ import {
   ViewModelBase,
   viewModelsConfig,
 } from 'mobx-view-model';
-import {
-  annotation,
-  applyObservable,
-  type ObservableAnnotationsArray,
-} from 'yummies/mobx';
+import * as annotation from 'yummies/mobx';
+import { applyObservable, type ObservableAnnotationsArray } from 'yummies/mobx';
 import type { Class } from 'yummies/types';
 import {
   type AnyAbstractRouteEntity,
