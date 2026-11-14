@@ -1,12 +1,14 @@
-import { computed } from 'mobx';
 import type { IQueryParams } from 'mobx-location-history';
 import {
-  applyObservable,
   type ViewModel,
   ViewModelBase,
   viewModelsConfig,
 } from 'mobx-view-model';
-import type { ObservableAnnotationsArray } from 'yummies/mobx';
+import {
+  annotation,
+  applyObservable,
+  type ObservableAnnotationsArray,
+} from 'yummies/mobx';
 import type { Class } from 'yummies/types';
 import {
   type AnyAbstractRouteEntity,
@@ -15,8 +17,8 @@ import {
 } from '../core/index.js';
 
 const annotations: ObservableAnnotationsArray<any> = [
-  [computed.struct, 'pathParams'],
-  [computed, 'query'],
+  [annotation.computedStruct, 'pathParams'],
+  [annotation.computed, 'query'],
 ];
 
 /**
@@ -77,7 +79,15 @@ export function withRoute<TRoute extends AnyAbstractRouteEntity>(
           ...args[0]?.vmConfig?.observable?.viewModels,
         };
 
-        applyObservable(this, annotations, observableConfig);
+        if (observableConfig.custom) {
+          observableConfig.custom(this, annotations);
+        } else {
+          applyObservable(
+            this,
+            annotations as ObservableAnnotationsArray<typeof this>,
+            observableConfig.useDecorators,
+          );
+        }
       }
 
       /**
@@ -129,7 +139,11 @@ export function withRoute<TRoute extends AnyAbstractRouteEntity>(
  * Base class created by the mixin with a dummy route.
  * Used internally by `RouteViewModel` to avoid duplicating the mixin logic.
  */
-const _RouteViewModelBase = withRoute({} as any)(ViewModelBase);
+const _RouteViewModelBase: typeof ViewModelBase &
+  Class<
+    InstanceType<typeof ViewModelBase> &
+      RouteViewModelMixinPublic<AnyAbstractRouteEntity>
+  > = withRoute({} as any)(ViewModelBase);
 
 /**
  * Abstract route-aware view model that extends `ViewModelBase<EmptyObject>`.

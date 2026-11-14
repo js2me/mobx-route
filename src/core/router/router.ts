@@ -1,10 +1,13 @@
-import { computed } from 'mobx';
 import {
   buildSearchString,
   type History,
   type IQueryParams,
 } from 'mobx-location-history';
-import { applyObservable, type ObservableAnnotationsArray } from 'yummies/mobx';
+import {
+  annotation,
+  applyObservable,
+  type ObservableAnnotationsArray,
+} from 'yummies/mobx';
 import { routeConfig } from '../config/index.js';
 import type { RoutesCollection } from '../route-group/index.js';
 import type {
@@ -13,7 +16,7 @@ import type {
 } from './router.types.js';
 
 const annotations: ObservableAnnotationsArray<Router<any>> = [
-  [computed.struct, 'location'],
+  [annotation.computedStruct, 'location'],
 ];
 
 /**

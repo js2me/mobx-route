@@ -1,4 +1,4 @@
-import { comparer, computed, observable, reaction, runInAction } from 'mobx';
+import { reaction, runInAction } from 'mobx';
 import {
   buildSearchString,
   type History,
@@ -11,7 +11,11 @@ import {
   parse,
   type TokenData,
 } from 'path-to-regexp';
-import { applyObservable, type ObservableAnnotationsArray } from 'yummies/mobx';
+import {
+  annotation,
+  applyObservable,
+  type ObservableAnnotationsArray,
+} from 'yummies/mobx';
 import type { AnyObject, IsPartial, Maybe } from 'yummies/types';
 import { routeConfig } from '../config/index.js';
 import type {
@@ -30,7 +34,7 @@ declare const process: { env: { NODE_ENV?: string } };
 
 const annotations: ObservableAnnotationsArray<Route<any, any, any, any>> = [
   [
-    computed,
+    annotation.computed,
     'isConfigPathMatched',
     'isPathMatched',
     'isOpened',
@@ -41,9 +45,9 @@ const annotations: ObservableAnnotationsArray<Route<any, any, any, any>> = [
     'isAbleToMergeQuery',
     'baseUrl',
   ],
-  [computed.struct, 'parsedPathData', 'params'],
-  [observable, 'children'],
-  [observable.ref, 'parent', 'status'],
+  [annotation.computedStruct, 'parsedPathData', 'params'],
+  [annotation.observable, 'children'],
+  [annotation.observableRef, 'parent', 'status'],
 ];
 
 /**
@@ -159,7 +163,7 @@ export class Route<
         {
           fireImmediately: false,
           signal: this.config.abortSignal,
-          equals: comparer.structural,
+          equals: annotation.comparer.structural,
         },
       );
       this.config.abortSignal?.addEventListener('abort', () => this.destroy(), {

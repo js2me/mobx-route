@@ -1,14 +1,11 @@
-import {
-  action,
-  comparer,
-  computed,
-  observable,
-  reaction,
-  runInAction,
-} from 'mobx';
+import { action, reaction, runInAction } from 'mobx';
 import type { IQueryParams } from 'mobx-location-history';
 import { callFunction } from 'yummies/common';
-import { applyObservable, type ObservableAnnotationsArray } from 'yummies/mobx';
+import {
+  annotation,
+  applyObservable,
+  type ObservableAnnotationsArray,
+} from 'yummies/mobx';
 import type { AnyObject, EmptyObject, IsPartial, Maybe } from 'yummies/types';
 import { routeConfig } from '../config/index.js';
 import type {
@@ -19,9 +16,15 @@ import type {
 } from './virtual-route.types.js';
 
 const annotations: ObservableAnnotationsArray<VirtualRoute<any>> = [
-  [observable, 'params'],
-  [observable.ref, 'status', 'trx', 'openChecker', 'isOuterOpened'],
-  [computed, 'isOpened', 'isOpening', 'isClosing'],
+  [annotation.observable, 'params'],
+  [
+    annotation.observableRef,
+    'status',
+    'trx',
+    'openChecker',
+    'isOuterOpened',
+  ],
+  [annotation.computed, 'isOpened', 'isOpening', 'isClosing'],
   [action, 'setOpenChecker', 'open', 'close', 'destroy'],
 ];
 
@@ -120,7 +123,7 @@ export class VirtualRoute<
         {
           fireImmediately: false,
           signal: this.config.abortSignal,
-          equals: comparer.structural,
+          equals: annotation.comparer.structural,
         },
       );
     }
