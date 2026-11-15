@@ -49,7 +49,7 @@
   "dependencies": {
     "mobx-location-history": "^9.5.0",
     "path-to-regexp": "^8.4.2",
-    "yummies": "^7.23.0"
+    "yummies": "^7.23.1"
   },
   "peerDependencies": {
     "mobx": "^6.12.4 || ^7.0.0",
