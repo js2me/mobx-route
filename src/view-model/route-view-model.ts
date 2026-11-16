@@ -136,11 +136,7 @@ export function withRoute<TRoute extends AnyAbstractRouteEntity>(
  * Base class created by the mixin with a dummy route.
  * Used internally by `RouteViewModel` to avoid duplicating the mixin logic.
  */
-const _RouteViewModelBase: typeof ViewModelBase &
-  Class<
-    InstanceType<typeof ViewModelBase> &
-      RouteViewModelMixinPublic<AnyAbstractRouteEntity>
-  > = withRoute({} as any)(ViewModelBase);
+const _RouteViewModelBase = withRoute({} as any)(ViewModelBase);
 
 /**
  * Abstract route-aware view model that extends `ViewModelBase<EmptyObject>`.
