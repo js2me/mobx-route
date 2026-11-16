@@ -13,6 +13,11 @@ jobs:
       matrix:
         node-version: [24]
         mobx-version: ['^6.12.4', '^7.0.0']
+        include:
+          - mobx-version: '^6.12.4'
+            mobx-react-lite-version: '^4.0.7'
+          - mobx-version: '^7.0.0'
+            mobx-react-lite-version: '^5.0.0'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout tree
@@ -26,7 +31,7 @@ jobs:
 
       - run: corepack enable
 
-      - run: pnpm add --workspace-root --save-dev --save-exact mobx@${{ matrix.mobx-version }}
+      - run: pnpm add --workspace-root --save-dev --save-exact mobx@${{ matrix.mobx-version }} mobx-react-lite@${{ matrix.mobx-react-lite-version }}
 
       - run: pnpm check
 
