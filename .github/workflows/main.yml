@@ -12,9 +12,9 @@ jobs:
       fail-fast: false
       matrix:
         node-version: [24]
-        mobx-version: ['^6.12.4', '^7.0.0']
+        mobx-version: ['^6.13.3', '^7.0.0']
         include:
-          - mobx-version: '^6.12.4'
+          - mobx-version: '^6.13.3'
             mobx-react-lite-version: '^4.0.7'
           - mobx-version: '^7.0.0'
             mobx-react-lite-version: '^5.0.0'

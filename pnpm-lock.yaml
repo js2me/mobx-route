@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       mobx:
-        specifier: ^6.12.4 || ^7.0.0
+        specifier: ^6.13.3 || ^7.0.0
         version: 6.16.1
       mobx-location-history:
         specifier: ^9.5.0
