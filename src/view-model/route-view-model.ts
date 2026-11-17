@@ -78,7 +78,7 @@ export function withRoute<TRoute extends AnyAbstractRouteEntity>(
 
         if (observableConfig.custom) {
           observableConfig.custom(this, annotations);
-        } else {
+        } else if (!observableConfig.disableWrapping) {
           applyObservable(
             this,
             annotations as ObservableAnnotationsArray<typeof this>,

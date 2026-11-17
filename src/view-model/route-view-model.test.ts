@@ -1,4 +1,4 @@
-import { when } from 'mobx';
+import { isComputedProp, when } from 'mobx';
 import {
   createBrowserHistory,
   createMemoryHistory,
@@ -114,7 +114,7 @@ describe('withRoute', () => {
     const vm = new CustomConfigRouteViewModel({
       vmConfig: {
         observable: {
-          viewModels: { custom: customApplyObservable },
+          viewModels: { custom: customApplyObservable, disableWrapping: true },
         },
       },
     } as any);
@@ -126,6 +126,23 @@ describe('withRoute', () => {
           annotations.some(([, ...fields]) => fields.includes('pathParams')),
       ),
     ).toBe(true);
+  });
+
+  it('does not annotate route getters when wrapping is disabled', () => {
+    const route = createRoute('/unwrapped');
+    class UnwrappedRouteViewModel extends withRoute(route)(ViewModelBase) {}
+
+    const vm = new UnwrappedRouteViewModel({
+      vmConfig: {
+        observable: {
+          viewModels: { disableWrapping: true, useDecorators: false },
+        },
+      },
+    } as any);
+
+    expect(isComputedProp(vm, 'query')).toBe(false);
+    expect(isComputedProp(vm, 'pathParams')).toBe(false);
+    route.destroy();
   });
 });
 
