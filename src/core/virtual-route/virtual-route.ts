@@ -14,13 +14,7 @@ import type {
 
 const annotations: ObservableAnnotationsArray<VirtualRoute<any>> = [
   [annotation.observable, 'params'],
-  [
-    annotation.observableRef,
-    'status',
-    'trx',
-    'openChecker',
-    'isOuterOpened',
-  ],
+  [annotation.observableRef, 'status', 'trx', 'openChecker', 'isOuterOpened'],
   [annotation.computed, 'isOpened', 'isOpening', 'isClosing'],
   [action, 'setOpenChecker', 'open', 'close', 'destroy'],
 ];
