@@ -1,5 +1,11 @@
 # mobx-route
 
+## 2.2.0
+
+### Minor Changes
+
+- [#63](https://github.com/js2me/mobx-route/pull/63) [`ccea55d`](https://github.com/js2me/mobx-route/commit/ccea55d3eb8858df23706f9432b8db2d4e6c5834) Thanks [@js2me](https://github.com/js2me)! - Add compatibility with MobX 7.
+
 ## 2.1.3
 
 ### Patch Changes
