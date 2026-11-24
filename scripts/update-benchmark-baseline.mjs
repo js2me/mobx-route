@@ -53,10 +53,7 @@ const benchmarks = [...meansByName].map(([name, means]) => ({
   mean: median(means),
 }));
 
-await writeFile(
-  outputPath,
-  `${JSON.stringify({ benchmarks }, null, 2)}\n`,
-);
+await writeFile(outputPath, `${JSON.stringify({ benchmarks }, null, 2)}\n`);
 
 console.log(`Updated ${updatedNames.size} baseline benchmarks.`);
 console.log(`Added ${benchmarks.length - updatedNames.size} new benchmarks.`);

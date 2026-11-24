@@ -6,9 +6,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { routeConfig } from '../../../../src/core/index.js';
 
 describe('<Link />', () => {
-  const history = createBrowserHistory();
+  let history: ReturnType<typeof createBrowserHistory>;
 
   beforeEach(() => {
+    history = createBrowserHistory();
     vi.spyOn(history, 'push').mockImplementation(() => {});
     vi.spyOn(history, 'replace').mockImplementation(() => {});
     routeConfig.update({

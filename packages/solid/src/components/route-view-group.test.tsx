@@ -192,6 +192,27 @@ describe('<RouteViewGroup />', () => {
     expect(history.push).not.toHaveBeenCalled();
   });
 
+  it('merges the current query, redirect query, and explicit query in order', () => {
+    const history = mockHistory(createBrowserHistory());
+    history.replace('/start?current=keep&shared=history&override=history');
+    routeConfig.update({ history });
+
+    render(() => (
+      <RouteViewGroup
+        otherwise="/not-found?shared=inline&override=inline#details"
+        mergeQuery
+        query={{ override: 'explicit' }}
+      >
+        <RouteView>Fallback</RouteView>
+      </RouteViewGroup>
+    ));
+
+    expect(history.push).toHaveBeenCalledExactlyOnceWith(
+      '/not-found?current=keep&shared=inline&override=explicit#details',
+      undefined,
+    );
+  });
+
   it('redirects an empty group without rendering the layout', () => {
     const history = mockHistory(createBrowserHistory());
     routeConfig.update({ history });
@@ -353,6 +374,56 @@ describe('<RouteViewGroup />', () => {
 
     expect(screen.getByTestId('layout')).toBeDefined();
     expect(screen.getByText('fallback-content')).toBeDefined();
+  });
+
+  it('reopens a standalone otherwise route after it closes', async () => {
+    routeConfig.update({ history: createBrowserHistory() });
+    const fallback = createVirtualRoute();
+    await fallback.open();
+    const open = vi.spyOn(fallback, 'open');
+
+    render(() => (
+      <RouteViewGroup otherwise={fallback}>
+        <RouteView>Fallback</RouteView>
+      </RouteViewGroup>
+    ));
+
+    expect(open).not.toHaveBeenCalled();
+    await fallback.close();
+    await when(() => fallback.isOpened);
+    expect(open).toHaveBeenCalledOnce();
+  });
+
+  it('attempts a rejected external opening once without looping on another rejection', async () => {
+    routeConfig.update({ history: createBrowserHistory() });
+    let finishOpening!: (opened: boolean) => void;
+    const beforeOpen = vi
+      .fn<() => boolean | Promise<boolean>>()
+      .mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            finishOpening = resolve;
+          }),
+      )
+      .mockReturnValueOnce(false)
+      .mockReturnValue(true);
+    const fallback = createVirtualRoute({ beforeOpen });
+    const externalOpen = fallback.open();
+
+    render(() => (
+      <RouteViewGroup otherwise={fallback}>
+        <RouteView route={fallback}>Fallback</RouteView>
+      </RouteViewGroup>
+    ));
+
+    expect(beforeOpen).toHaveBeenCalledOnce();
+    finishOpening(false);
+    await externalOpen;
+    await vi.waitFor(() => {
+      expect(beforeOpen).toHaveBeenCalledTimes(2);
+      expect(fallback.isOpening).toBe(false);
+      expect(fallback.isOpened).toBe(false);
+    });
   });
 
   it('does not open otherwise while a route isOpening', async () => {

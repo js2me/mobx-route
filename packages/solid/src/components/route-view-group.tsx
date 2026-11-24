@@ -1,6 +1,8 @@
 import {
   type AnyRouteEntity,
   buildSearchString,
+  parsePath,
+  parseSearchString,
   type RouteNavigateParams,
   type RouteParams,
   routeConfig,
@@ -81,44 +83,76 @@ export function RouteViewGroup<TRoute extends AnyRouteEntity>(
   });
 
   const hasActiveChild = createMemo(() => !!activeRegistration());
+  const hasOpenedChild = createMemo(() => !!activeRegistration()?.()?.isOpened);
   const shouldRenderNull = () =>
     !hasActiveChild() &&
     typeof props.otherwise === 'string' &&
     !!props.otherwise;
 
+  const fallbackStatus = createMemo(() => {
+    const otherwise = props.otherwise;
+    if (!otherwise || typeof otherwise === 'string') return;
+    if (otherwise.isOpened) return 'opened';
+    return isRouteActive(otherwise) ? 'opening' : 'inactive';
+  });
+
+  let attemptedFallback = false;
+
   // Effects run after the initial render, when children have registered.
   createEffect(
-    on([hasActiveChild, () => props.otherwise], ([hasActive, otherwise]) => {
-      if (hasActive || !otherwise) return;
-
-      const navigateParams: RouteNavigateParams = {
-        mergeQuery: props.mergeQuery,
-        query: props.query,
-        replace: props.replace,
-        state: props.state,
-      };
-
-      if (typeof otherwise === 'string') {
-        const history = routeConfig.get().history;
-        const url = `${otherwise}${buildSearchString(navigateParams.query || {})}`;
-
-        if (navigateParams.replace) {
-          history.replace(url, navigateParams.state);
-        } else {
-          history.push(url, navigateParams.state);
+    on(
+      [hasActiveChild, hasOpenedChild, () => props.otherwise, fallbackStatus],
+      ([hasActive, hasOpened, otherwise, status], previous) => {
+        if (otherwise !== previous?.[2] || status === 'opened' || hasOpened) {
+          attemptedFallback = false;
         }
-      } else if (!isRouteActive(otherwise)) {
-        const params = 'params' in props ? props.params : undefined;
-        void Promise.resolve(otherwise.open(params, navigateParams)).catch(
-          (error) => {
-            console.error(
-              'Failed to open the RouteViewGroup fallback route',
-              error,
-            );
-          },
-        );
-      }
-    }),
+        if (hasActive || hasOpened || !otherwise) return;
+
+        const navigateParams: RouteNavigateParams = {
+          mergeQuery: props.mergeQuery,
+          query: props.query,
+          replace: props.replace,
+          state: props.state,
+        };
+
+        if (typeof otherwise === 'string') {
+          const config = routeConfig.get();
+          const mergeQuery = navigateParams.mergeQuery ?? config.mergeQuery;
+          let url = otherwise;
+          if (mergeQuery || navigateParams.query) {
+            const {
+              pathname = '',
+              search = '',
+              hash = '',
+            } = parsePath(otherwise);
+            const query = {
+              ...(mergeQuery ? config.queryParams.data : undefined),
+              ...parseSearchString(search),
+              ...navigateParams.query,
+            };
+            url = `${pathname}${buildSearchString(query)}${hash}`;
+          }
+
+          if (navigateParams.replace) {
+            config.history.replace(url, navigateParams.state);
+          } else {
+            config.history.push(url, navigateParams.state);
+          }
+        } else if (status === 'inactive' && !attemptedFallback) {
+          // A rejected attempt can move the route back to inactive immediately.
+          attemptedFallback = true;
+          const params = 'params' in props ? props.params : undefined;
+          void Promise.resolve(otherwise.open(params, navigateParams)).catch(
+            (error) => {
+              console.error(
+                'Failed to open the RouteViewGroup fallback route',
+                error,
+              );
+            },
+          );
+        }
+      },
+    ),
   );
 
   const Content = () => {

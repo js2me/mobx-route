@@ -3,7 +3,7 @@
   "files": {
     "includes": [
       "src/**/*.{js,jsx,ts,tsx}",
-      "scripts/**/*.{js,jsx,ts,tsx}",
+      "scripts/**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}",
       "./*.config.{ts,mjs,cjs,js,jsx,mts,cts,tsx}",
       "types/**/*.{js,jsx,ts,tsx}",
       "!src/shared/api/__generated__/**/*",

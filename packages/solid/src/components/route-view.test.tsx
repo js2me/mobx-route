@@ -1,37 +1,10 @@
 import { render, screen } from '@solidjs/testing-library';
-import { createBrowserHistory, type History } from 'mobx-location-history';
-import { enableObservableTracking } from 'mobx-solid';
+import { createBrowserHistory } from 'mobx-location-history';
+import { RouteView } from 'mobx-route/solid';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-
-// Enable MobX ↔ SolidJS reactivity bridge
-enableObservableTracking();
-
 import { sleep } from 'yummies/async';
 import { createRoute, routeConfig } from '../../../../src/core/index.js';
-import { RouteView } from './route-view.js';
-
-const mockHistory = <THistory extends History>(history: THistory) => {
-  const originPush = history.push.bind(history);
-  const originReplace = history.replace.bind(history);
-
-  const pushSpy = vi.fn(originPush);
-  const replaceSpy = vi.fn(originReplace);
-
-  const resetMock = () => {
-    pushSpy.mockReset();
-    replaceSpy.mockReset();
-  };
-
-  Object.assign(history, {
-    push: pushSpy,
-    replace: replaceSpy,
-    resetMock,
-  });
-
-  return history as THistory & {
-    resetMock: () => void;
-  };
-};
+import { mockHistory } from '../../../../src/core/test-utils/mock-history.js';
 
 describe('<RouteView />', () => {
   const history = mockHistory(createBrowserHistory());
