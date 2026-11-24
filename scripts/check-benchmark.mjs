@@ -56,7 +56,6 @@ for (const benchmark of baseline.benchmarks) {
 
   const currentMean = median(results);
   const change = currentMean / benchmark.mean - 1;
-  const absoluteChange = currentMean - benchmark.mean;
   const changePercent = (change * 100).toFixed(2);
   const isRegression = currentBenchmarkRuns.every((run) => {
     const mean = run.get(benchmark.name)?.mean;

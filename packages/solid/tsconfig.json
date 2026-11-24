@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "types": [],
+    "target": "ESNext",
+    "declaration": true,
+    "declarationMap": true,
+    "useDefineForClassFields": true,
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": false,
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js",
+    "paths": {
+      "mobx-route": ["../../src/index.ts"],
+      "mobx-route/solid": ["../../src/solid/index.ts"]
+    }
+  },
+  "include": ["src", "../../src/solid"]
+}

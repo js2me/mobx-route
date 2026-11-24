@@ -1,3 +1,13 @@
 {
-  "extends": ["js2me-biome-config/base.json", "js2me-biome-config/lib.json"]
+  "extends": ["js2me-biome-config/base.json", "js2me-biome-config/lib.json"],
+  "files": {
+    "includes": [
+      "src/**/*.{js,jsx,ts,tsx}",
+      "scripts/**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}",
+      "./*.config.{ts,mjs,cjs,js,jsx,mts,cts,tsx}",
+      "types/**/*.{js,jsx,ts,tsx}",
+      "!src/shared/api/__generated__/**/*",
+      "packages/solid/**/*.{js,ts,tsx}"
+    ]
+  }
 }
