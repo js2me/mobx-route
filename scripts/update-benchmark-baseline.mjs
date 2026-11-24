@@ -1,11 +1,13 @@
 import { readFile, writeFile } from 'node:fs/promises';
 
 const baselinePath = 'benchmark-baseline.json';
-const resultPaths = process.argv.slice(2);
+const args = process.argv.slice(2);
+const [outputPath, ...resultPaths] =
+  args[0] === '--output' ? args.slice(1) : [baselinePath, ...args];
 
-if (resultPaths.length === 0) {
+if (!outputPath || resultPaths.length === 0) {
   console.error(
-    'Usage: pnpm profile:bench:update-baseline <benchmark-results.json> [...results]',
+    'Usage: node scripts/update-benchmark-baseline.mjs [--output <baseline.json>] <benchmark-results.json> [...results]',
   );
   process.exit(1);
 }
@@ -52,7 +54,7 @@ const benchmarks = [...meansByName].map(([name, means]) => ({
 }));
 
 await writeFile(
-  baselinePath,
+  outputPath,
   `${JSON.stringify({ benchmarks }, null, 2)}\n`,
 );
 

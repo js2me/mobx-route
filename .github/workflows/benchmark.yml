@@ -17,6 +17,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -30,11 +32,28 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Install base dependencies
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          git worktree add --detach "$RUNNER_TEMP/benchmark-base" "$BASE_SHA"
+          pnpm --dir "$RUNNER_TEMP/benchmark-base" install --frozen-lockfile
+
       - name: Run benchmark
         run: |
-          pnpm run profile:bench --outputJson=benchmark-results-1.json
-          pnpm run profile:bench --outputJson=benchmark-results-2.json
-          pnpm run profile:bench --outputJson=benchmark-results-3.json
+          for run in 1 2 3; do
+            if [[ "$GITHUB_EVENT_NAME" == pull_request ]]; then
+              pnpm --dir "$RUNNER_TEMP/benchmark-base" run profile:bench --outputJson="$RUNNER_TEMP/benchmark-base-$run.json"
+            fi
+            pnpm run profile:bench --outputJson="$RUNNER_TEMP/benchmark-head-$run.json"
+          done
 
       - name: Check for regressions
-        run: node scripts/check-benchmark.mjs benchmark-baseline.json benchmark-results-1.json benchmark-results-2.json benchmark-results-3.json
+        run: |
+          baseline=benchmark-baseline.json
+          if [[ "$GITHUB_EVENT_NAME" == pull_request ]]; then
+            baseline="$RUNNER_TEMP/benchmark-baseline.json"
+            node scripts/update-benchmark-baseline.mjs --output "$baseline" "$RUNNER_TEMP"/benchmark-base-{1,2,3}.json
+          fi
+          node scripts/check-benchmark.mjs "$baseline" "$RUNNER_TEMP"/benchmark-head-{1,2,3}.json
