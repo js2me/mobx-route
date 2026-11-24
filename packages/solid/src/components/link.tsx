@@ -72,9 +72,6 @@ export function Link<TRoute extends AnyRoute>(
     linkPropKeys,
   );
 
-  const isExternalNavigation = () =>
-    props.target === '_blank' || props.target === 'blank';
-
   const href = createMemo(() => {
     const navigateParams: RouteNavigateParams = {
       mergeQuery: props.mergeQuery,
@@ -124,9 +121,12 @@ export function Link<TRoute extends AnyRoute>(
     props.onClick?.(event);
 
     const currentHref = href();
+    const anchor = event.currentTarget;
+    const target = anchor.target.toLowerCase();
     if (
       event.defaultPrevented ||
-      isExternalNavigation() ||
+      (target && target !== '_self') ||
+      anchor.hasAttribute('download') ||
       event.ctrlKey ||
       event.metaKey ||
       event.altKey ||
@@ -152,9 +152,12 @@ export function Link<TRoute extends AnyRoute>(
     },
     onClick: handleClick,
     get rel() {
+      const target = props.target?.toLowerCase();
       return (
         props.rel ??
-        (isExternalNavigation() ? 'noopener noreferrer' : undefined)
+        (target === '_blank' || target === 'blank'
+          ? 'noopener noreferrer'
+          : undefined)
       );
     },
   });

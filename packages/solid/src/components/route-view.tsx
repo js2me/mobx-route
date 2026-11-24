@@ -5,6 +5,7 @@ import type {
 } from 'mobx-route';
 import { type Component, type JSX, onCleanup, Show } from 'solid-js';
 import { Dynamic } from 'solid-js/web';
+import { isRouteActive } from './is-route-active.js';
 import { useRouteViewGroup } from './route-view-group-context.js';
 
 export type RouteViewComponent<TRoute extends AnyAbstractRouteEntity> =
@@ -56,16 +57,6 @@ export function RouteView<TRoute extends AnyAbstractRouteEntity>(
       ? (props as RouteViewConfigWithRoute<TRoute>).route
       : undefined;
 
-  const isOpening = () => {
-    const r = route();
-    return r && 'isOpening' in r ? Boolean(r.isOpening) : false;
-  };
-
-  const isOpenedOrOpening = () => {
-    const r = route();
-    return r ? r.isOpened || isOpening() : false;
-  };
-
   const params = () => {
     const r = route();
     return r && 'params' in r ? r.params : {};
@@ -89,8 +80,11 @@ export function RouteView<TRoute extends AnyAbstractRouteEntity>(
     onCleanup(group.registerRoute(route));
   }
 
-  const shouldShow = () =>
-    group ? group.activeRoute() === route() : isOpenedOrOpening();
+  const shouldShow = () => {
+    if (group) return group.activeRegistration() === route;
+    const entity = route();
+    return entity && isRouteActive(entity);
+  };
 
   const viewComponent = () => (props as RouteViewConfigWithRoute<TRoute>).view;
   const children = () => props.children;

@@ -4,7 +4,7 @@ import { createBrowserHistory } from 'mobx-location-history';
 import { RouteView, RouteViewGroup } from 'mobx-route/solid';
 import { createSignal, Show } from 'solid-js';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { Route, routeConfig } from '../../../../src/core/index.js';
+import { groupRoutes, Route, routeConfig } from '../../../../src/core/index.js';
 import { createVirtualRoute } from '../../../../src/core/virtual-route/virtual-route.js';
 
 const mockHistory = (history: ReturnType<typeof createBrowserHistory>) => {
@@ -246,6 +246,56 @@ describe('<RouteViewGroup />', () => {
     setMounted(false);
     expect(screen.getByText('Second')).toBeDefined();
     expect(screen.queryByText('First')).toBeNull();
+  });
+
+  it('selects one view when several views share the same route', async () => {
+    routeConfig.update({ history: createBrowserHistory() });
+    const route = new Route('/shared-route');
+    await route.open();
+
+    const [useLastOpened, setUseLastOpened] = createSignal(false);
+    render(() => (
+      <RouteViewGroup useLastOpened={useLastOpened()}>
+        <RouteView route={route}>First instance</RouteView>
+        <RouteView route={route}>Second instance</RouteView>
+      </RouteViewGroup>
+    ));
+
+    expect(screen.getByText('First instance')).toBeDefined();
+    expect(screen.queryByText('Second instance')).toBeNull();
+    setUseLastOpened(true);
+    expect(screen.getByText('Second instance')).toBeDefined();
+    expect(screen.queryByText('First instance')).toBeNull();
+  });
+
+  it('keeps a group view active while a nested route is opening', async () => {
+    const history = mockHistory(createBrowserHistory());
+    routeConfig.update({ history });
+
+    let resolveOpen!: () => void;
+    const page = new Route('/nested-page', {
+      index: true,
+      beforeOpen: () =>
+        new Promise<void>((resolve) => {
+          resolveOpen = resolve;
+        }),
+    });
+    const nestedGroup = groupRoutes({ nested: groupRoutes([page]) });
+    history.push('/nested-page');
+    await when(() => page.isOpening);
+
+    render(() => (
+      <RouteViewGroup otherwise="/not-found">
+        <RouteView route={nestedGroup}>Nested page</RouteView>
+      </RouteViewGroup>
+    ));
+
+    expect(screen.getByText('Nested page')).toBeDefined();
+    expect(history.push).toHaveBeenCalledTimes(1);
+    resolveOpen();
+    await when(() => page.isOpened);
+    expect(screen.getByText('Nested page')).toBeDefined();
+    expect(history.push).toHaveBeenCalledTimes(1);
   });
 
   it('Should open route passed to otherwise with params and navigation options', async () => {

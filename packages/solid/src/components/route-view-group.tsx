@@ -1,6 +1,4 @@
 import {
-  type AnyAbstractRouteEntity,
-  type AnyRoute,
   type AnyRouteEntity,
   buildSearchString,
   type RouteNavigateParams,
@@ -8,7 +6,6 @@ import {
   routeConfig,
 } from 'mobx-route';
 import {
-  type Accessor,
   type Component,
   createEffect,
   createMemo,
@@ -20,7 +17,11 @@ import {
 } from 'solid-js';
 import { Dynamic } from 'solid-js/web';
 import type { IsPartial, Maybe } from 'yummies/types';
-import { RouteViewGroupContext } from './route-view-group-context.js';
+import { isRouteActive } from './is-route-active.js';
+import {
+  type RouteRegistration,
+  RouteViewGroupContext,
+} from './route-view-group-context.js';
 
 type LayoutComponent = Component<{ children?: JSX.Element }>;
 
@@ -52,42 +53,34 @@ export type RouteViewGroupProps<TRoute extends AnyRouteEntity> =
   | PropsWithDefaultRoute<TRoute>
   | PropsWithDefaultUrl;
 
-function isOpeningRoute(route: AnyAbstractRouteEntity): route is AnyRoute {
-  return 'isOpening' in route;
-}
-
 export function RouteViewGroup<TRoute extends AnyRouteEntity>(
   props: RouteViewGroupProps<TRoute>,
 ): JSX.Element {
-  type RouteAccessor = Accessor<AnyAbstractRouteEntity | undefined>;
-  const [registeredRoutes, setRegisteredRoutes] = createSignal<RouteAccessor[]>(
-    [],
-  );
+  const [registeredRoutes, setRegisteredRoutes] = createSignal<
+    RouteRegistration[]
+  >([]);
 
-  const registerRoute = (route: RouteAccessor) => {
+  const registerRoute = (route: RouteRegistration) => {
     setRegisteredRoutes((routes) => [...routes, route]);
     return () =>
       setRegisteredRoutes((routes) => routes.filter((read) => read !== route));
   };
 
   const useLastOpened = () => !!props.useLastOpened;
-  const activeRouteEntity = createMemo(() => {
-    let activeRoute: AnyAbstractRouteEntity | null = null;
+  const activeRegistration = createMemo(() => {
+    let activeRoute: RouteRegistration | undefined;
     const useLast = useLastOpened();
     for (const read of registeredRoutes()) {
       const route = read();
-      if (
-        route &&
-        (route.isOpened || (isOpeningRoute(route) && route.isOpening))
-      ) {
-        activeRoute = route;
+      if (route && isRouteActive(route)) {
+        activeRoute = read;
         if (!useLast) break;
       }
     }
     return activeRoute;
   });
 
-  const hasActiveChild = createMemo(() => activeRouteEntity() !== null);
+  const hasActiveChild = createMemo(() => !!activeRegistration());
   const shouldRenderNull = () =>
     !hasActiveChild() &&
     typeof props.otherwise === 'string' &&
@@ -114,7 +107,7 @@ export function RouteViewGroup<TRoute extends AnyRouteEntity>(
         } else {
           history.push(url, navigateParams.state);
         }
-      } else if (!otherwise.isOpened) {
+      } else if (!isRouteActive(otherwise)) {
         const params = 'params' in props ? props.params : undefined;
         void Promise.resolve(otherwise.open(params, navigateParams)).catch(
           (error) => {
@@ -150,7 +143,8 @@ export function RouteViewGroup<TRoute extends AnyRouteEntity>(
     <RouteViewGroupContext.Provider
       value={{
         registerRoute,
-        activeRoute: activeRouteEntity,
+        activeRegistration,
+        activeRoute: () => activeRegistration()?.() ?? null,
         hasActiveChild,
         useLastOpened,
         shouldRenderNull,

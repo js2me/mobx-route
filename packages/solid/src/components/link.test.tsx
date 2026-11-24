@@ -78,10 +78,14 @@ describe('<Link />', () => {
     expect(history.push).not.toHaveBeenCalled();
   });
 
-  it('calls onClick without intercepting a link to a new tab', () => {
+  it.each([
+    '_blank',
+    '_parent',
+    'preview',
+  ])('calls onClick without intercepting target %s', (target) => {
     const onClick = vi.fn();
     render(() => (
-      <Link href="/app/profile" target="_blank" onClick={onClick}>
+      <Link href="/app/profile" target={target} onClick={onClick}>
         New tab
       </Link>
     ));
@@ -89,6 +93,28 @@ describe('<Link />', () => {
     expect(fireEvent.click(screen.getByText('New tab'))).toBe(true);
 
     expect(onClick).toHaveBeenCalledOnce();
+    expect(history.push).not.toHaveBeenCalled();
+  });
+
+  it('intercepts links targeting the current context', () => {
+    render(() => (
+      <Link href="/app/profile" target="_SELF">
+        Current tab
+      </Link>
+    ));
+
+    expect(fireEvent.click(screen.getByText('Current tab'))).toBe(false);
+    expect(history.push).toHaveBeenCalledWith('/app/profile', undefined);
+  });
+
+  it('preserves downloads with an empty download attribute', () => {
+    render(() => (
+      <Link href="/report.csv" download="">
+        Download
+      </Link>
+    ));
+
+    expect(fireEvent.click(screen.getByText('Download'))).toBe(true);
     expect(history.push).not.toHaveBeenCalled();
   });
 

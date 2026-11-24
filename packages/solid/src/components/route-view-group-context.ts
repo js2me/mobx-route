@@ -1,10 +1,11 @@
 import type { AnyAbstractRouteEntity } from 'mobx-route';
 import { type Accessor, createContext, useContext } from 'solid-js';
 
+export type RouteRegistration = Accessor<AnyAbstractRouteEntity | undefined>;
+
 interface RouteViewGroupRegistry {
-  registerRoute: (
-    route: Accessor<AnyAbstractRouteEntity | undefined>,
-  ) => () => void;
+  registerRoute: (route: RouteRegistration) => () => void;
+  activeRegistration: Accessor<RouteRegistration | undefined>;
   /** Returns the currently active route entity (or null) */
   activeRoute: Accessor<AnyAbstractRouteEntity | null>;
   /** Whether there is an active child route */
