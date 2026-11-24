@@ -1,5 +1,23 @@
 # mobx-route
 
+## 2.2.0
+
+### Minor Changes
+
+- [#63](https://github.com/js2me/mobx-route/pull/63) [`ccea55d`](https://github.com/js2me/mobx-route/commit/ccea55d3eb8858df23706f9432b8db2d4e6c5834) Thanks [@js2me](https://github.com/js2me)! - Add compatibility with MobX 7.
+
+## 2.1.3
+
+### Patch Changes
+
+- [`bc7f65b`](https://github.com/js2me/mobx-route/commit/bc7f65b6fc3bb994723473e2a4f9a06f5575d202) Thanks [@js2me](https://github.com/js2me)! - Add support for `mobx-view-model` v11.
+
+## 2.1.2
+
+### Patch Changes
+
+- [`405bd3f`](https://github.com/js2me/mobx-route/commit/405bd3ff55aab2a093e8e722fc41bf5bfa400af1) Thanks [@js2me](https://github.com/js2me)! - fix flaky <RouteViewGroup /> otherwise property work
+
 ## 2.1.1
 
 ### Patch Changes

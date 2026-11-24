@@ -1,11 +1,11 @@
-import { computed } from 'mobx';
 import type { IQueryParams } from 'mobx-location-history';
 import {
-  applyObservable,
   type ViewModel,
   ViewModelBase,
+  viewModelsConfig,
 } from 'mobx-view-model';
-import type { ObservableAnnotationsArray } from 'yummies/mobx';
+import * as annotation from 'yummies/mobx';
+import { applyObservable, type ObservableAnnotationsArray } from 'yummies/mobx';
 import type { Class } from 'yummies/types';
 import {
   type AnyAbstractRouteEntity,
@@ -14,8 +14,8 @@ import {
 } from '../core/index.js';
 
 const annotations: ObservableAnnotationsArray<any> = [
-  [computed.struct, 'pathParams'],
-  [computed, 'query'],
+  [annotation.computedStruct, 'pathParams'],
+  [annotation.computed, 'query'],
 ];
 
 /**
@@ -69,7 +69,22 @@ export function withRoute<TRoute extends AnyAbstractRouteEntity>(
       constructor(...args: any[]) {
         super(...args);
 
-        applyObservable(this, annotations, this.vmConfig.observable.viewModels);
+        // v11 keeps vmConfig internal; the exported config supplies its defaults.
+        const observableConfig = (this as any).vmConfig?.observable
+          ?.viewModels ?? {
+          ...viewModelsConfig.observable.viewModels,
+          ...args[0]?.vmConfig?.observable?.viewModels,
+        };
+
+        if (observableConfig.custom) {
+          observableConfig.custom(this, annotations);
+        } else if (!observableConfig.disableWrapping) {
+          applyObservable(
+            this,
+            annotations as ObservableAnnotationsArray<typeof this>,
+            observableConfig.useDecorators,
+          );
+        }
       }
 
       /**

@@ -3,9 +3,8 @@ import type {
   AnyRoute,
   AnyVirtualRoute,
 } from 'mobx-route';
-import type { Component, JSX } from 'solid-js';
+import { type Component, type JSX, onCleanup, Show } from 'solid-js';
 import { Dynamic } from 'solid-js/web';
-import { Show } from 'solid-js';
 import { useRouteViewGroup } from './route-view-group-context.js';
 
 export type RouteViewComponent<TRoute extends AnyAbstractRouteEntity> =
@@ -72,31 +71,13 @@ export function RouteView<TRoute extends AnyAbstractRouteEntity>(
     return r && 'params' in r ? r.params : {};
   };
 
-  // When inside a RouteViewGroup, check if this route is the active one
-  const isActiveInGroup = () => {
-    if (!group) return isOpenedOrOpening();
-    const r = route();
-    if (!r || !isOpenedOrOpening()) return false;
-    const active = group.activeRoute();
-    if (!active) return false;
-    return active === r;
-  };
-
-  // Register with parent RouteViewGroup if present
-  if (group) {
-    const r = route();
-    if (r) {
-      group.registerRoute(r);
-    }
-  }
-
-  // No route prop — these are non-route children inside RouteViewGroup
-  // (e.g. <RouteView><div>not_found</div></RouteView>). Only render when
-  // no route is active AND the group is not in "shouldRenderNull" state.
   if (!isWithRoute()) {
-    // Use <Show> for reactive visibility — static `if` won't update
     return (
-      <Show when={group ? !group.hasActiveChild() && !group.shouldRenderNull() : true}>
+      <Show
+        when={
+          group ? !group.hasActiveChild() && !group.shouldRenderNull() : true
+        }
+      >
         {typeof props.children === 'function'
           ? (props.children as () => JSX.Element)()
           : (props.children as JSX.Element)}
@@ -104,22 +85,23 @@ export function RouteView<TRoute extends AnyAbstractRouteEntity>(
     );
   }
 
-  // Determine if this route view should be visible.
-  // IMPORTANT: In SolidJS, component body runs once. Static `if` conditions
-  // are NOT reactive. We must use <Show> for reactive conditional rendering.
-  const shouldShow = () => {
-    if (group) return isActiveInGroup();
-    return isOpenedOrOpening();
-  };
+  if (group) {
+    onCleanup(group.registerRoute(route));
+  }
 
-  const fallback = () =>
-    ((props as RouteViewConfigWithRoute<TRoute>).fallback ?? null) as JSX.Element;
+  const shouldShow = () =>
+    group ? group.activeRoute() === route() : isOpenedOrOpening();
 
   const viewComponent = () => (props as RouteViewConfigWithRoute<TRoute>).view;
   const children = () => props.children;
 
   return (
-    <Show when={shouldShow()} fallback={fallback()}>
+    <Show
+      when={shouldShow()}
+      fallback={
+        group ? undefined : (props as RouteViewConfigWithRoute<TRoute>).fallback
+      }
+    >
       {viewComponent() ? (
         <Dynamic component={viewComponent()!} params={params()}>
           {typeof children() === 'function'

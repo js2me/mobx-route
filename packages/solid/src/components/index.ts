@@ -1,4 +1,4 @@
-export { Link } from './link.js';
+export { Link, type LinkChildProps, type LinkProps } from './link.js';
 export { RouteView } from './route-view.js';
 export {
   RouteViewGroup,

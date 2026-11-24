@@ -1,40 +1,21 @@
 import { render, screen } from '@solidjs/testing-library';
 import { when } from 'mobx';
-import { enableObservableTracking } from 'mobx-solid';
 import { createBrowserHistory } from 'mobx-location-history';
-import { describe, expect, it, vi } from 'vitest';
-
-// Enable MobX ↔ SolidJS reactivity bridge
-enableObservableTracking();
+import { RouteView, RouteViewGroup } from 'mobx-route/solid';
+import { createSignal, Show } from 'solid-js';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Route, routeConfig } from '../../../../src/core/index.js';
 import { createVirtualRoute } from '../../../../src/core/virtual-route/virtual-route.js';
-import { RouteView } from './route-view.js';
-import { RouteViewGroup } from './route-view-group.js';
 
 const mockHistory = (history: ReturnType<typeof createBrowserHistory>) => {
-  const originPush = history.push.bind(history);
-  const originReplace = history.replace.bind(history);
-
-  const pushSpy = vi.fn(originPush);
-  const replaceSpy = vi.fn(originReplace);
-
-  const resetMock = () => {
-    pushSpy.mockReset();
-    replaceSpy.mockReset();
-  };
-
-  Object.assign(history, {
-    push: pushSpy,
-    replace: replaceSpy,
-    resetMock,
-  });
-
-  return history as typeof history & {
-    resetMock: () => void;
-  };
+  vi.spyOn(history, 'push');
+  vi.spyOn(history, 'replace');
+  return history;
 };
 
 describe('<RouteViewGroup />', () => {
+  afterEach(() => vi.restoreAllMocks());
+
   it('Should render nothing when no one route is opened', async () => {
     const history = mockHistory(createBrowserHistory());
 
@@ -125,7 +106,9 @@ describe('<RouteViewGroup />', () => {
         <RouteView route={route1} view={() => <div>route1</div>} />
         <RouteView route={route2} view={() => <div>route2</div>} />
         <RouteView route={route3} view={() => <div>route3</div>} />
-        <RouteView><div>not_found1</div></RouteView>
+        <RouteView>
+          <div>not_found1</div>
+        </RouteView>
       </RouteViewGroup>
     ));
 
@@ -153,7 +136,9 @@ describe('<RouteViewGroup />', () => {
         <RouteView route={route1} view={() => <div>route1</div>} />
         <RouteView route={route2} view={() => <div>route2</div>} />
         <RouteView route={route3} view={() => <div>route3</div>} />
-        <RouteView><div>not_found1</div></RouteView>
+        <RouteView>
+          <div>not_found1</div>
+        </RouteView>
       </RouteViewGroup>
     ));
 
@@ -205,6 +190,62 @@ describe('<RouteViewGroup />', () => {
 
     expect(history.replace).toHaveBeenCalledWith('/not-found', undefined);
     expect(history.push).not.toHaveBeenCalled();
+  });
+
+  it('redirects an empty group without rendering the layout', () => {
+    const history = mockHistory(createBrowserHistory());
+    routeConfig.update({ history });
+
+    const layout = vi.fn(() => <section>Layout</section>);
+    const { container } = render(() => (
+      <RouteViewGroup otherwise="/not-found" layout={layout}>
+        <RouteView>Fallback</RouteView>
+      </RouteViewGroup>
+    ));
+
+    expect(history.push).toHaveBeenCalledExactlyOnceWith(
+      '/not-found',
+      undefined,
+    );
+    expect(layout).not.toHaveBeenCalled();
+    expect(container.firstChild).toBeNull();
+  });
+
+  it('picks another view when the selected route changes or unmounts', async () => {
+    const history = mockHistory(createBrowserHistory());
+    routeConfig.update({ history });
+    const first = new Route('/group-active');
+    const second = new Route('/group-active');
+    const inactive = new Route('/group-inactive');
+    await first.open();
+
+    const [route, setRoute] = createSignal<typeof first | typeof inactive>(
+      first,
+    );
+    const [mounted, setMounted] = createSignal(true);
+    render(() => (
+      <RouteViewGroup>
+        <Show when={mounted()}>
+          <RouteView route={route()} fallback="First fallback">
+            First
+          </RouteView>
+        </Show>
+        <RouteView route={second} fallback="Second fallback">
+          Second
+        </RouteView>
+      </RouteViewGroup>
+    ));
+
+    expect(screen.getByText('First')).toBeDefined();
+    expect(screen.queryByText('Second fallback')).toBeNull();
+    setRoute(inactive);
+    expect(screen.getByText('Second')).toBeDefined();
+    expect(screen.queryByText('First fallback')).toBeNull();
+    setRoute(first);
+    expect(screen.getByText('First')).toBeDefined();
+    setMounted(false);
+    expect(screen.getByText('Second')).toBeDefined();
+    expect(screen.queryByText('First')).toBeNull();
   });
 
   it('Should open route passed to otherwise with params and navigation options', async () => {

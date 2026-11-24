@@ -1,4 +1,4 @@
-import { when } from 'mobx';
+import { isComputedProp, when } from 'mobx';
 import {
   createBrowserHistory,
   createMemoryHistory,
@@ -6,6 +6,7 @@ import {
 } from 'mobx-location-history';
 import { ViewModelBase } from 'mobx-view-model';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { applyObservable, type ObservableAnnotationsArray } from 'yummies/mobx';
 
 import { createRoute, Route, routeConfig } from '../core/index.js';
 import { RouteViewModel, withRoute } from './route-view-model.js';
@@ -98,6 +99,50 @@ describe('withRoute', () => {
     expect(vm.pathParams).toEqual({ id: '123' });
     expect(vm2.payload).toEqual({ slug: 'next' });
     expect(vm2.pathParams).toEqual({ slug: 'next' });
+  });
+
+  it('passes custom observable configuration to the route mixin', () => {
+    const route = createRoute('/custom-config');
+    const customApplyObservable = vi.fn(
+      (context: any, annotations: ObservableAnnotationsArray) => {
+        applyObservable(context, annotations);
+      },
+    );
+
+    class CustomConfigRouteViewModel extends withRoute(route)(ViewModelBase) {}
+
+    const vm = new CustomConfigRouteViewModel({
+      vmConfig: {
+        observable: {
+          viewModels: { custom: customApplyObservable, disableWrapping: true },
+        },
+      },
+    } as any);
+
+    expect(
+      customApplyObservable.mock.calls.some(
+        ([context, annotations]) =>
+          context === vm &&
+          annotations.some(([, ...fields]) => fields.includes('pathParams')),
+      ),
+    ).toBe(true);
+  });
+
+  it('does not annotate route getters when wrapping is disabled', () => {
+    const route = createRoute('/unwrapped');
+    class UnwrappedRouteViewModel extends withRoute(route)(ViewModelBase) {}
+
+    const vm = new UnwrappedRouteViewModel({
+      vmConfig: {
+        observable: {
+          viewModels: { disableWrapping: true, useDecorators: false },
+        },
+      },
+    } as any);
+
+    expect(isComputedProp(vm, 'query')).toBe(false);
+    expect(isComputedProp(vm, 'pathParams')).toBe(false);
+    route.destroy();
   });
 });
 

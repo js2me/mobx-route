@@ -19,8 +19,9 @@
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
     "paths": {
-      "mobx-route": ["../../src/index.ts"]
+      "mobx-route": ["../../src/index.ts"],
+      "mobx-route/solid": ["../../src/solid/index.ts"]
     }
   },
-  "include": ["src"]
+  "include": ["src", "../../src/solid"]
 }

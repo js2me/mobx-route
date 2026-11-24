@@ -1,10 +1,11 @@
 import { render, screen } from '@solidjs/testing-library';
-import { enableObservableTracking } from 'mobx-solid';
 import { createBrowserHistory, type History } from 'mobx-location-history';
+import { enableObservableTracking } from 'mobx-solid';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Enable MobX ↔ SolidJS reactivity bridge
 enableObservableTracking();
+
 import { sleep } from 'yummies/async';
 import { createRoute, routeConfig } from '../../../../src/core/index.js';
 import { RouteView } from './route-view.js';

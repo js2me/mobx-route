@@ -1,4 +1,4 @@
-import { computed, observable } from 'mobx';
+import * as annotation from 'yummies/mobx';
 import { applyObservable, type ObservableAnnotationsArray } from 'yummies/mobx';
 import type {
   AbstractRouteGroup,
@@ -9,8 +9,8 @@ import type {
 declare const process: { env: { NODE_ENV?: string } };
 
 const annotations: ObservableAnnotationsArray<RouteGroup<any>> = [
-  [computed, 'isOpened', 'indexRoute', 'canNavigate'],
-  [observable.shallow, 'routes'],
+  [annotation.computed, 'isOpened', 'indexRoute', 'canNavigate'],
+  [annotation.observableShallow, 'routes'],
 ];
 
 /**

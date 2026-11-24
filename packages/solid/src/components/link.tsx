@@ -6,18 +6,28 @@ import {
   type RouteNavigateParams,
   routeConfig,
 } from 'mobx-route';
-import { type Component, createMemo, type JSX, Show } from 'solid-js';
+import { createMemo, type JSX, mergeProps, Show, splitProps } from 'solid-js';
 import { Dynamic } from 'solid-js/web';
 import type { IsPartial, Maybe } from 'yummies/types';
 
-interface LinkAnchorProps {
-  asChild?: boolean;
+interface LinkAnchorProps
+  extends Omit<
+    JSX.AnchorHTMLAttributes<HTMLAnchorElement>,
+    'children' | 'href' | 'onClick' | 'ref'
+  > {
   ref?: (el: HTMLAnchorElement) => void;
   onClick?: JSX.EventHandler<HTMLAnchorElement, MouseEvent>;
-  target?: string;
-  rel?: string;
-  [key: string]: any;
 }
+
+export type LinkChildProps = LinkAnchorProps & { href: string };
+
+type LinkCompositionProps =
+  | { asChild?: false; children?: JSX.Element }
+  | {
+      asChild: true;
+      /** Render an anchor and spread the supplied props onto it. */
+      children: (props: LinkChildProps) => JSX.Element;
+    };
 
 type LinkPathRouteProps<TRoute extends AnyRoute> = {
   to: TRoute;
@@ -36,12 +46,32 @@ type LinkSimpleRouteProps =
     };
 
 export type LinkProps<TRoute extends AnyRoute> = LinkAnchorProps &
+  LinkCompositionProps &
   RouteNavigateParams &
   (LinkPathRouteProps<TRoute> | LinkSimpleRouteProps);
+
+const linkPropKeys = [
+  'to',
+  'href',
+  'params',
+  'query',
+  'replace',
+  'state',
+  'mergeQuery',
+  'asChild',
+  'children',
+  'onClick',
+] as const;
 
 export function Link<TRoute extends AnyRoute>(
   props: LinkProps<TRoute>,
 ): JSX.Element {
+  const [, forwardedProps] = splitProps(
+    props as LinkAnchorProps &
+      Partial<Record<(typeof linkPropKeys)[number], unknown>>,
+    linkPropKeys,
+  );
+
   const isExternalNavigation = () =>
     props.target === '_blank' || props.target === 'blank';
 
@@ -88,85 +118,58 @@ export function Link<TRoute extends AnyRoute>(
     return cfg.formatLinkHref?.(hrefValue) ?? hrefValue;
   });
 
-  const handleClick = (event: MouseEvent) => {
+  const handleClick: JSX.EventHandler<HTMLAnchorElement, MouseEvent> = (
+    event,
+  ) => {
+    props.onClick?.(event);
+
+    const currentHref = href();
     if (
+      event.defaultPrevented ||
       isExternalNavigation() ||
       event.ctrlKey ||
       event.metaKey ||
       event.altKey ||
       event.shiftKey ||
-      event.button !== 0
-    )
-      return;
-
-    props.onClick?.(event as any);
-
-    const currentHref = href();
-
-    if (
-      !event.defaultPrevented &&
-      !currentHref.startsWith('https://') &&
-      !currentHref.startsWith('http://')
+      event.button !== 0 ||
+      /^(?:\/\/|[a-z][a-z\d+.-]*:)/i.test(currentHref.trimStart())
     ) {
-      event.preventDefault();
+      return;
+    }
 
-      const navigateParams: RouteNavigateParams = {
-        mergeQuery: props.mergeQuery,
-        query: props.query,
-        replace: props.replace,
-        state: props.state,
-      };
-
-      if (navigateParams.replace) {
-        routeConfig.get().history.replace(currentHref, navigateParams.state);
-      } else {
-        routeConfig.get().history.push(currentHref, navigateParams.state);
-      }
+    event.preventDefault();
+    const { history } = routeConfig.get();
+    if (props.replace) {
+      history.replace(currentHref, props.state);
+    } else {
+      history.push(currentHref, props.state);
     }
   };
 
-  const anchorProps = () => {
-    const {
-      to,
-      href: _,
-      params,
-      query,
-      replace,
-      state,
-      mergeQuery,
-      asChild,
-      children,
-      ref,
-      ...rest
-    } = props as any;
-    return {
-      ...rest,
-      get href() {
-        return href();
-      },
-      onClick: handleClick,
-      get rel() {
-        return (
-          rest.rel ??
-          (isExternalNavigation() ? 'noopener noreferrer' : undefined)
-        );
-      },
-    };
-  };
+  const anchorProps = mergeProps(forwardedProps, {
+    get href() {
+      return href();
+    },
+    onClick: handleClick,
+    get rel() {
+      return (
+        props.rel ??
+        (isExternalNavigation() ? 'noopener noreferrer' : undefined)
+      );
+    },
+  });
 
   return (
     <Show
-      when={props.asChild}
+      when={props.asChild && props.children}
+      keyed
       fallback={
-        <a {...anchorProps()} ref={props.ref as any}>
-          {props.children}
-        </a>
+        <Dynamic component="a" {...anchorProps}>
+          {!props.asChild && props.children}
+        </Dynamic>
       }
     >
-      <Dynamic
-        component={props.children as Component<any>}
-        {...anchorProps()}
-      />
+      {(renderChild) => renderChild(anchorProps)}
     </Show>
   );
 }

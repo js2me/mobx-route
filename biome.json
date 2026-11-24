@@ -2,8 +2,12 @@
   "extends": ["js2me-biome-config/base.json", "js2me-biome-config/lib.json"],
   "files": {
     "includes": [
-      "packages/solid/**/*.{js,jsx,ts,tsx}",
-      "!packages/solid/**/*.jsx"
+      "src/**/*.{js,jsx,ts,tsx}",
+      "scripts/**/*.{js,jsx,ts,tsx}",
+      "./*.config.{ts,mjs,cjs,js,jsx,mts,cts,tsx}",
+      "types/**/*.{js,jsx,ts,tsx}",
+      "!src/shared/api/__generated__/**/*",
+      "packages/solid/**/*.{js,ts,tsx}"
     ]
   }
 }
